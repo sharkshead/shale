@@ -1,4 +1,4 @@
 # shale
-An very elegant reverse-polish notation language.
+An elegant reverse-polish notation language.
 
 Compiles on Linux and Mac OS X. See shale -h and shale -s for some details.
