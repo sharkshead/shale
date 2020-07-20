@@ -1,2 +1,2 @@
 # shale
-An elegant reverse-polish notation language
+An very elegant reverse-polish notation language
