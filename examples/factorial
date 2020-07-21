@@ -10,7 +10,10 @@
 // or
 //    shale factorial n=10
 
-n initialised not { "Usage: ./factorial n={n}\n  eg: ./factorial n=10\n" printf 0 exit } ifthen
+n initialised not {
+  "Usage: ./factorial n={n}\n  eg: ./factorial n=10\n" printf
+  0 exit
+} ifthen
 
 factorial var
 factorial {
