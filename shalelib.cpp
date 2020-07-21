@@ -1775,7 +1775,6 @@ bool PrintStack::action() {
     try {
       na = o->getName(getLexInfo());
       printf("%s\n", na->getValue());
-      na->release(getLexInfo());
       found = true;
     } catch(Exception *e) { }
 
