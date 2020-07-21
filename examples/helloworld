@@ -1,0 +1,3 @@
+#!/usr/local/bin/shale
+
+"Hello, World!" println

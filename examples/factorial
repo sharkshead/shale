@@ -1,0 +1,33 @@
+#!/usr/local/bin/shale
+
+// Simple recursive factorial script.
+//
+// A loop version is simpler and a little faster, this is just to demonstrate
+// that recursion is possible.
+//
+// To call this you must pass in the value as a replacement, eg
+//    ./factorial n=10
+// or
+//    shale factorial n=10
+
+n initialised not { "Usage: ./factorial n={n}\n  eg: ./factorial n=10\n" printf 0 exit } ifthen
+
+factorial var
+factorial {
+  i var i swap =
+  i 0 == {
+    1
+  } {
+    i 2 > {
+      i i 1 - factorial() *
+    } {
+      i.value
+    } if
+  } if
+} =
+
+n 0 < {
+  "Can't do negative numbers\n" printf
+} {
+  n int factorial() n int "%d! = %d\n" printf
+} if
