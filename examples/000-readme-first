@@ -1,0 +1,64 @@
+#!/usr/local/bin/shale
+
+// shale is a reverse-polish notation language, meaning you don't write
+// things like:
+//
+//  (1 + 2) * 3
+//
+// Instead you must think about the order in which these operations
+// are to be done. In the example above you must add 1 and 2, then multiply
+// the result by 3. And you can't just "add 1 and 2", you need to
+// get 1, then get 2, add them together, then get 3 and do the multiplication.
+//
+// Easiest way to think about this is to picture yourself doing this
+// with pencil and paper. The first thing you have to do is write down the
+// two numbers that you are going to add together, then you add them,
+// then you write down the multiplier, then do the multiplication.
+//
+// if (1 + 2) * 3 seems a little trite, imagine doing this on paper:
+//
+//  (3.1415926 + 2.7182818) * 1.6180339
+//
+// You'd have to write the numbers down before doing the addition, and then
+// write the multiplier down before doing the multiplication.
+//
+// And so it is with shale. Before you invoke any operator you have to
+// "write down" the operands it requires before you call the operator.
+//
+// Let's start with a simple (1 + 2) * 3 example, and print the result:
+//
+
+1 2 + 3 * println
+
+// If you run this script then 9 will be the first line output.
+//
+// How does this work? shale gives you a stack that you can put things on,
+// like the "1" and "2", and a bunch of operators, like "+" and "println",
+// that take the contents of the stack, perform their function, and possibly
+// leave their results on the stack.
+//
+// In the case of the "+" operator, it take the top two elements off the stack,
+// adds them together, and puts the result onto the stack.
+// The "println" operator takes the top element off the stack and prints it
+// (with a newline).
+//
+// So, in a nutshell, you know all the basics of shale - there is a stack you
+// put things on, and operators that take those stacked items and do stuff
+// with them, possibly leaving a result on the stack.
+//
+// I am, of course, glossing over a lot of detail here. shale can do:
+//  variables
+//  if statements
+//  while loops
+//  functions
+//
+// Yeah, I know you're saying all, litterally all, programming languages
+// give you these features.
+//
+// Do these other programming languages allow you to create new code
+// on-the-fly within the script? Probably not. But I digress.
+//
+// Are these other languages as simple and elegant as shale?
+// shale doesn't have confusing or ambiguous grammer. Just put things
+// on the stack and then call the operator to do the work.
+// So simple. So elegant.
