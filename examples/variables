@@ -1,0 +1,185 @@
+#!/usr/local/bin/shale
+
+// There are two types of variables, simple and namespace.
+//
+// This file only deals with simple variables. See the namespace
+// example file for details.
+//
+// Simple variables. 
+//
+// A simple variable name starts with an alphabetic character followed by
+// zero of more alphanumeric or undercore characters. For example
+//
+//  i
+//  loopCounter
+//  loop_counter
+//
+// To create a variable, push its name on the stack and call the var operator
+
+i var
+
+// This creates i but does not give it a value. Here's how
+
+i 123 =
+
+// using the assignment operator =.
+//
+// Most operators, when given i as an operand, will use the value
+// stored in i. So for example, to print the value of i
+
+i println
+
+// or to print the value of i + 2
+
+i 2 + println
+
+// and so on for most of the operators. If you give an operator
+// a name, it will use the named variable's value instead.
+// As you can see from the above code, the var and = (and the &=) operators
+// do not use the variable's value, they use the variable itself.
+//
+// Variables can be created within a code fragment. So, for example, if a
+// function needs local variables, it can create and use them,
+// and they will be removed when that code fragment terminates.
+// For example, here's a while-loop version of the factorial function.
+
+factorial var
+factorial {
+  i var
+  res var
+  i swap =
+  res 1 =
+  { i 1 > } { res res i * = i i 1 - = } while
+  res.value
+} =
+10 factorial() "10! = %d\n" printf
+
+//
+// Variable scope.
+//
+// Variables can be defined within a code fragment, and they are accessible for
+// the duration of that code fragment's execution, then they are removed.
+// Notice that I said "for the duration of that code fragment's execution".
+// I did not say they are only available within that code fragment. Big different.
+//
+// Just to recap, pushing a variable on the stack does not push its value on the stack,
+// it pushes its name on the stack. With this in mind, lets look at a few scenarios
+// where "a name on the stack" can cause a problem, and how you go about avoiding
+// these problems.
+//
+// First, passing values into a code block (same as a function.)
+// In the factorial example above, lets say that instead of pushing
+// 10 on the stack and calling factorial(), we create a variable i, assigned it the value 10,
+// then push i on the stack and call factorial(). What would happen?
+//
+//  i var
+//  i 10 =
+//  i factorial() println
+//
+// Looking at factorial(), the first thing it does is create a new variable
+// called i. This is an entirely new variable, and will last until the code fragment ends.
+// Now consider the third line, "i swap =". i (the name) is already on the stack from
+// before we called factorial(), then this line will push i (the name) on the stack,
+// swap the top two stack entries, and call the assignment operator.
+// Essentially this is equivalent to i i =. Problem is, within this code block i has
+// been defined but is yet to be initialised. The = operator cannot see
+// the i from outside the code block, it only sees the new i created within this code fragment.
+//
+// There are a couple of ways of avoiding this problem. The simplest is to not push
+// the name i in the stack before calling factorial(), by pushing its value instead.
+// You do this with the value or .value operator. So if we had said
+//
+//  i.value factorial() println
+//
+// there would not be any problem. Another way would be to not use i as a variable name within
+// the fctorial code fragment. The way I'm advocating is to use a coding standard and
+// the $ operator, but more on this later.
+//
+// The second problem is getting values out of a code fragment. You can see how I've
+// done this in the fractorial() code above - use the .value (or value) operator.
+// If the res.value had not had the .value operator added then the name res would be
+// left on the stack when this code fragment finished. Once the factorial() code had
+// finished and left the res name on the stack, the following code will have to deal with
+// a name res rather than the value of res as calculated within the factorial() code.
+//
+// The third issue is a function that uses a variable that it hasn't created and does
+// not know where that variable has been created. Consider a simple function that
+// prints the value of the variable i
+
+printi var
+printi {
+  i println
+} =
+
+i 123 =
+printi()
+
+// This code will print 123.
+//
+// And now we introduce another code fragment, which could be a function or
+// any fragment, that defines another i, as in
+
+cf var
+cf {
+  i var     // this code fragment defines i again, effectively shadowing the earlier i
+  i 987 =
+  printi()
+} =
+cf()
+
+// This last cf() call will print 987. And that's because the i defined within the cf fragment
+// is visible to all fragments, including the call to printi(), until the cf() fragment ends.
+//
+// So, how to avoid these kind of problems? "Use the force, Luke!". Use the $ operator, along
+// with a good dose of coding standards.
+//
+// The $ operator turns a number or string on the top of the stack into a variable name.
+// This lets you circumvent the "alphabetic, alphanumeric and underscore" rule applied to
+// simple variables. So, if you want a variable called //#.!@**&554@@() push it as
+// a string and use the $ operator
+
+"//#.!@**&554@@()"$ var
+
+// and you can assign it any value you want like any other variable
+
+"//#.!@**&554@@()"$ 12345 =
+"//#.!@**&554@@()"$ println
+
+// This give you lots of freedom, but to tame it a little you should apply a coding standard
+// that defines how a function's variables are named, and how you must use the value (or .value) operator
+// when pushing any value on the stack to live on after the code fragment terminates.
+//
+// For example, to recast the factorial() code from above, you might do this
+
+factorial {
+  "_factorial_loop_counter"$ var
+  "_factorial_res"$ var
+  "_factorial_loop_counter"$ swap =
+  "_factorial_res"$ 1 =
+  { "_factorial_loop_counter"$ 1 > } { "_factorial_res"$ "_factorial_res"$ "_factorial_loop_counter"$ * = "_factorial_loop_counter"$ "_factorial_loop_counter"$ 1 - = } while
+  "_factorial_res"$.value
+} =
+10 factorial() "10! = %d\n" printf
+
+// I've done a simple text substitutiion of i snd res and the line length
+// has blown out significantly, but you get the idea. Use variable names
+// that are particular to the function name so they don't clash with the
+// variables in other function.
+//
+// However, there is another less verbose way, and one that I occasionally use,
+// and that is to simply use numbers for the local variables. Another way to
+// write the factorial function is
+
+factorial {
+  0$ var 0$ swap =    // 0$ = the argument
+  1$ var              // 1$ = the result
+  1$ 1 =              // initialise the result to 1
+  { 0$ 1 > } { 1$ 1$ 0$ * = 0$ 0$ 1 - = } while
+  1$.value            // return the result value
+} =
+10 factorial() "10! = %d\n" printf
+
+
+
+// So that's it for simple variables and the $ operator. The next installment
+// of variables relates to namespaces, and that will be covered in another exmple file.
