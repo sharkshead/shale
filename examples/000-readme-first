@@ -26,7 +26,6 @@
 // "write down" the operands it requires before you call the operator.
 //
 // Let's start with a simple (1 + 2) * 3 example, and print the result:
-//
 
 1 2 + 3 * println
 
@@ -38,27 +37,173 @@
 // leave their results on the stack.
 //
 // In the case of the "+" operator, it take the top two elements off the stack,
-// adds them together, and puts the result onto the stack.
+// adds them together, and puts the result on the stack.
 // The "println" operator takes the top element off the stack and prints it
 // (with a newline).
 //
-// So, in a nutshell, you know all the basics of shale - there is a stack you
-// put things on, and operators that take those stacked items and do stuff
+// So, in a nutshell, you now know all the basics of shale - there is a stack you
+// put things on, and operators you call that take those stacked items and do stuff
 // with them, possibly leaving a result on the stack.
 //
 // I am, of course, glossing over a lot of detail here. shale can do:
 //  variables
+//  assignments
+//  pointers
 //  if statements
 //  while loops
 //  functions
 //
-// Yeah, I know you're saying all, litterally all, programming languages
-// give you these features.
+// And with some helper functions you can create multi-dimensional arrays
+// and something that looks kind of like accessing a struct or C++ class (but it isn't.)
+//
+// Yeah, I know you're saying all programming languages give you these features.
 //
 // Do these other programming languages allow you to create new code
 // on-the-fly within the script? Probably not. But I digress.
 //
-// Are these other languages as simple and elegant as shale?
-// shale doesn't have confusing or ambiguous grammer. Just put things
-// on the stack and then call the operator to do the work.
-// So simple. So elegant.
+// Variables.
+//
+// Variables are created by pushing the name of a variable on the stack
+// and calling the var operator.
+
+i var
+
+// This cretes a variable called i. Simple variables start with an alphabetic
+// character followed by zero or more alphanumeric or underscore characters.
+// You can create variables that don't follow these rules, which will be
+// explainee in another example file, so we'll stick to simple variable names for now.
+//
+// Assignments.
+//
+// To assign a value to a variable push the name of the variable and the value
+// on the stack and call the = operatos
+
+i 123 =
+
+// and to print the value of i you could do
+
+i println
+
+// (123 will be the second output line).
+//
+// It's worth pointing out that there's something going on here, because
+// in both cases (the assignment and the println) i is pushed on the stack,
+// and yet they are treated differently, one as the destination of the value 123,
+// and one as the value 123. In all cases, when you push the name of a variable
+// on the stack, you are pushing the name, not its value, on the stack.
+// It is up to the operator that you've called to use either the name or its
+// value based on the operator's context. That's why the assignment took
+// the name and used it to assign a value, and the println took the value of
+// the name.
+//
+// Back to the assignment, lets say we have another variable j
+
+j var
+j 987 =
+
+// and then we do
+
+i j =
+i println
+
+// (987 will be output). In this case the assignment operator will take
+// the i on the stack as a name, and the j as its value.
+//
+// I'll mention pointers here quickly. They will be explained in more
+// detail in another example file. To create a pointer you use the pointer assignmane
+// operator, and to access the thing pointed to you use the dereference operator.
+// Like this:
+
+i j &=        // the pointer assinment operator. i ia a pointer to j
+i-> println   // the pointer dereference operator. 987 will be output
+i-> 3.141 =   // another pointer dereference. this will assign 3.141 to j
+j println     // 3.141 will be output
+
+// If statements.
+//
+// Here's where we get into something cool. You've seen how you can push
+// numbers and names on the stack (strings as well, like "abc123"), you can
+// also push code fragments on the stack. Yes, a code fragment. The code
+// isn't executed, just pushed on the stack. There are a couple of operators
+// that will execute a code fragment on the stack, and the first of these
+// we'll look at is the if operator.
+//
+// The if operator needs three things on the stack. The first thing you
+// push on the stack is a boolean, the second is a code fragment which will
+// be executed if the boolean is true, and the third is a code fragment
+// to be executed if the boolean is false.
+//
+// You push a code fragment on the stack by enclosing it within curly braces,
+// 
+//  { 1 2 + pl }
+//
+// Here's an if operator example, using the less-then operator.
+
+i 99 =        // reassign i
+i 100 < {     // the boolean and the opening the then code fragment
+  "i is less than 100" println
+} {           // closing the then fragment and opening the else fragment
+  "i is greater then or equal to 100" println
+} if          // closing the else fragment and the if operator
+
+// There is also an ifthen operator where you don't sepcify the else fragment.
+
+i j != {
+  "i and j are different" println
+} ifthen
+
+// While loops.
+//
+// The while loop expects two code fragments on the stack. The first you
+// push on is a fragment which, when executed, leaves a boolean on the stack,
+// and the second you push on is the body of the while.
+
+i 0 =                   // initialise the loop counter.
+{ i 10 < } {            // boolean fragment, and opening the body fragment
+  i "i = %d\n" printf   // do something interesting
+  i i 1 + =             // increment the loop variable
+} while
+
+// Functions.
+//
+// This is the last feature I'll be discussing here. To create a
+// function, first create a variable, then assign a code fragment
+// to it.
+
+f var
+f {
+  1 2 + 3 * println
+} =
+
+// That's it, function created. To execute the function use the execute operator,
+// which is the "execute" keyword, or for simplicity's sake, ().
+
+f execute   // one form of the execute operator
+f()         // another, more familiar, form
+
+// You'll notice there's no space between the f and (). You can put a space in,
+// but it's not neccessary becaue a name cannot contain a ( character, so shale
+// stops interpreting the name as soon as it hits the (. I add lots of
+// spaces and newlines and indents for clarity, but they are not strictly necessary.
+// For example, here's the function definition above with all unneccessary spaces removed
+//
+//  f{1 2+3*println}=
+//
+// You can, I hope, see why I space things out.
+
+
+
+// So that's it for this example file. The important takeaway from this is
+// to push things on the stack in the order that the operator you're
+// about to call expects.
+//
+// For the full list of the operators do
+//
+//  shale -s
+//
+// shale will also play nice when you run it interactively, which is great
+// for playing around. Simply run shale with no arguments.
+
+
+// PS. Comments can be introduced by //, as you see in this file,
+// or by #, also used in this file. Take you pick.
