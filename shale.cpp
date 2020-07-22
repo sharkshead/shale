@@ -11,7 +11,7 @@ int lexTokenIndex;
 LexReplacement *lexReplacements;
 char *lexReplacement;
 bool lexSendNamespaceToken;    // This is really dodgy.
-char *shaleFileName;
+const char *shaleFileName;
 int olStackIndex;
 bool interactive;
 Exception shaleException;
@@ -749,7 +749,8 @@ void syntax() {
   printf("\n");
   printf("Special shale:: namespace\n");
   printf("  The shale:: namespace is used by shale to provide interaction between the script and shale.\n");
-  printf("  The namespace currently contains the shale version numbers:\n");
+  printf("  The namespace currently contains the shale script name and version numbers:\n");
+  printf("    file arg:: shale::\n");
   printf("    major version:: shale::\n");
   printf("    minor version:: shale::\n");
   printf("    micro version:: shale::\n");
@@ -758,25 +759,25 @@ void syntax() {
   printf("  You can generate new shale code by adding code blocks together with the + operator.\n");
   printf("  The + operator will take two code blocks, or variables whose value is a code block,\n");
   printf("  and push on the stack a code block that combines both. For example\n");
-  printf("    { 1200 34 } { + pl } + execute\n");
-  printf("  will output 1234\n");
+  printf("    { 6 7 } { * pl } + execute\n");
+  printf("  will output 42\n");
   printf("\n");
   printf("Replacements\n");
-  printf("  When passing in the shale program via a file, any arguments following the file can specify replacements, and are specified as\n");
+  printf("  When passing in the shale script via a file, any arguments following the file can specify replacements, and are specified as\n");
   printf("    name=text\n");
-  printf("  Anywhere in the program where 'name' appears will be replaced with the given text. Any number of these can follow the file argument.\n");
-  printf("  The use of these is to paramaterise the program to some degree, where things such as sensor/actor/config names or thresholds or timeouts\n");
-  printf("  can be referred to in the program using names, and the replacements on the command line specify them as actual values for that invocation of the program.\n");
+  printf("  Anywhere in the script where 'name' appears will be replaced with the given text. Any number of replacements can follow the file.\n");
+  printf("  This introduces command line arguments into your script.\n");
   printf("\n");
-  printf("  As an example, say you want to check different thresholds on different BC's controlling something, the program may look like (paraphrased):\n");
-  printf("  As an example, say you want to set different values to the code, the script might look like (paraphrased):\n");
+  printf("  As an example, say you want to pass different values to the code, the script might look like (paraphrased):\n");
   printf("\n");
-  printf("    n fibonacci()\n");
+  printf("    factorial var\n");
+  printf("    factorial { ... } =\n");
+  printf("    n factorial() println\n");
   printf("\n");
-  printf("  Then using this program (say, in a file called fib) you can try different values with\n");
+  printf("  Then when using this script (say, in a file called fact) you can try different values for n with\n");
   printf("\n");
-  printf("    shale fib n=5\n");
-  printf("    shale fib n=120\n");
+  printf("    shale fact n=5\n");
+  printf("    shale fact n=20\n");
   exit(0);
 }
 
@@ -785,8 +786,12 @@ void version() {
   exit(0);
 }
 
-void storeVersion() {
+void setupShaleNamespace(const char *arg0) {
   Variable *v;
+
+  v = new Variable("/file/arg/shale");
+  v->setObject(new String(arg0));
+  btree.addVariable(v);
 
   v = new Variable("/major/version/shale");
   v->setObject(new Number(MAJOR));
@@ -802,24 +807,14 @@ void storeVersion() {
 }
 
 int main(int ac, char **av) {
-  char theCommand[1024];
-  char cppCommand[1024];
   LexReplacement *r;
   Lex lex;
-  char **pp;
   char *p;
   struct stat statb;
+  char command[1024];
   int node;
   int number;
   int i;
-
-  sprintf(theCommand, "shale");
-  p = theCommand;
-  while(*p != 0) p++;
-  for(pp = &av[1]; *pp != (char *) 0; pp++) {
-    sprintf(p, " %s", *pp);
-    while(*p != 0) p++;
-  }
 
   interactive = false;
   lexLineNumber = 0;
@@ -847,6 +842,7 @@ int main(int ac, char **av) {
   if(ac == 1) {
     lexInput = stdin;
     interactive = true;
+    shaleFileName = "<stdin>";
   } else {
     shaleFileName = av[1];
     if((lexInput = fopen(shaleFileName, "r")) == NULL) {
@@ -868,7 +864,7 @@ int main(int ac, char **av) {
     }
   }
 
-  storeVersion();
+  setupShaleNamespace(shaleFileName);
 
   do {
     try {
