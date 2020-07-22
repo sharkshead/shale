@@ -736,12 +736,12 @@ void syntax() {
   printf("  The :: operator takes two arguments, the namespace name and an index.\n");
   printf("  The index and name can be a name, a number or a string. Numbers can be either an integer or a float (to 3 decimal places).\n");
   printf("  Some examples:\n");
-  printf("    i a::         equivalent to a::i in C++\n");
+  printf("    i a::         equivalent to a::i in C++, or like a struct or class attribute reference a.i\n");
   printf("    0 a::         an array element, essentially equivalent to a[0]\n");
-  printf("    i.value a::   same as a[i.value]\n");
-  printf("    \"i\" a::       same as a::i\n");
+  printf("    i.value a::   equivalent to a[i]\n");
+  printf("    \"i\" a::       same as a::i or a.i\n");
   printf("  And they can be nested\n");
-  printf("    a b:: c::     equivalent to c::b::a (not sure this exists in C++)\n");
+  printf("    a b:: c::     equivalent to c::b::a (not sure this exists in C++), or c.b.a\n");
   printf("    4 8:: a::     multi-dimensional array, equivalent to a[8][4]\n");
   printf("    3.142 a::     example floating point index\n");
   printf("  If you want floating point indices and names to be something other than 3 decimal places, use sprintf to\n");
