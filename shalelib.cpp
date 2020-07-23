@@ -2239,7 +2239,7 @@ void BTree::printDetail(BTreeNode *t, int i) {
   printf("%s: ", v->getName());
   o = v->getObject();
   if(o == (Object *) 0) {
-    printf("...undefined...");
+    printf("...undefined...\n");
     return;
   }
 
