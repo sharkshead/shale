@@ -1,0 +1,110 @@
+#!/usr/local/bin/shale
+
+// Namespaces give you another way of creating variables, but they are
+// different to simple variables in important ways.
+//
+// To recap simple variables, you create them with the var operator
+//
+//  i var
+//
+// and they have a scope that is defined by the code fragment's execution
+// rather than a lexical scope you'd expect in a C-like language.
+// You can read more about this in the variables example file.
+//
+// Namespaces can use used to store variables that are global. They are not
+// tied to a code fragmet's execution. And namespaces have features that
+// mean they can be used to implement arrays (single or multi-dimensional,
+// fully populated and sparse). You can even think of namespaces as
+// something like a perl hash, or even a struct or class if you really
+// squint your eyes. shale doesn't have structs or classes, but you can
+// use namespaces to achieve simething resembling them.
+//
+// The namespace operator is :: and it takes an index and a name from
+// the stack
+//
+//  i ns::
+//
+// to create a variable name of index i in the namespace ns.
+// All this does is create a variable name. It doesn't create the variable.
+// You create the variable with the var operator as you would with
+// simple variables
+
+i ns:: var
+
+// And you can use "i ns::" snywhere you can use a simple variable.
+// You can assign a value to it
+
+i ns:: 123 =
+
+// Asign a code fragment to it and execitee it
+
+i ns:: { "Hello, World!" println } =
+i ns::()
+
+// You can assign a pointer to it, and assign it a pointer
+
+i var
+i 321 =
+j var
+j 987 =
+i ns:: i &=
+j i ns:: &=
+
+i ns::-> println      // 321
+j-> 3.141 =
+i ns:: println        // 3.141
+
+// Anything you can do with a simple variable you can also do with a namespace variable.
+//
+// Namespaces can be nested
+
+i a:: b:: var
+
+// creates i in namespace a in namespace b. Effectively b::a::i.
+// You can next them as deep as you want, subject to variable name limitations,
+// and again you can use this like any other variable.
+//
+// The index and namespac name don't have to be names, they can be numbers
+// or strings.
+
+0 a:: var
+0 a:: 123 =
+
+// In effect this has created the equivalent of a[0] = 123 in C.
+// With some helper functions to create and initiaiase array elements
+// you have a fully functional array.
+//
+// And if you want the equivalent of a[i] you could use
+
+i 0 =
+i.value a:: println
+
+// To effect multi-dimensional arrays, just nest them
+
+5 8:: a:: var
+5 8:: a:: 987 =
+
+// is equivalent to a[8][5] = 987. And when using index variables
+
+i 5 =
+j 8 =
+i.value j.value:: a:: println
+
+// will print the value of a[j][i], 987.
+//
+// Taking it further, the index and namespace name can be strings
+// or floating point numbers, as well. Floating point numbers maybe
+// not all that useful, but strings are ueful whem your index or name
+// is not an integer, like a code composed of alphanumeric charaters.
+//
+// shale also uses a namespace to store a couple of things you
+// may or may not find useful
+
+file arg:: shale:: "file argument '%s'\n" printf
+micro version:: shale:: minor version:: shale:: major version:: shale:: "shale version %d.%d.%d\n" printf
+
+// And finally, when you're developing a scrript that uses namespaces it is handy to
+// know about the btree operator. It prints the contents of the BTree
+// that stores the namespace entroes. Here's what it looks like
+
+btree
