@@ -1709,7 +1709,7 @@ bool Printf::action() {
             try {
               n = o->getNumber(getLexInfo());
               if(n->isInt()) sprintf(op, "%ld", n->getInt());
-              else sprintf(op, "%03f", n->getDouble());
+              else sprintf(op, "%0.3f", n->getDouble());
               n->release(getLexInfo());
               found = true;
             } catch(Exception *e) { }
