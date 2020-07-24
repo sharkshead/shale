@@ -1,0 +1,139 @@
+#!/usr/local/bin/shale
+
+// Arrays in shale are implemented using the namespace operator ::
+// 
+// Namespaces can be used for arrays, both fully populated and sparse,
+// and for something similar to structs and classes.
+//
+// For an example of sparse arrays see the array.sparse example file.
+// For an example of structs and classes, see the structs example file.
+//
+// Described here is an example of using namespaces to implement
+// fully populated arrays, meaning the equivalent of, for example, int a[10]; in C.
+//
+// To recap namespaces, the :: operator takes an index and a name, as in
+//
+//  {index} {name}::
+//
+// eg
+//
+//  i a::
+//
+// to refer to the name "i" in the namespace "a". Kind of equivalent to a::i in C++.
+//
+// However, {index} can also be a number, and this is where our array journey starts.
+// This:
+//
+//  0 a::
+//
+// is like a[0] in C.
+//
+// And if you have a variable "i" and you want the equivalent of a[i], do
+//
+//  i.value a::
+//
+// You can roll your own array functions if you like, or you can use
+// the functions provided by the "array" library.
+
+array library
+
+// This loads in the dynamic library "array". Everything this library
+// offers in placed under the array:: namespace. This shows you what it provides
+
+help array::()
+
+// It provides array create, scooch, get and set functions. Create and scooch
+// are to support fully populated arrays, where every index between 0 and the
+// maximum - 1 is created, and get and set are geared towards space arrays,
+// where you on;y create the indicies as needed.
+//
+// Fully populated arrays.
+//
+// The create a fully populated array with create array::() you push the
+// initial value on the stack, then the cound, then the array name
+
+123 10 a create array::()
+
+// This creates the equivalent of a[0] through a[9], all with the initial value of 123.
+//
+// You can then go ahead and use this like an array by refering to, for exmple
+
+5 a:: println
+i var
+i 5 =
+i.value a:: 987 =
+5 a:: println
+
+// Another function the array library provides is scooch. Is simply moves all the
+// entries along one and assigned a new value to the first element.
+
+"abc123" a scooch array::()
+3.141 a scooch array::()
+
+// Now a[0] is 3.141, a[1] is "abc123" and a[7] is 987
+
+0 a:: println
+1 a:: println
+7 a:: println
+
+// If you check the btree output you'll notice an entry "_$" a::
+// This is simply the count from when you used create array::(). You can use this
+// as well to iterate through the array, like this print function
+
+printArray var
+printArray {
+  0$ var 0$ swap &=         // the array name
+  1$ var 1$ "_$" 0$->:: =   // array entry count using the array's "_$" entry
+  2$ var 2$ 0 =             // loop variable
+
+  { 2$ 1$ < } {
+    2$.value 0$->:: 0$-> 2$.value "%d %n:: = %p\n" printf
+    2$ 2$ 1 + =
+  } while
+} =
+a printArray()
+
+// Don't worry for now if printArray looks like complete jibberish.
+//
+// Sparse arrays.
+//
+// A sparse array is one where you don't create every entry from 0 through to the maximum-1.
+// Indeed, a sparse array doesn't need to use integers as indcies. It can use integers,
+// float point numbers and strings.
+//
+// There's no setup required for a sparse array, you just use the set and get functions.
+
+"hlvb" fq "Hasta la vista, baby" set array::()
+"oiar" fq "Only in a rerun" set array::()
+"tgte" fq "These go to eleven" set array::()
+
+// This has created the "hlvb" and "oiar" indexes with their given values in fq.
+//
+// Getting an entry from a sparse array is a little more involved than a fully populated one.
+//
+// When you're fetching an entry in a sparse array you need to know if the entry is there and,
+// if it is, you want its value. The way the array library does this
+// is that you push a variable to store the value, along with the index and array name.
+// and get array::() will assign the value to the variable if the index exists, and will
+// leave on the stack a boolean value indicating whether the index exists.
+//
+// Upshot is, you need to define a variable to hold the value, and use the result
+// of get array::() in an if statement to work out what to do
+
+res var
+
+res "hlvb" fq get array::() {
+  res println
+} {
+  "hlvb does not exist" println
+} if
+
+res "ibb" fq get array::() {
+  res println
+} {
+  "ibb does not exist" println
+} if
+
+// Access to array elements is pretty quick because all the entries are stored
+// in namespaces, which in turn are stored in a BTree. Creating a 1,000,000 entry
+// fully populated array might take a few seconds, but accessing entries is lightning fast.
