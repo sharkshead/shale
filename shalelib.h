@@ -521,6 +521,12 @@ class Namespace : public Operation {
     bool action();
 };
 
+class Library : public Operation {
+  public:
+    Library(LexInfo *);
+    bool action();
+};
+
 class Print : public Operation {
   public:
     Print(bool, LexInfo *);

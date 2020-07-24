@@ -1549,6 +1549,37 @@ bool Namespace::action() {
   return true;
 }
 
+// The Library class
+
+Library::Library(LexInfo *li) : Operation(li) { }
+
+bool Library::action() {
+  Object *o;
+  Name *n;
+  char pluginName[256];
+  void *handle;
+  void *(*slmain)();
+  char *err;
+
+  o = stack.pop(getLexInfo());
+  n = o->getName(getLexInfo());
+  sprintf(pluginName, "/usr/local/lib/shale/%s.so", n->getValue());
+
+  dlerror();
+
+  handle = dlopen(pluginName, RTLD_NOW | RTLD_GLOBAL);
+  if((err = dlerror()) != (char *) 0) slexception.chuck(err, getLexInfo());
+
+  slmain = (void *(*)(void)) dlsym(handle, "slmain");
+  if((err = dlerror()) != (char *) 0) slexception.chuck(err, getLexInfo());
+
+  (*slmain)();
+
+  o->release(getLexInfo());
+
+  return true;
+}
+
 // Execute class
 
 Execute::Execute(LexInfo *li) : Operation(li) { }

@@ -68,6 +68,7 @@ Keyword keyword[] = {
   { "value",          LEX_TOKEN_KEYWORD_VALUE           },
   { "defined",        LEX_TOKEN_KEYWORD_DEFINED         },
   { "initialised",    LEX_TOKEN_KEYWORD_INITIALISED     },
+  { "library",        LEX_TOKEN_KEYWORD_LIBRARY         },
   { "stack",          LEX_TOKEN_KEYWORD_STACK           },
   { "debug",          LEX_TOKEN_KEYWORD_DEBUG           },
   { "btree",          LEX_TOKEN_KEYWORD_BTREE           },
@@ -616,6 +617,7 @@ void olBuild(Lex &lex) {
         case LEX_TOKEN_KEYWORD_INITIALISED: op = new Initialised(li); break;
         case LEX_TOKEN_KEYWORD_TONAME: op = new ToName(li); break;
         case LEX_TOKEN_KEYWORD_NAMESPACE: op = new Namespace(li); break;
+        case LEX_TOKEN_KEYWORD_LIBRARY: op = new Library(li); break;
         case LEX_TOKEN_KEYWORD_DEBUG: op = new Debug(li); break;
         case LEX_TOKEN_KEYWORD_BTREE: op = new BTreeDebug(li); break;
         default: shaleException.chuck("unexpected token", li); // throw unexpectedTokenException;
@@ -709,6 +711,7 @@ void syntax() {
   printf("  while           { bool } { code } while\n");
   printf("  execute         { code } execute\n");
   printf("  ()                                          - same as execute. allows shorthand for function calls, eg plus()\n");
+  printf("  {name} library                              - load the library {name}. see below\n");
   printf("  print           {value} print\n");
   printf("  println         {value} println\n");
   printf("  pl                                          - same as println\n");
@@ -780,6 +783,16 @@ void syntax() {
   printf("    major version:: shale::\n");
   printf("    minor version:: shale::\n");
   printf("    micro version:: shale::\n");
+  printf("\n");
+  printf("Libraries\n");
+  printf("  Libraries are loaded with the library keyword\n");
+  printf("    {name} library\n");
+  printf("  The library places all of its offerings under the {name}:: namespace. Every library has a help function accessable as\n");
+  printf("    help {name}::()\n");
+  printf("  once the library is loaded, and will detail all of the functionality the library provides.\n");
+  printf("  Current libraries are:\n");
+  printf("    maths       - pi, e, log functions, etc. See help maths::() for details.\n");
+  printf("    array       - support for sparse and fully populated arrays. See help array::() for details.\n");
   printf("\n");
   printf("Generating new shale code from within shale\n");
   printf("  You can generate new shale code by adding code blocks together with the + operator.\n");

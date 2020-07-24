@@ -96,9 +96,10 @@ SOFTWARE.
 #define LEX_TOKEN_KEYWORD_INITIALISED      20
 #define LEX_TOKEN_KEYWORD_TONAME           21
 #define LEX_TOKEN_KEYWORD_NAMESPACE        22
-#define LEX_TOKEN_KEYWORD_DEBUG            23
-#define LEX_TOKEN_KEYWORD_STACK            24
-#define LEX_TOKEN_KEYWORD_BTREE            25
+#define LEX_TOKEN_KEYWORD_LIBRARY          23
+#define LEX_TOKEN_KEYWORD_DEBUG            24
+#define LEX_TOKEN_KEYWORD_STACK            25
+#define LEX_TOKEN_KEYWORD_BTREE            26
 
 // How the lexical analyser stores things.
 
