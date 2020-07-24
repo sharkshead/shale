@@ -204,11 +204,11 @@ bool ArrayScooch::action() {
   const char *n;
   Variable *vc;
   Number *c;
-  int count;
+  INT count;
   Variable *src;
   Variable *dst;
-  int i;
-  int j;
+  INT i;
+  INT j;
   char element[1024];
 
   name = stack.pop(getLexInfo());
