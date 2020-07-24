@@ -226,7 +226,7 @@ bool ArrayScooch::action() {
     j = count - 1;
     sprintf(element, "/%ld/%s", j, n);
     if((dst = btree.findVariable(element)) == (Variable *) 0) slexception.chuck(element, getLexInfo());
-    if(i > 0) {
+    if(j > 0) {
       for(i = j; i > 0; i--) {
         sprintf(element, "/%ld/%s", i - 1, n);
         if((src = btree.findVariable(element)) == (Variable *) 0) slexception.chuck(element, getLexInfo());
