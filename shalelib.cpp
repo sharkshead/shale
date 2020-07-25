@@ -2412,5 +2412,5 @@ int Stack::getUsedSize() {
 }
 
 void Stack::debug() {
-  printf("Stack: size %d,  free %d\n", stackSize, usedSize);
+  printf("Stack: size %d, free %d\n", stackSize, usedSize);
 }
