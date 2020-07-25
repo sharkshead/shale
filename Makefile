@@ -1,6 +1,6 @@
-all: shale maths.so array.so
+all: shale maths.so array.so file.so
 
-install: /usr/local/bin/shale /usr/local/lib/shale/maths.so /usr/local/lib/shale/array.so
+install: /usr/local/bin/shale /usr/local/lib/shale/maths.so /usr/local/lib/shale/array.so /usr/local/lib/shale/file.so
 
 clean:
 	rm -f shale *.o *.so
@@ -26,6 +26,12 @@ array.o: array.cpp shalelib.h
 array.so: array.o
 	g++ -shared -o array.so array.o
 
+file.o: file.cpp shalelib.h
+	g++ -fPIC -c -o file.o file.cpp
+
+file.so: file.o
+	g++ -shared -o file.so file.o
+
 /usr/local/bin/shale: shale
 	sudo rm -f /usr/local/bin/shale
 	sudo cp shale /usr/local/bin/shale
@@ -39,3 +45,8 @@ array.so: array.o
 	[ -d /usr/local/lib/shale ] || sudo mkdir /usr/local/lib/shale
 	sudo rm -f /usr/local/lib/shale/array.so
 	sudo cp array.so /usr/local/lib/shale/array.so
+
+/usr/local/lib/shale/file.so: file.so
+	[ -d /usr/local/lib/shale ] || sudo mkdir /usr/local/lib/shale
+	sudo rm -f /usr/local/lib/shale/file.so
+	sudo cp file.so /usr/local/lib/shale/file.so

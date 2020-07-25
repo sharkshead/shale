@@ -1756,9 +1756,10 @@ bool Printf::action() {
     if((q = (char *) malloc(strlen(res) + 1)) == (char *) 0) slexception.chuck("malloc error", getLexInfo());
     strcpy(q, res);
     stack.push(cache.newString(q, true));
-    format->release(getLexInfo());
-    formatObject->release(getLexInfo());
   }
+
+  format->release(getLexInfo());
+  formatObject->release(getLexInfo());
 
   return true;
 }
