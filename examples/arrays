@@ -49,8 +49,8 @@ help array::()
 //
 // Fully populated arrays.
 //
-// The create a fully populated array with create array::() you push the
-// initial value on the stack, then the cound, then the array name
+// To create a fully populated array with create array::() you push the
+// initial value on the stack, then the count, then the array name
 
 123 10 a create array::()
 
@@ -98,7 +98,7 @@ a printArray()
 // Sparse arrays.
 //
 // A sparse array is one where you don't create every entry from 0 through to the maximum-1.
-// Indeed, a sparse array doesn't need to use integers as indcies. It can use integers,
+// Indeed, a sparse array doesn't need to use integers as indicies. It can use integers,
 // float point numbers and strings.
 //
 // There's no setup required for a sparse array, you just use the set and get functions.
@@ -107,7 +107,7 @@ a printArray()
 "oiar" fq "Only in a rerun" set array::()
 "tgte" fq "These go to eleven" set array::()
 
-// This has created the "hlvb" and "oiar" indexes with their given values in fq.
+// This has created the "hlvb", "oiar" and "tgte" indexes with their given values in fq.
 //
 // Getting an entry from a sparse array is a little more involved than a fully populated one.
 //
