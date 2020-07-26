@@ -131,7 +131,7 @@ j println     // 3.141 will be output
 // The if operator needs three things on the stack. The first thing you
 // push on the stack is a boolean, the second is a code fragment which will
 // be executed if the boolean is true, and the third is a code fragment
-// to be executed if the boolean is false. Then yu call the of operator.
+// to be executed if the boolean is false. Then you call the if operator.
 //
 // You push a code fragment on the stack by enclosing it within curly braces
 // 
