@@ -110,7 +110,7 @@ i println
 // the i on the stack as a name, and the j as its value.
 //
 // I'll mention pointers here quickly. They will be explained in more
-// detail in another example file. To create a pointer you use the pointer assignmane
+// detail in another example file. To create a pointer you use the pointer assignmant
 // operator, and to access the thing pointed to you use the dereference operator.
 // Like this:
 
@@ -131,20 +131,20 @@ j println     // 3.141 will be output
 // The if operator needs three things on the stack. The first thing you
 // push on the stack is a boolean, the second is a code fragment which will
 // be executed if the boolean is true, and the third is a code fragment
-// to be executed if the boolean is false.
+// to be executed if the boolean is false. Then yu call the of operator.
 //
-// You push a code fragment on the stack by enclosing it within curly braces,
+// You push a code fragment on the stack by enclosing it within curly braces
 // 
 //  { 1 2 + pl }
 //
-// Here's an if operator example, using the less-then operator.
+// Here's an if operator example, using the boolean less-then operator.
 
 i 99 =        // reassign i
-i 100 < {     // the boolean and the opening the then code fragment
+i 100 < {     // the boolean and opening the then code fragment
   "i is less than 100" println
 } {           // closing the then fragment and opening the else fragment
   "i is greater then or equal to 100" println
-} if          // closing the else fragment and the if operator
+} if          // closing the else fragment and the calling if operator
 
 // There is also an ifthen operator where you don't sepcify the else fragment.
 
@@ -159,9 +159,9 @@ i j != {
 // and the second you push on is the body of the while.
 
 i 0 =                   // initialise the loop counter.
-{ i 10 < } {            // boolean fragment, and opening the body fragment
+{ i 10 < } {            // boolean fragment and opening the body fragment
   i "i = %d\n" printf   // do something interesting
-  i i 1 + =             // increment the loop variable
+  i i 1 + =             // increment the loop counter
 } while
 
 // Functions.
@@ -185,11 +185,11 @@ f()         // another, more familiar, form
 // but it's not neccessary becaue a name cannot contain a ( character, so shale
 // stops interpreting the name as soon as it hits the (. I add lots of
 // spaces and newlines and indents for clarity, but they are not strictly necessary.
-// For example, here's the function definition above with all unneccessary spaces removed
+// For example, here's the function definition above with all unnecessary spacing removed
 //
 //  f{1 2+3*println}=
 //
-// You can, I hope, see why I space things out.
+// You can see, I hope, why I space things out.
 
 
 
@@ -201,7 +201,7 @@ f()         // another, more familiar, form
 //
 //  shale -s
 //
-// shale will also play nice when you run it interactively, which is great
+// shale also plays nice when run interactively, which is great
 // for playing around. Simply run shale with no arguments.
 
 
