@@ -36,32 +36,31 @@ i ns:: var
 
 i ns:: 123 =
 
-// Asign a code fragment to it and execitee it
+// Assign a code fragment to it and execute it
 
 i ns:: { "Hello, World!" println } =
 i ns::()
 
-// You can assign a pointer to it, and assign it a pointer
+// Pointer assignment and dereference works as well
 
 i var
 i 321 =
-j var
-j 987 =
 i ns:: i &=
-j i ns:: &=
-
 i ns::-> println      // 321
+
+j var
+j i ns:: &=
 j-> 3.141 =
 i ns:: println        // 3.141
 
-// Anything you can do with a simple variable you can also do with a namespace variable.
+// Anything you can do with a simple variable you can do with a namespace variable.
 //
 // Namespaces can be nested
 
 i a:: b:: var
 
 // creates i in namespace a in namespace b. Effectively b::a::i.
-// You can next them as deep as you want, subject to variable name limitations,
+// You can nest them as deep as you want, subject to variable name limitations,
 // and again you can use this like any other variable.
 //
 // The index and namespac name don't have to be names, they can be numbers
@@ -71,8 +70,8 @@ i a:: b:: var
 0 a:: 123 =
 
 // In effect this has created the equivalent of a[0] = 123 in C.
-// With some helper functions to create and initiaiase array elements
-// you have a fully functional array.
+// With some helper functions to create and initiaiase array elements,
+// in the array library, you have a fully functional array.
 //
 // And if you want the equivalent of a[i] you could use
 
@@ -93,18 +92,17 @@ i.value j.value:: a:: println
 // will print the value of a[j][i], 987.
 //
 // Taking it further, the index and namespace name can be strings
-// or floating point numbers, as well. Floating point numbers maybe
-// not all that useful, but strings are ueful whem your index or name
+// or floating point numbers, as well. Floating point numbers may
+// not be that useful, but strings are ueful whem your index or name
 // is not an integer, like a code composed of alphanumeric charaters.
 //
-// shale also uses a namespace to store a couple of things you
-// may or may not find useful
+// shale also uses a namespace to store a couple of things you may find useful
 
 file arg:: shale:: "file argument '%s'\n" printf
 micro version:: shale:: minor version:: shale:: major version:: shale:: "shale version %d.%d.%d\n" printf
 
-// And finally, when you're developing a scrript that uses namespaces it is handy to
+// And finally, when you're developing a script that uses namespaces, it is handy to
 // know about the btree operator. It prints the contents of the BTree
-// that stores the namespace entroes. Here's what it looks like
+// that stores the namespace entries. Here's what it looks like
 
 btree
