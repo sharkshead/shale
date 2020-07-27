@@ -509,7 +509,17 @@ void lexNextToken(Lex &lex) {
         lexGetChar();
         p = lex.str;
         while(lexChar != '"') {
-          *p++ = lexChar;
+          if(lexChar == '\\') {
+            lexGetChar();
+            if(lexChar == 'n') {
+              *p++ = '\\';
+              *p++ = 'n';
+            } else {
+              *p++ = lexChar;
+            }
+          } else {
+            *p++ = lexChar;
+          }
           lexGetChar();
         }
         lexGetChar();
