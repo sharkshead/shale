@@ -68,14 +68,14 @@
 
 i var
 
-// This cretes a variable called i. Simple variables start with an alphabetic
+// This creates the variable called i. Simple variables start with an alphabetic
 // character followed by zero or more alphanumeric or underscore characters.
 // You can create variables that don't follow these rules, which will be
-// explainee in another example file, so we'll stick to simple variable names for now.
+// explained in another example file, so we'll stick to simple variable names for now.
 //
 // Assignments.
 //
-// To assign a value to a variable push the name of the variable and the value
+// To assign a value to a variable, push the name of the variable and the value
 // on the stack and call the = operatos
 
 i 123 =
@@ -84,7 +84,7 @@ i 123 =
 
 i println
 
-// (123 will be the second output line).
+// (123 will be the second output line of this script).
 //
 // It's worth pointing out that there's something going on here, because
 // in both cases (the assignment and the println) i is pushed on the stack,
@@ -110,9 +110,8 @@ i println
 // the i on the stack as a name, and the j as its value.
 //
 // I'll mention pointers here quickly. They will be explained in more
-// detail in another example file. To create a pointer you use the pointer assignmant
+// detail in another example file. To create a pointer you use the pointer assignment
 // operator, and to access the thing pointed to you use the dereference operator.
-// Like this:
 
 i j &=        // the pointer assinment operator. i ia a pointer to j
 i-> println   // the pointer dereference operator. 987 will be output
@@ -139,10 +138,10 @@ j println     // 3.141 will be output
 //
 // Here's an if operator example, using the boolean less-then operator.
 
-i 99 =        // reassign i
-i 100 < {     // the boolean and opening the then code fragment
+i 99 =        // reassign i to 99
+i 100 < {     // the boolean and opening the then-code fragment
   "i is less than 100" println
-} {           // closing the then fragment and opening the else fragment
+} {           // closing the then fragment and opening the else-code fragment
   "i is greater then or equal to 100" println
 } if          // closing the else fragment and the calling if operator
 
@@ -176,7 +175,7 @@ f {
 } =
 
 // That's it, function created. To execute the function use the execute operator,
-// which is the "execute" keyword, or for simplicity's sake, ().
+// which is the "execute" keyword, or alternatively, ().
 
 f execute   // one form of the execute operator
 f()         // another, more familiar, form
@@ -194,8 +193,8 @@ f()         // another, more familiar, form
 
 
 // So that's it for this example file. The important takeaway from this is
-// to push things on the stack in the order that the operator you're
-// about to call expects.
+// to push things on the stack in the order expected by the operator you're
+// about to call.
 //
 // For the full list of the operators do
 //
