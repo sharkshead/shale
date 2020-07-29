@@ -60,15 +60,23 @@ class FileFprintf : public Operation {
     bool action();
 };
 
+class FileFlush : public Operation {
+  public:
+    FileFlush(LexInfo *);
+    bool action();
+};
+
 const char *fileHelp[] = {
   "File library",
   "  {filename} {mode} open file::()      - open filename according to fopen's mode. if the file cannot",
   "                                         be opened it pushes false on the stack, otherwise it",
   "                                         pushes the file handle then true on the stack.",
-  "                                         file and mode must both be strings.",
+  "                                         file and mode must both be strings",
+  "  {handle} flush file::()              - flush the given handle's buffer\n",
   "  {handle} close file::()              - close the given file handle",
   "  {handle} fgets file::()              - get one line from the handle with newline stripped",
   "  ... {fmt} {handle} fprintf file::()  - fprintf to the given handle",
+  "  ... {fmt} {handle} fpf file::()      - same as fprintf",
   "  stdin file::                         - stdin",
   "  stdout file::                        - stdout",
   "  stderr file::                        - stderr",
@@ -85,6 +93,7 @@ FILE *handle[HANDLES];
 extern "C" void slmain() {
   OperationList *ol;
   Variable *v;
+  Object *fpf;
   int i;
 
   // Are we already loaded?
@@ -146,6 +155,17 @@ extern "C" void slmain() {
   ol = new OperationList;
   ol->addOperation(new FileFprintf((LexInfo *) 0));
   v = new Variable("/fprintf/file");
+  fpf = new Code(ol);
+  v->setObject(fpf);
+  btree.addVariable(v);
+
+  v = new Variable("/fpf/file");
+  v->setObject(fpf);
+  btree.addVariable(v);
+
+  ol = new OperationList;
+  ol->addOperation(new FileFlush((LexInfo *) 0));
+  v = new Variable("/flush/file");
   v->setObject(new Code(ol));
   btree.addVariable(v);
 }
@@ -180,7 +200,7 @@ bool FileOpen::action() {
   for(i = 0; i < HANDLES; i++) {
     if(handle[i] == (FILE *) 0) break;
   }
-  if((i >= 0) && (i < HANDLES)) {
+  if(i < HANDLES) {
     if((f = fopen(filename->getValue(), mode->getValue())) != (FILE *) 0) {
       handle[i] = f;
       stack.push(cache.newNumber((INT) i));
@@ -211,7 +231,7 @@ bool FileClose::action() {
   h = oh->getNumber(getLexInfo());
 
   i = h->getInt();
-  if((i >= 0) && (i < HANDLES)) {
+  if((i >= 0) && (i < HANDLES) && (handle[i] != (FILE *) 0)) {
     fclose(handle[i]);
     handle[i] = (FILE *) 0;
   } else {
@@ -238,7 +258,7 @@ bool FileFgets::action() {
   h = oh->getNumber(getLexInfo());
 
   i = h->getInt();
-  if((i >= 0) && (i < HANDLES)) {
+  if((i >= 0) && (i < HANDLES) && (handle[i] != (FILE *) 0)) {
     if(fgets(line, sizeof(line), handle[i]) != NULL) {
       for(p = line; *p != 0; p++) {
         if((*p == '\n') || (*p == '\r')) {
@@ -257,7 +277,7 @@ bool FileFgets::action() {
       stack.push(cache.newNumber((INT) 0));
     }
   } else {
-    stack.push(cache.newNumber((INT) 0));
+    slexception.chuck("Unknown file handle", getLexInfo());
   }
 
   h->release(getLexInfo());
@@ -291,7 +311,7 @@ bool FileFprintf::action() {
   formatObject = stack.pop(getLexInfo());
   format = formatObject->getString(getLexInfo());
 
-  if((i < 0) || (i > HANDLES)) slexception.chuck("Bad handle", getLexInfo());
+  if((i < 0) || (i > HANDLES) || (handle[i] == (FILE *) 0)) slexception.chuck("Bad handle", getLexInfo());
 
   op = res;
   *op = 0;
@@ -386,6 +406,29 @@ bool FileFprintf::action() {
   formatObject->release(getLexInfo());
   h->release(getLexInfo());
   handleObject->release(getLexInfo());
+
+  return true;
+}
+
+FileFlush::FileFlush(LexInfo *li) : Operation(li) { }
+
+bool FileFlush::action() {
+  Object *oh;
+  Number *h;
+  int i;
+
+  oh = stack.pop(getLexInfo());
+  h = oh->getNumber(getLexInfo());
+
+  i = h->getInt();
+  if((i >= 0) && (i < HANDLES) && (handle[i] != (FILE *) 0)) {
+    fflush(handle[i]);
+  } else {
+    slexception.chuck("Close of unknown file handle", getLexInfo());
+  }
+
+  h->release(getLexInfo());
+  oh->release(getLexInfo());
 
   return true;
 }
