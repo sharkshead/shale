@@ -2339,10 +2339,7 @@ void BTree::printDetail(BTreeNode *t, int i) {
 
   if(! found) printf("...unknown");
 
-  printf(" (0x%lx, %d", (unsigned long) t, i);
-  if(t->isLeaf()) printf(", leaf %d", t->getNumber());
-  if(t == tree) printf(", top");
-  printf(")\n");
+  printf("\n");
 }
 
 // StackItem class
