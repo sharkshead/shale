@@ -72,7 +72,7 @@ const char *fileHelp[] = {
   "                                         be opened it pushes false on the stack, otherwise it",
   "                                         pushes the file handle then true on the stack.",
   "                                         file and mode must both be strings",
-  "  {handle} flush file::()              - flush the given handle's buffer\n",
+  "  {handle} flush file::()              - flush the given handle's buffer",
   "  {handle} close file::()              - close the given file handle",
   "  {handle} fgets file::()              - get one line from the handle with newline stripped",
   "  ... {fmt} {handle} fprintf file::()  - fprintf to the given handle",
