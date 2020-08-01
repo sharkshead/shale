@@ -175,7 +175,7 @@ f {
 } =
 
 // That's it, function created. To execute the function use the execute operator,
-// which is the "execute" keyword, or alternatively, ().
+// which is the "execute" keyword or, alternatively, ().
 
 f execute   // one form of the execute operator
 f()         // another, more familiar, form
