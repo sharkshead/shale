@@ -1,17 +1,25 @@
 #!/usr/local/bin/shale
 
-// Here's a very simple use of the file library to implement cat.
+// Here's a very simple use of the file library to implement something like cat.
 
-// Presented without comment.
-
-f initialised not {
-  file arg:: shale:: "Usage: %s f={filename}\n" printf
-  "  where {filename} must be enclosed in double quotes" println
-  file arg:: shale:: "  eg %s f=\\\"/etc/hosts\\\"\n" printf
-  1 exit
-} ifthen
+// Either takes a replacement of f=\"...file...\"
+// for exampe: ./cat f=\"/etc/hosts\"
+// or with no replacement will ask for the file name to be entered.
 
 file library
+
+f initialised {
+  f
+} {
+  "File: " print
+  stdin file:: fgets file::() not {
+    "no file given" println
+    1 exit
+  } ifthen
+} if
+
+file var
+file swap =
 
 cat var
 cat {
@@ -28,4 +36,4 @@ cat {
   } if
 } =
 
-f cat()
+file cat()
