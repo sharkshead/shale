@@ -1,0 +1,68 @@
+#!/usr/local/bin/shale
+
+// Pointers in shale are created with the pointer assignment operator &=
+
+i var
+i 123 =
+p var
+p i &=
+
+// The above creates the variable i, assigns 123 to it, creates p, and assigns
+// it a pointer to i.
+//
+// To refer to the thing a pointer points to, use the dereference operator ->
+
+p-> println
+
+// will print out the value of i, 123
+
+p-> 987 =
+i println
+
+// will print 987.
+//
+// Pointers are not restricted to pointing at ohter variables, they can point to
+// any object at all, like numbers, strings and code fragments.
+
+p 123 &=
+p-> println
+
+// Of course you can't assign a new value to 123, so if you did
+//
+//  p-> 987 =
+//
+// you'd receive an error.
+//
+// Assigning a pointer to either a code fragment or a variable
+// whose value is a code fragment (a function) works as well.
+
+p { 1 2 + println } &=
+p->()
+
+f var
+f { 1200 34 + println } =
+p f &=
+p->()
+
+// And you can have pointers to pointers to pointers to your hearts content.
+
+pp var
+pp p &=
+pp->->()
+
+ppp var
+ppp pp &=
+ppp->->->()
+
+// And one final note, you can have two or more pointers to the same object,
+// by either creating a new pointer with &= or assigning it directly with =
+
+p i &=
+p2 var
+p2 i &=
+p3 var
+p3 p =    // could also do: p3 p2 =
+p3-> p2-> p-> i "i = %d, p-> = %d, p2-> = %d, p3-> = %d\n" printf
+
+p3-> 123 =
+p3-> p2-> p-> i "i = %d, p-> = %d, p2-> = %d, p3-> = %d\n" printf
