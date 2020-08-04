@@ -41,6 +41,11 @@
 // The "println" operator takes the top element off the stack and prints it
 // (with a newline).
 //
+// Another way to do this calculation is to push all the numbers on the stack
+// bfore calling the operators
+
+3 1 2 + * println
+
 // So, in a nutshell, you now know all the basics of shale - there is a stack you
 // put things on, and operators you call that take those stacked items and do stuff
 // with them, possibly leaving a result on the stack.
@@ -60,19 +65,23 @@
 //
 // Do these other programming languages allow you to create new code
 // on-the-fly within the script? Probably not. But I digress.
-//
+
+
+
 // Variables.
 //
 // Variables are created by pushing the name of a variable on the stack
-// and calling the var operator.
+// and calling the var operator
 
 i var
 
 // This creates the variable called i. Simple variables start with an alphabetic
 // character followed by zero or more alphanumeric or underscore characters.
 // You can create variables that don't follow these rules, which will be
-// explained in another example file, so we'll stick to simple variable names for now.
-//
+// explained in another example file, however we'll stick to simple variable names for now.
+
+
+
 // Assignments.
 //
 // To assign a value to a variable, push the name of the variable and the value
@@ -118,6 +127,8 @@ i-> println   // the pointer dereference operator. 987 will be output
 i-> 3.141 =   // another pointer dereference. this will assign 3.141 to j
 j println     // 3.141 will be output
 
+
+
 // If statements.
 //
 // Here's where we get into something cool. You've seen how you can push
@@ -143,13 +154,15 @@ i 100 < {     // the boolean and opening the then-code fragment
   "i is less than 100" println
 } {           // closing the then fragment and opening the else-code fragment
   "i is greater then or equal to 100" println
-} if          // closing the else fragment and the calling if operator
+} if          // closing the else fragment and the calling the if operator
 
 // There is also an ifthen operator where you don't sepcify the else fragment.
 
 i j != {
   "i and j are different" println
 } ifthen
+
+
 
 // While loops.
 //
@@ -162,6 +175,8 @@ i 0 =                   // initialise the loop counter.
   i "i = %d\n" printf   // do something interesting
   i i 1 + =             // increment the loop counter
 } while
+
+
 
 // Functions.
 //
@@ -192,9 +207,10 @@ f()         // another, more familiar, form
 
 
 
-// So that's it for this example file. The important takeaway from this is
-// to push things on the stack in the order expected by the operator you're
-// about to call.
+// Closing comment.
+//
+// The important takeaway from this is to push things on the stack in the order expected
+// by the operator you're about to call.
 //
 // For the full list of the operators do
 //
@@ -204,5 +220,6 @@ f()         // another, more familiar, form
 // for playing around. Simply run shale with no arguments.
 
 
-// PS. Comments can be introduced by //, as you see in this file,
-// or by #, also used in this file. Take you pick.
+
+// PS. Comments are introduced by // until the end of the line,
+// as you see in this file, or by #, also used in this file. Take you pick.
