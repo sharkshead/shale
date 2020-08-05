@@ -195,7 +195,7 @@ f {
 f execute   // one form of the execute operator
 f()         // another, more familiar, form
 
-// You'll notice there's no space between the f and (). You can put a space in,
+// You'll notice there's no space between the f and (). You can put a space in if you like,
 // but it's not neccessary becaue a name cannot contain a ( character, so shale
 // stops interpreting the name as soon as it hits the (. I add lots of
 // spaces and newlines and indents for clarity, but they are not strictly necessary.
@@ -215,11 +215,13 @@ f()         // another, more familiar, form
 // For the full list of the operators do
 //
 //  shale -s
-//
-// shale also plays nice when run interactively, which is great
-// for playing around. Simply run shale with no arguments.
 
 
 
 // PS. Comments are introduced by // until the end of the line,
 // as you see in this file, or by #, also used in this file. Take you pick.
+
+
+
+// PPS. shale also plays nice when run interactively, which is great
+// for playing around. Simply run shale with no arguments.
