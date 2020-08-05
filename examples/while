@@ -13,7 +13,7 @@
 n initialised not {
   file arg:: shale:: "Usage: %s n={n}\n" printf
   file arg:: shale:: "  eg: %s n=10\n" printf
-  0 exit
+  1 exit
 } ifthen
 
 // In C this could look like:
@@ -35,7 +35,7 @@ n initialised not {
 // Some sanity checking. n must be greater than 0.
 n 0 <= {
   "n must be greater than 0" println
-  0 exit
+  1 exit
 } ifthen
 
 // Define the variables.

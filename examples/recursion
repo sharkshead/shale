@@ -13,7 +13,7 @@
 n initialised not {
   file arg:: shale:: "Usage: %s n={n}\n" printf
   file arg:: shale:: "  eg: %s n=10\n" printf
-  0 exit
+  1 exit
 } ifthen
 
 factorial var
