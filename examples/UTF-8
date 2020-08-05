@@ -1,3 +1,5 @@
 #!/usr/local/bin/shale
 
 // shale is not UTF-8 os Unicode compliant.
+
+"shale is not UTF-8 or Unicode compliant" println
