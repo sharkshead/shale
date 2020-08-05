@@ -1,0 +1,43 @@
+#!/usr/local/bin/shale
+
+// There are three operators that might help you debug
+// a shale script: stack btree debug
+
+
+
+123 "abc123" 3.141
+"stack:" println
+stack
+
+// This prints the contents of the stack, top-of-stack
+// first through to the end, and does not change anything.
+// At the moment it can't print code fragments, but it can
+// print names, numbers, and strings.
+
+
+
+"" println
+"btree:" println
+btree
+
+// All namespace variables are stored in a BTree (as opposed
+// to simple variables that have a separate variable stack).
+// The btree operator prints each namespace variable along
+// with its valus. You'll notice that the internal name of
+// each namespace variable resembles a Unix pathname, so a
+// name such as
+//
+//  i ns::
+//
+// is stored in the BTree as /i/ns.
+
+
+
+"" println
+"debug:" println
+debug
+
+// This is really useful for diagnosing shale memory leaks.
+// It may not be that useful for diagnosing script problems, but if
+// you find that your code causes the numbers reported by debug
+// to rise endlessly, then you should let me know.
