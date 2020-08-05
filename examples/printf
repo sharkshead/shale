@@ -1,0 +1,58 @@
+#!/usr/local/bin/shale
+
+// printf, along with sprintf and fprintf from the file library, implements
+// a subset of the stdio.h printf's format specifiers, and includes
+// a couple of specifiers that are particular to shale.
+
+
+
+// %d %x %f %s
+//
+// These closely follow the stdio printf functionality, with one
+// notable exception. You can use them as above, and you can
+// also specify output widths, for example
+
+123 "abc123" 3.1415926 "%8.4f %-8s %10d\n" printf
+
+// What you can't do (the exception) is use * as a width specifier.
+// So although this would work fine in C or C++, it won't work in shale
+//
+//  123 10 "%*d\n" printf
+
+
+
+// %%
+//
+// Prints a single % character
+
+
+
+// %p
+//
+// %p is particular to shale and prints the object on
+// the stack no matter what type it is, using a default
+// set of formattting options. It is equivalent to the
+// print operator. It does not take a width specifier.
+
+
+
+// %n
+//
+// Another specifier that is particular to shale. This prints
+// the name of a variable on the stack. It does not take
+// a width specifier.
+
+
+
+// \n
+//
+// Prints a newline chanacter.
+
+
+
+// With any other % specifier you'll get an error message,
+// and with any other \-escape you'll just get the character.
+//
+// sprintf is the same as printf except it pushes the result
+// as a string on the stack, and fprintf in the file library
+// send its output to the file handle you specify.
