@@ -1670,7 +1670,7 @@ bool Printf::action() {
     if(*p == '%') {
       q = buf;
       *q++ = *p++;
-      while((*p != 0) && (*p != 'd') && (*p != 'f') && (*p != 's') && (*p != 't') && (*p != 'x') && (*p != 'X') && (*p != 'p') && (*p != 'n') && (*p != '%')) *q++ = *p++;
+      while((*p != 0) && (*p != 'd') && (*p != 'f') && (*p != 's') && (*p != 'x') && (*p != 'X') && (*p != 'p') && (*p != 'n') && (*p != '%')) *q++ = *p++;
       if(*p == 0) slexception.chuck("format error", getLexInfo());
       *q++ = *p;
       *q = 0;
@@ -1743,7 +1743,7 @@ bool Printf::action() {
     } else if(*p == '\\') {
       p++;
       if(*p == 'n') { *op++ = '\n'; *op = 0; }
-      else { *op++ = '\\'; *op++ = *p; *op = 0; }
+      else { *op++ = *p; *op = 0; }
     } else {
       *op++ = *p;
       *op = 0;

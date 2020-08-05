@@ -510,13 +510,9 @@ void lexNextToken(Lex &lex) {
         p = lex.str;
         while(lexChar != '"') {
           if(lexChar == '\\') {
+            *p++ = lexChar;
             lexGetChar();
-            if(lexChar == 'n') {
-              *p++ = '\\';
-              *p++ = 'n';
-            } else {
-              *p++ = lexChar;
-            }
+            *p++ = lexChar;
           } else {
             *p++ = lexChar;
           }
@@ -756,7 +752,7 @@ void syntax() {
   printf("\n");
   printf("Printf and sprintf operator\n");
   printf("  Takes the following %% specifiers and passes them, complete with any field width and decimal place specs, to printf:\n");
-  printf("    %%d %%x %%x %%f %%s %%%%\n");
+  printf("    %%d %%x %%f %%s %%%%\n");
   printf("  Takes %%p to print any object, ala the print keyword.\n");
   printf("  Takes %%n to print the name of a variable.\n");
   printf("  \\n produces a new line, all others are printed as-is\n");
