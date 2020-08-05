@@ -35,7 +35,7 @@ i 2 + println
 
 // and so on for most of the operators. If you give an operator
 // a name, it will use the named variable's value instead.
-// As you can see from the above code, the var and = (and the &=) operators
+// As you can see from the above code, the var and = (and &=) operators
 // do not use the variable's value, they use the variable itself.
 //
 // Variables can be created within a code fragment. So, for example, if a
@@ -54,7 +54,8 @@ factorial {
 } =
 10 factorial() "10! = %d\n" printf
 
-//
+
+
 // Variable scope.
 //
 // Variables can be defined within a code fragment, and they are accessible for
@@ -86,7 +87,7 @@ factorial {
 // the i from outside the code block, it only sees the new i created within this code fragment.
 //
 // There are a couple of ways of avoiding this problem. The simplest is to not push
-// the name i in the stack before calling factorial(), by pushing its value instead.
+// the name i in the stack before calling factorial(), but instead pushing its value.
 // You do this with the value or .value operator. So if we had said
 //
 //  i.value factorial() println
@@ -97,10 +98,9 @@ factorial {
 //
 // The second problem is getting values out of a code fragment. You can see how I've
 // done this in the fractorial() code above - use the .value (or value) operator.
-// If the res.value had not had the .value operator added then the name res would be
-// left on the stack when this code fragment finished. Once the factorial() code had
-// finished and left the res name on the stack, the following code will have to deal with
-// a name res rather than the value of res as calculated within the factorial() code.
+// If the .value operator had not been used then the name res would be left on the stack
+// when this code fragment finished, then the following code will have to deal with a
+// name res rather than the value of res as calculated within the factorial() code.
 //
 // The third issue is a function that uses a variable that it hasn't created and does
 // not know where that variable has been created. Consider a simple function that
@@ -117,7 +117,7 @@ printi()
 // This code will print 123.
 //
 // And now we introduce another code fragment, which could be a function or
-// any fragment, that defines another i, as in
+// part of an if or while, that defines another i, as in
 
 cf var
 cf {
@@ -132,7 +132,9 @@ cf()
 //
 // So, how to avoid these kind of problems? "Use the force, Luke!". Use the $ operator, along
 // with a good dose of coding standards.
-//
+
+
+
 // The $ operator turns a number or string on the top of the stack into a variable name.
 // This lets you circumvent the "alphabetic, alphanumeric and underscore" rule applied to
 // simple variables. So, if you want a variable called //#.!@**&554@@() push it as
@@ -166,7 +168,7 @@ factorial {
 // that are particular to the function name so they don't clash with the
 // variables in other function.
 //
-// However, there is another less verbose way, and one that I occasionally use,
+// However, there is another, less verbose way, and one that I occasionally use,
 // and that is to simply use numbers for the local variables. Another way to
 // write the factorial function is
 
@@ -182,4 +184,4 @@ factorial {
 
 
 // So that's it for simple variables and the $ operator. The next installment
-// of variables relates to namespaces, and that will be covered in another exmple file.
+// of variables relates to namespaces, and is covered in another example file.
