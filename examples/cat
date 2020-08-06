@@ -4,10 +4,16 @@
 
 // Either takes a replacement of f=\"...file...\"
 // for exampe: ./cat f=\"/etc/hosts\"
-// or with no replacement will ask for the file name to be entered.
+// or with no replacement will read the file name from stdin.
 
+
+
+// Load the file library. See
+//  help file::()
+// for the functionality provided by this library.
 file library
 
+// This if leaves the file name on the stack or exits if no file name is entered.
 f initialised {
   f
 } {
@@ -18,16 +24,14 @@ f initialised {
   } ifthen
 } if
 
-file var
-file swap =
-
+// Define the cat function, which assumes the file name is on the top of the stack.
 cat var
 cat {
   0$ var
 
-  "r" open file::() {
-    0$ swap =
-    { 0$ fgets file::() } {
+  "r" open file::() {         // Attempt to open the file read-only.
+    0$ swap =                 // Grab the file handle.
+    { 0$ fgets file::() } {   // Iterate through each line until we hit EOF.
       println
     } while
     0$ close file::()
@@ -36,4 +40,5 @@ cat {
   } if
 } =
 
-file cat()
+// Execute the cat function.
+cat()
