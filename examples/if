@@ -1,0 +1,51 @@
+#!/usr/local/bin/shale
+
+// if statements in shale come in two flavours: if and ifthen.
+// The if operator implements an if-then-else, and ifthen implements if-then.
+
+
+
+// if
+//
+// You push 3 things on the stack before calling the if operator:
+// first, a boolean, second a code fragment that will be executed if the boolean
+// is true, and third a code fragment that will be executed if the boolean
+// is false.
+//
+// For the boolean you can use any combination of the various comparison
+// and logical operators, like ==, || etc. A boolean is any number, integer
+// or floating point, which will be interpreted as false if it is 0 (zero)
+// and true for any non-zero value.
+//
+// The then-code and else-code fragments can either be inline fragments
+// of variables who's value is a code fragment. Usually they are inline fragments.
+
+i var
+i 123 =
+
+i 100 < {
+  "i is less than 100"
+} {
+  "i is greater than or equal to 100"
+} if
+println
+
+
+
+// ifthen
+//
+// The ifthen operator take a boolean and a then-code fragment.
+
+i 100 > {
+  "i is greater than 100" println
+} ifthen
+
+
+
+// Closing comment. The if and ifthen operators are relatively simple,
+// as you can see from the above examples. From a formatting point of view,
+// you want to be fairly rigorous in your placement of curly braces
+// and indenting so that you don't get lost in a sea of unreadable code
+// when you have many nested if's and ifthen's.
+// You can see my style above, but there are other styles that also
+// are simple to view and grasp visually.
