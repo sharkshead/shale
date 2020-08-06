@@ -111,29 +111,22 @@ a printArray()
 //
 // Getting an entry from a sparse array is a little more involved than a fully populated one.
 //
-// When you're fetching an entry in a sparse array you need to know if the entry is there and,
-// if it is, you want its value. The way the array library does this
-// is that you push a variable to store the value, along with the index and array name.
-// and get array::() will assign the value to the variable if the index exists, and will
-// leave on the stack a boolean value indicating whether the index exists.
-//
-// Upshot is, you need to define a variable to hold the value, and use the result
-// of get array::() in an if statement to work out what to do
+// If the entry exists and has a value then get array::() pushes the value and then true
+// on the stack, and if the entry does not exists or is not initialised it pushes false
+// on the stack.
 
-res var
-
-res "hlvb" fq get array::() {
-  res println
+"hlvb" fq get array::() {
+  println
 } {
   "hlvb does not exist" println
 } if
 
-res "ibb" fq get array::() {
-  res println
+"ibb" fq get array::() {
+  println
 } {
   "ibb does not exist" println
 } if
 
 // Access to array elements is pretty quick because all the entries are stored
-// in namespaces, which in turn are stored in a BTree. Creating a 1,000,000 entry
+// in namespaces, which shale stores in a BTree. Creating a 1,000,000 entry
 // fully populated array might take a few seconds, but accessing entries is lightning fast.

@@ -274,19 +274,17 @@ ArrayGet::ArrayGet(LexInfo *li) : Operation(li) { }
 bool ArrayGet::action() {
   Object *array;
   Object *index;
-  Object *variable;
   Name *arrayName;
   Number *indexNumber;
   String *indexString;
   Variable *v;
-  Variable *dst;
+  Object *val;
   char buf[1024];
   char element[1024];
   bool found;
 
   array = stack.pop(getLexInfo());
   index = stack.pop(getLexInfo());
-  variable = stack.pop(getLexInfo());
 
   arrayName = array->getName(getLexInfo());
 
@@ -317,16 +315,19 @@ bool ArrayGet::action() {
   sprintf(element, "/%s/%s", buf, arrayName->getValue());
   v = btree.findVariable(element);
   if(v != (Variable *) 0) {
-    dst = variableStack.findVariable(variable->getName(getLexInfo())->getValue());
-    dst->setObject(v->getObject());
-    stack.push(cache.newNumber((INT) 1));
+    val = v->getObject();
+    if(val != (Object *) 0) {
+      stack.push(val);
+      stack.push(cache.newNumber((INT) 1));
+    } else {
+      stack.push(cache.newNumber((INT) 0));
+    }
   } else {
     stack.push(cache.newNumber((INT) 0));
   }
 
   array->release(getLexInfo());
   index->release(getLexInfo());
-  variable->release(getLexInfo());
 
   return true;
 }
