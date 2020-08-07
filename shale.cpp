@@ -53,11 +53,8 @@ Keyword keyword[] = {
   { "execute",        LEX_TOKEN_KEYWORD_EXECUTE         },
   { "print",          LEX_TOKEN_KEYWORD_PRINT           },
   { "println",        LEX_TOKEN_KEYWORD_PRINTLN         },
-  { "pl",             LEX_TOKEN_KEYWORD_PRINTLN         },
   { "printf",         LEX_TOKEN_KEYWORD_PRINTF          },
-  { "pf",             LEX_TOKEN_KEYWORD_PRINTF          },
   { "sprintf",        LEX_TOKEN_KEYWORD_SPRINTF         },
-  { "spf",            LEX_TOKEN_KEYWORD_SPRINTF         },
   { "true",           LEX_TOKEN_KEYWORD_TRUE            },
   { "false",          LEX_TOKEN_KEYWORD_FALSE           },
   { "int",            LEX_TOKEN_KEYWORD_INT             },
@@ -720,11 +717,8 @@ void syntax() {
   printf("  {name} library                              - load the library {name}. see below\n");
   printf("  print           {value} print\n");
   printf("  println         {value} println\n");
-  printf("  pl                                          - same as println\n");
   printf("  printf          {args ...} {format} printf  - printf-like formatted output. see below\n");
-  printf("  pf                                          - same as printf\n");
   printf("  sprintf         {args ...} {format} sprintf - sprintf-like formatted output. see below\n");
-  printf("  spf                                         - same as sprintf\n");
   printf("  true                                        - pushes 1 on the stack\n");
   printf("  false                                       - pushes 0 on the stack\n");
   printf("  int             {n} int                     - convert to int\n");
