@@ -75,7 +75,6 @@ const char *fileHelp[] = {
   "  {handle} close file::()              - close the given file handle",
   "  {handle} fgets file::()              - get one line from the handle with newline stripped",
   "  ... {fmt} {handle} fprintf file::()  - fprintf to the given handle",
-  "  ... {fmt} {handle} fpf file::()      - same as fprintf",
   "  {handle} flush file::()              - flush the given handle's buffer",
   "  stdin file::                         - stdin",
   "  stdout file::                        - stdout",
@@ -93,7 +92,6 @@ FILE *handle[HANDLES];
 extern "C" void slmain() {
   OperationList *ol;
   Variable *v;
-  Object *fpf;
   int i;
 
   // Are we already loaded?
@@ -155,12 +153,7 @@ extern "C" void slmain() {
   ol = new OperationList;
   ol->addOperation(new FileFprintf((LexInfo *) 0));
   v = new Variable("/fprintf/file");
-  fpf = new Code(ol);
-  v->setObject(fpf);
-  btree.addVariable(v);
-
-  v = new Variable("/fpf/file");
-  v->setObject(fpf);
+  v->setObject(new Code(ol));
   btree.addVariable(v);
 
   ol = new OperationList;
