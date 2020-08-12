@@ -4,7 +4,7 @@
 // It is based on the python code from the Computerphile video https://www.youtube.com/watch?v=G_UYXzGuqvM
 // The sudoku example from this video is used below.
 
-// The sudoku grid is stored in a multi-dimentional array under the grid:: namespace.
+// The sudoku grid is stored in a multi-dimensional array under the grid:: namespace.
 // The row and column of each cell is represented by:
 //
 //  row column:: grid::
