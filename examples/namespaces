@@ -11,27 +11,27 @@
 // rather than a lexical scope you'd expect in a C-like language.
 // You can read more about this in the variables example file.
 //
-// Namespaces can use used to store variables that are global. They are not
+// Namespaces can be used to store variables that are global. They are not
 // tied to a code fragmet's execution. And namespaces have features that
 // mean they can be used to implement arrays (single or multi-dimensional,
 // fully populated and sparse). You can even think of namespaces as
 // something like a perl hash, or even a struct or class if you really
 // squint your eyes. shale doesn't have structs or classes, but you can
-// use namespaces to achieve simething resembling them.
+// use namespaces to achieve something resembling them.
 //
 // The namespace operator is :: and it takes an index and a name from
 // the stack
 //
 //  i ns::
 //
-// to create a variable name of index i in the namespace ns.
+// is the variable i in the namespace ns.
 // All this does is create a variable name. It doesn't create the variable.
 // You create the variable with the var operator as you would with
 // simple variables
 
 i ns:: var
 
-// And you can use "i ns::" snywhere you can use a simple variable.
+// And you can use "i ns::" anywhere you can use a simple variable.
 // You can assign a value to it
 
 i ns:: 123 =
@@ -60,7 +60,7 @@ i ns:: println        // 3.141
 i a:: b:: var
 
 // creates i in namespace a in namespace b. Effectively b::a::i.
-// You can nest them as deep as you want, subject to variable name limitations,
+// You can nest them as deep as you want, subject to variable name length limitations,
 // and again you can use this like any other variable.
 //
 // The index and namespac name don't have to be names, they can be numbers
@@ -69,9 +69,7 @@ i a:: b:: var
 0 a:: var
 0 a:: 123 =
 
-// In effect this has created the equivalent of a[0] = 123 in C.
-// With some helper functions to create and initiaiase array elements,
-// in the array library, you have a fully functional array.
+// In effect this is the equivalent of a[0] = 123 in C.
 //
 // And if you want the equivalent of a[i] you could use
 
@@ -96,7 +94,7 @@ i.value j.value:: a:: println
 // not be that useful, but strings are ueful whem your index or name
 // is not an integer, like a code composed of alphanumeric charaters.
 //
-// shale also uses a namespace to store a couple of things you may find useful
+// shale also uses the shale:: namespace to store a couple of things you may find useful
 
 file arg:: shale:: "file argument '%s'\n" printf
 micro version:: shale:: minor version:: shale:: major version:: shale:: "shale version %d.%d.%d\n" printf
