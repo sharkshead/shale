@@ -4,6 +4,13 @@
 // It is based on the python code from the Computerphile video https://www.youtube.com/watch?v=G_UYXzGuqvM
 // The sudoku example from this video is used below.
 
+// The sudoku grid is stored in a multimentional array under the grid:: namespace.
+// The row and column of each cell is represented by
+//
+//  row column:: grid::
+//
+// A 0 value represents an empty cell, and a 1 to 9 value represents a cell value.
+
 printGrid var
 printGrid {
   r var
@@ -35,8 +42,17 @@ setRow {
   r var r swap =
   i var
 
+  r 0 < r 8 > or {
+    r "Illegal row %d\n" printf
+    1 exit
+  } ifthen
+
   i 0 =
   { i 9 < } {
+    i.value$ 0 < i.value$ 9 > or {
+      i r i.value$ "Illegal value %d specified for r%dc%d\n" printf
+      1 exit
+    } ifthen
     r.value i.value:: grid:: defined not {
       r.value i.value:: grid:: var
     } ifthen
