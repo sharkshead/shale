@@ -81,14 +81,20 @@ Keyword dotKeyword[] = {
 
 INT atoINT(const char *p) {
   INT res;
+  bool neg;
 
   res = 0;
+  neg = false;
+  if(*p == '-') {
+    neg = true;
+    p++;
+  }
   while(*p != 0) {
     res *= 10;
     res += *p - '0';
     p++;
   }
-  return res;
+  return neg ? -res : res;
 }
 
 void lexGetChar() {
