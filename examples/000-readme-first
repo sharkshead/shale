@@ -85,7 +85,7 @@ i var
 // Assignments.
 //
 // To assign a value to a variable, push the name of the variable and the value
-// on the stack and call the = operatos
+// on the stack and call the = operator
 
 i 123 =
 
@@ -197,8 +197,9 @@ f()         // another, more familiar, form
 
 // You'll notice there's no space between the f and (). You can put a space in if you like,
 // but it's not neccessary becaue a name cannot contain a ( character, so shale
-// stops interpreting the name as soon as it hits the (. I add lots of
-// spaces and newlines and indents for clarity, but they are not strictly necessary.
+// stops interpreting the name as soon as it hits the (.
+//
+// I add lots of spaces and newlines and indents for clarity, but they are not strictly necessary.
 // For example, here's the function definition above with all unnecessary spacing removed
 //
 //  f{1 2+3*println}=
@@ -218,7 +219,7 @@ f()         // another, more familiar, form
 
 
 
-// PS. Comments are introduced by // until the end of the line,
+// PS. Comments are introduced by // and extend to the end of the line,
 // as you see in this file, or by #, also used in this file. Take your pick.
 
 
