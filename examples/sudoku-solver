@@ -164,7 +164,7 @@ solve {
 8 0 0 0 0 8 0 0 7 9 setRow()
 
 // From https://www.youtube.com/watch?v=MXUgYxHmKq4&t=0s
-// This is a Cracking The Cryptic video and takes considerably longer than the one above.
+// This sudoku was featured on Cracking The Cryptic, and takes considerably longer than the one above.
 // 0 0 6 8 0 0 0 0 1 3 setRow()
 // 1 0 0 0 9 0 1 0 0 0 setRow()
 // 2 0 0 0 0 0 8 0 0 4 setRow()
