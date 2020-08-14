@@ -54,5 +54,5 @@
 // and with any other \-escape you'll just get the character.
 //
 // sprintf is the same as printf except it pushes the result
-// as a string on the stack, and fprintf in the file library
-// send its output to the file handle you specify.
+// as a string on the stack, and fprintf, in the file library,
+// sends its output to the file handle you specify.
