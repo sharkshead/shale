@@ -145,7 +145,7 @@ j println     // 3.141 will be output
 //
 // You push a code fragment on the stack by enclosing it within curly braces
 // 
-//  { 1 2 + pl }
+//  { 1 2 + println }
 //
 // Here's an if operator example, using the boolean less-then operator.
 
@@ -161,6 +161,9 @@ i 100 < {     // the boolean and opening the then-code fragment
 i j != {
   "i and j are different" println
 } ifthen
+
+// A quick note on booleans. shale follows the convention of a boolean being a number,
+// either an integer or floating point, where 0 (zero) is false, and not zero is true.
 
 
 
@@ -205,12 +208,18 @@ f()         // another, more familiar, form
 //  f{1 2+3*println}=
 //
 // You can see, I hope, why I space things out.
+//
+// There is a side effect of this type of "function" - there is no return statement.
+// A "function" is just a code fragment assigned to a variable. In effect, the variable
+// becomes a place holder for the code fragment. The lack of a return statement may
+// complicate some code and it may force you to arrange you code differently to how
+// you would in a language with proper functions.
 
 
 
 // Closing comment.
 //
-// The important takeaway from this is to push things on the stack in the order expected
+// The important takeaway with shale is to push things on the stack in the order expected
 // by the operator you're about to call.
 //
 // For the full list of the operators do
@@ -224,5 +233,5 @@ f()         // another, more familiar, form
 
 
 
-// PPS. shale also plays nice when run interactively, which is great
-// for playing around. Simply run shale with no arguments.
+// PPS. shale plays nice when run interactively, which is great
+// for trying things out. Simply run shale with no arguments.
