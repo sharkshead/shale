@@ -798,7 +798,7 @@ void syntax() {
   printf("  once the library is loaded, and will detail all of the functionality the library provides.\n");
   printf("  Current libraries are:\n");
   printf("    array       - support for sparse and fully populated arrays. See help array::() for details.\n");
-  printf("    file        - some stdio function. See help file::() for details.\n");
+  printf("    file        - some stdio functions. See help file::() for details.\n");
   printf("    maths       - pi, e, log functions, etc. See help maths::() for details.\n");
   printf("\n");
   printf("Generating new shale code from within shale\n");
