@@ -805,7 +805,7 @@ void syntax() {
   printf("  You can generate new shale code by adding code blocks together with the + operator.\n");
   printf("  The + operator will take two code blocks, or variables whose value is a code block,\n");
   printf("  and push on the stack a code block that combines both. For example\n");
-  printf("    { 6 7 } { * pl } + execute\n");
+  printf("    { 6 7 } { * println } + execute\n");
   printf("  will output 42\n");
   printf("\n");
   printf("Replacements\n");
