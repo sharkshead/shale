@@ -260,7 +260,7 @@ void String::debug() { printf("String: %s\n", str); }
 Name::Name(const char *n) : Object() {
   int i;
 
-  for(i = 0; (i < 31) && (n[i] != 0); i++) {
+  for(i = 0; (i < (MAX_NAME_LENGTH - 1)) && (n[i] != 0); i++) {
     name[i] = n[i];
   }
   name[i] = 0;
@@ -1529,12 +1529,12 @@ bool Namespace::action() {
   i = 0;
   p = inelementp;
   if(*p != '/') namebuf[i++] = '/';
-  for(j = 0; (p[j] != 0) && (i < 30); j++, i++) namebuf[i] = p[j];
+  for(j = 0; (p[j] != 0) && (i < (MAX_NAME_LENGTH - 2)); j++, i++) namebuf[i] = p[j];
   if(p[j] != 0) slexception.chuck("name too long", getLexInfo());
 
   p = nselementp;
   if(*p != '/') namebuf[i++] = '/';
-  for(j = 0; (p[j] != 0) && (i < 31); j++, i++) namebuf[i] = p[j];
+  for(j = 0; (p[j] != 0) && (i < (MAX_NAME_LENGTH - 1)); j++, i++) namebuf[i] = p[j];
   if(p[j] != 0) slexception.chuck("name too long", getLexInfo());
 
   namebuf[i] = 0;

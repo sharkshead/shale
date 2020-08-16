@@ -48,6 +48,8 @@ using namespace std;
 
 #define INT long int
 
+#define MAX_NAME_LENGTH    64
+
 #define BTREE_DATA_COUNT    6
 
 // The LexInfo and Exception class tie an execution error back to the input.
@@ -150,7 +152,7 @@ class Name : public Object {
     void debug();
 
   private:
-    char name[32];
+    char name[MAX_NAME_LENGTH];
 };
 
 class OperationList;
