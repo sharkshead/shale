@@ -32,7 +32,7 @@
 //  } =
 //
 // shale does have a break operator that will break you out of the
-// enclosing while loop. no matter how deep into other code fragments
+// enclosing while loop, no matter how deep into other code fragments
 // you are:
 //
 //  { i 10 < } {
@@ -60,30 +60,30 @@
 //    j 0 =
 //    { j 10 < }
 //      some-condition {
-//        return true =
-//        break   // break from the "j" while
+//        return true =   // set our return valiable to true
+//        break           // break from the "j" while
 //      } ifthen
 //      j j 1 + =
 //    } while
-//    return {
-//      break     // break from the "i" while
+//    return {            // should we return
+//      break             // yes, break from the "i" while
 //    } ifthen
 //    i i 1 + =
 //  } while
-//  ... execution continues here after the break
+//  ... execution continues here after the initial break
 //
 // In the code above, if some-condition is true then we set the
 // value of "return" to true and break. The code will then continue after
-// the inner while and hit the ifthen test on return, and
+// the inner while and hit the ifthen test on return, which
 // will execute another break, terminating the outer while.
 //
 // If, on the other hand, you don't have any while loops to break from
 // and your code consists of nested if/ifthen's, and you want to return
 // from deep inside the nesting, then the simplest thing to do is enclose
-// your code in a while. That way you can call break from anywhere in your
+// your code in a while. That way you can break from anywhere in your
 // nested if's and you'll immediately be outside the enclosing while.
 // Of course you need to ensure you don't go around the while loop,
-// but that's easy to avoid:
+// which is easy to avoid:
 //
 //  return var
 //  return true =
