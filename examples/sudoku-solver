@@ -70,30 +70,30 @@ possible {
   j var
   r0 var
   c0 var
-  ret var
+  return var
 
-  ret true =
+  return true =
 
   i 0 =
   { i 9 < } {
     r.value i.value:: grid:: n == {
-      ret false =
+      return false =
       break
     } ifthen
     i i 1 + =
   } while
 
-  ret {
+  return {
     i 0 =
     { i 9 < } {
       i.value c.value:: grid:: n == {
-        ret false =
+        return false =
         break
       } ifthen
       i i 1 + =
     } while
 
-    ret {
+    return {
       r0 r 3 / 3 * =
       c0 c 3 / 3 * =
       i 0 =
@@ -101,18 +101,18 @@ possible {
         j 0 =
         { j 3 < } {
           r0 i + c0 j +:: grid:: n == {
-            ret false =
+            return false =
             break
           } ifthen
           j j 1 + =
         } while
-        ret not { break } ifthen
+        return not { break } ifthen
         i i 1 + =
       } while
     } ifthen
   } ifthen
 
-  ret.value
+  return.value
 } =
 
 solve var
