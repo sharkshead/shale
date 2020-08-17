@@ -1,0 +1,102 @@
+#!/usr/local/bin/shale
+
+// Functions. shale doesn't have functions, even though I mention
+// them constantly. shale doesn't have functions. What shale has is the
+// ability to assign a code fragment to a variable, and then execute
+// that code fragment. Executing a code fragment tucked away in
+// a variable is no different to the if, ifthen of while operators
+// executing code fragments in order to achieve their stated aims.
+//
+// The upshot of this is that there is no return statement like you
+// find in other languages.
+//
+// So how do you live without a return statement? That depends.
+//
+// If your "function" has a few initial conditions which, if not met,
+// cause you function to return, simply put their negation in
+// an ifthen:
+//
+//  void fn(int arg) {
+//    if(arg == 0) return;
+//    if(some-other-condition) return;
+//    ... rest of function
+//  }
+//
+// could become
+//
+//  fn var
+//  fn {
+//    arg 0 != some-other-condition not and {
+//      ... rest of function
+//    } ifthen
+//  } =
+//
+// shale does have a break operator that will break you out of the
+// enclosing while loop. no matter how deep into other code fragments
+// you are:
+//
+//  { i 10 < } {
+//    some-condition {
+//      break
+//    } ifthen
+//    i i 1 + =
+//  } while
+//  ... execution will resume here after the break
+//
+// Even though the break is in a code fragment executed by ifthen,
+// the code execution will continue after the while. This is
+// what will happen no matter how deep you are into other code
+// fragments - the nearest enclosing while will terminate.
+//
+// If you have nested while loops and you want to return from an
+// inner loop, then you'll need a variable, which I often call "return".
+// Set this to false at the start and set it to true before you
+// do the break, and then include ifthen code to perform further
+// breaks until you are out of your nested loops.
+//
+//  return var
+//  return false =
+//  { i 10 < } {
+//    j 0 =
+//    { j 10 < }
+//      some-condition {
+//        return true =
+//        break   // break from the "j" while
+//      } ifthen
+//      j j 1 + =
+//    } while
+//    return {
+//      break     // break from the "i" while
+//    } ifthen
+//    i i 1 + =
+//  } while
+//  ... execution continues here after the break
+//
+// In the code above, if some-condition is true then we set the
+// value of "return" to true and break. The code will then continue after
+// the inner while and hit the ifthen test on return, and
+// will execute another break, terminating the outer while.
+//
+// If, on the other hand, you don't have any while loops to break from
+// and your code consists of nested if/ifthen's, and you want to return
+// from deep inside the nesting, then the simplest thing to do is enclose
+// your code in a while. That way you can call break from anywhere in your
+// nested if's and you'll immediately be outside the enclosing while.
+// Of course you need to ensure you don't go around the while loop,
+// but that's easy to avoid:
+//
+//  return var
+//  return true =
+//  { return } {
+//    ... lots of nested if and ifthen operators
+//      break           // a break anywhere will exit the enclosing while loop
+//                      // if there are no breaks we still need the while loop to
+//                      // terminate, so we set return to false.
+//    return false =    // don't go around the loop
+//  } while
+//
+// There are millions of ways your function could return from
+// deep within the code, and I can't cover them all, but I hope I've
+// given you some thoughts on how to handle a return-less language.
+
+"Please read this file rather than executing it." println
