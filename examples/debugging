@@ -37,7 +37,27 @@ btree
 "debug:" println
 debug
 
-// This is really useful for diagnosing shale memory leaks.
-// It may not be that useful for diagnosing script problems, but if
-// you find that your code causes the numbers reported by debug
-// to rise endlessly, then you should let me know.
+// This is really useful for diagnosing stack and namespace blowouts,
+// and shale memory leaks.
+//
+// These numbers are all interrelated to some degree.
+//
+// If your stack number (size minus free) rises as your script runs then
+// you are pushing objects on the stack without calling an operator
+// to deal with those objects. You'll need to work out where these
+// pushes are occuring and either remove them or work out why you're
+// not calling the intended operator. If your stack numbers are rising
+// you may also find that the "Number, String, Pointer" numbers also rise.
+// This is an artifact of pushing something on the stack and never processing it.
+// It wont always be the case that the "Number, ..." numbers will rise,
+// it's just more likely that they will.
+//
+// If your BTree numbers rise then this means you're storing more and more
+// entries in namespace variables. You will quite possibly get a similar
+// rise in the "Number, ..." numbers. If you're expecting your script to
+// store more and more data in namespace variables then this is OK,
+// but if you're not then you have a namespace blowout problem.
+//
+// If the stack and BTree numbers are static and the "Number, ..." numbers
+// are risinng then this is a pretty good indicator that there is
+// a memory leak within shale. If this happens, please let me know.
