@@ -11,6 +11,11 @@
 //
 // A 0 value represents an empty cell, and a 1 to 9 value represents a cell value.
 
+increment var
+increment {
+  dup 1 + =
+} =
+
 printGrid var
 printGrid {
   r var
@@ -21,10 +26,10 @@ printGrid {
     c 0 =
     { c 9 < } {
       r.value c.value:: grid:: dup 0 == { pop " ." } { " %d" } if printf
-      c c 1 + =
+      c increment()
     } while
     "" println
-    r r 1 + =
+    r increment()
   } while
 } =
 
@@ -57,7 +62,7 @@ setRow {
       r.value i.value:: grid:: var
     } ifthen
     r.value i.value:: grid:: i.value$ =
-    i i 1 + =
+    i increment()
   } while
 } =
 
@@ -80,7 +85,7 @@ possible {
       return false =
       break
     } ifthen
-    i i 1 + =
+    i increment()
   } while
 
   return {
@@ -90,7 +95,7 @@ possible {
         return false =
         break
       } ifthen
-      i i 1 + =
+      i increment()
     } while
 
     return {
@@ -104,10 +109,10 @@ possible {
             return false =
             break
           } ifthen
-          j j 1 + =
+          j increment()
         } while
         return not { break } ifthen
-        i i 1 + =
+        i increment()
       } while
     } ifthen
   } ifthen
@@ -135,15 +140,15 @@ solve {
             solve()
             r.value c.value:: grid:: 0 =
           } ifthen
-          n n 1 + =
+          n increment()
         } while
         prt false =
         break
       } ifthen
-      c c 1 + =
+      c increment()
     } while
     prt not { break } ifthen
-    r r 1 + =
+    r increment()
   } while
 
   prt {
