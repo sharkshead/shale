@@ -18,7 +18,7 @@
 // and true for any non-zero value.
 //
 // The then-code and else-code fragments can either be inline fragments
-// of variables who's value is a code fragment. Usually they are inline fragments.
+// of variables whose value is a code fragment. Usually they are inline fragments.
 
 i var
 i 123 =
@@ -39,6 +39,23 @@ println
 i 100 > {
   "i is greater than 100" println
 } ifthen
+
+
+
+// One or both of the then-code and else-code fragments don't need to be
+// inline { ...code... } fragments. They can also be variables whose value is a code fragment.
+
+some_condition var
+some_condition true =
+good var
+good {
+  "This is good"
+} =
+bad var
+bad {
+  "This is bad"
+} =
+some_condition good bad if println
 
 
 

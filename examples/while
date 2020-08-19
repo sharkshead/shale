@@ -28,7 +28,8 @@ n initialised not {
 //  }
 //  printf("%d\n", res);
 //
-// The while operator expects two code fragments on the stack,
+// The while operator expects two code fragments or variables whose
+// value is a code fragment on the stack,
 // one that indicates whether the loop should terminate or keep going,
 // and the other is the body of the while.
 
