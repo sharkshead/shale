@@ -12,7 +12,7 @@
 // You can read more about this in the variables example file.
 //
 // Namespaces can be used to store variables that are global. They are not
-// tied to a code fragmet's execution. And namespaces have features that
+// tied to a code fragment's execution. And namespaces have features that
 // mean they can be used to implement arrays (single or multi-dimensional,
 // fully populated and sparse). You can even think of namespaces as
 // something like a perl hash, or even a struct or class if you really

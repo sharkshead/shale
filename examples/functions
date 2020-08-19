@@ -4,7 +4,7 @@
 // them constantly. shale doesn't have functions. What shale has is the
 // ability to assign a code fragment to a variable, and then execute
 // that code fragment. Executing a code fragment tucked away in
-// a variable is no different to the if, ifthen of while operators
+// a variable is no different to the if, ifthen or while operators
 // executing code fragments in order to achieve their stated aims.
 //
 // The upshot of this is that there is no return statement like you
@@ -13,7 +13,7 @@
 // So how do you live without a return statement? That depends.
 //
 // If your "function" has a few initial conditions which, if not met,
-// cause you function to return, simply put their negation in
+// cause your function to return, simply put their negation in
 // an ifthen:
 //
 //  void fn(int arg) {
@@ -52,7 +52,7 @@
 // inner loop, then you'll need a variable, which I often call "return".
 // Set this to false at the start and set it to true before you
 // do the break, and then include ifthen code to perform further
-// breaks until you are out of your nested loops.
+// breaks when "return" is true until you are out of your nested loops.
 //
 //  return var
 //  return false =
@@ -82,8 +82,8 @@
 // from deep inside the nesting, then the simplest thing to do is enclose
 // your code in a while. That way you can break from anywhere in your
 // nested if's and you'll immediately be outside the enclosing while.
-// Of course you need to ensure you don't go around the while loop,
-// which is easy to avoid:
+// Of course you need to ensure you don't go around the while loop
+// a second time, which is easy to avoid:
 //
 //  return var
 //  return true =
@@ -92,7 +92,7 @@
 //      break           // a break anywhere will exit the enclosing while loop
 //                      // if there are no breaks we still need the while loop to
 //                      // terminate, so we set return to false.
-//    return false =    // don't go around the loop
+//    return false =    // don't go around the loop again
 //  } while
 //
 // There are millions of ways your function could return from
