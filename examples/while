@@ -55,3 +55,20 @@ res 0 =
 } while
 
 res "%d\n" printf
+
+// The either or both of the condition and body can also be variables
+// whose value is a code fragment.
+
+i 0 =
+res 0 =
+condition var
+condition {
+  i 10 <=
+} =
+body var
+body {
+  res res i + =
+  i i 1 + =
+} =
+condition body while
+res "%d\n" printf
