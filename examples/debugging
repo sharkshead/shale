@@ -5,7 +5,7 @@
 
 
 
-123 "abc123" 3.141
+{ "a code fragment" } 123 "abc123" 3.141
 "stack:" println
 stack
 
