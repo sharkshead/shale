@@ -37,9 +37,9 @@
 // leave their results on the stack.
 //
 // In the case of the "+" operator, it take the top two elements off the stack,
-// adds them together, and puts the result on the stack.
-// The "println" operator takes the top element off the stack and prints it
-// (with a newline).
+// adds them together, and puts the result on the stack. Similarly with the "3" and "*" operator.
+// The "println" operator takes the top element off the stack and prints it,
+// with a newline.
 //
 // Another way to do this calculation is to push all the numbers on the stack
 // bfore calling the operators
@@ -210,10 +210,11 @@ f()         // another, more familiar, form
 // You can see, I hope, why I space things out.
 //
 // There is a side effect of this type of "function" - there is no return statement.
-// A "function" is just a code fragment assigned to a variable. In effect, the variable
+// A shale "function" is just a code fragment assigned to a variable. In effect, the variable
 // becomes a place holder for the code fragment. The lack of a return statement may
 // complicate some code and it may force you to arrange you code differently to how
-// you would in a language with proper functions.
+// you would in a language with proper functions. See the "functions" example for
+// ideas on dealing with a return-less function.
 
 
 
@@ -222,7 +223,7 @@ f()         // another, more familiar, form
 // The important takeaway with shale is to push things on the stack in the order expected
 // by the operator you're about to call.
 //
-// For the full list of the operators do
+// For the full list of operators, do
 //
 //  shale -s
 

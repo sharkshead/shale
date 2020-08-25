@@ -5,9 +5,6 @@
 // Namespaces can be used for arrays, both fully populated and sparse,
 // and for something similar to structs and classes.
 //
-// For an example of sparse arrays see the array.sparse example file.
-// For an example of structs and classes, see the structs example file.
-//
 // Described here is an example of using namespaces to implement
 // fully populated arrays, meaning the equivalent of, for example, int a[10]; in C.
 //
@@ -76,7 +73,7 @@ i.value a:: 987 =
 1 a:: println
 7 a:: println
 
-// If you check the btree output you'll notice an entry "_$" a::
+// If you check the btree output (see debuging) you'll notice an entry "_$" a:: (as "/_$/a")
 // This is simply the count from when you used create array::(). You can use this
 // as well to iterate through the array, like this print function
 
@@ -107,9 +104,9 @@ a printArray()
 "oiar" fq "Only in a rerun" set array::()
 "tgte" fq "These go to eleven" set array::()
 
-// This has created the "hlvb", "oiar" and "tgte" indexes with their given values in fq.
+// This has created the "hlvb", "oiar" and "tgte" indicies with their given values in fq.
 //
-// Getting an entry from a sparse array is a little more involved than a fully populated one.
+// Getting an entry from a sparse array is a little more involved than a fully populated array.
 //
 // If the entry exists and has a value then get array::() pushes the value and then true
 // on the stack, and if the entry does not exists or is not initialised it pushes false
