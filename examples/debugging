@@ -5,18 +5,6 @@
 
 
 
-{ "a code fragment" } 123 "abc123" 3.141
-"stack:" println
-stack
-
-// This prints the contents of the stack, top-of-stack
-// first through to the end, and does not change anything.
-// At the moment it can't print code fragments, but it can
-// print names, numbers, and strings.
-
-
-
-"" println
 "btree:" println
 btree
 
@@ -30,6 +18,18 @@ btree
 //  i ns::
 //
 // is stored in the BTree as /i/ns.
+
+
+
+"" println
+"stack:" println
+{ "a code fragment" } 123 "abc123" 3.141 aName a namespace:: variable::
+stack
+
+// This prints the contents of the stack, top-of-stack
+// first through to the end, and does not change anything.
+// At the moment it can't print code fragments, but it can
+// print names, numbers, and strings.
 
 
 
