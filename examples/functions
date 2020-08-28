@@ -85,14 +85,14 @@
 // Of course you need to ensure you don't go around the while loop
 // a second time, which is easy to avoid:
 //
-//  return var
-//  return true =
-//  { return } {
+//  once var
+//  once true =
+//  { once } {
 //    ... lots of nested if and ifthen operators
 //      break           // a break anywhere will exit the enclosing while loop
 //                      // if there are no breaks we still need the while loop to
 //                      // terminate, so we set return to false.
-//    return false =    // don't go around the loop again
+//    once false =      // don't go around the loop again
 //  } while
 //
 // There are millions of ways your function could return from
