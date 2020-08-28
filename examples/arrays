@@ -73,7 +73,7 @@ i.value a:: 987 =
 1 a:: println
 7 a:: println
 
-// If you check the btree output (see debuging) you'll notice an entry "_$" a:: (as "/_$/a")
+// If you check the btree output (see debugfing) you'll notice an entry "_$" a:: (as "/_$/a")
 // This is simply the count from when you used create array::(). You can use this
 // as well to iterate through the array, like this print function
 
@@ -109,7 +109,7 @@ a printArray()
 // Getting an entry from a sparse array is a little more involved than a fully populated array.
 //
 // If the entry exists and has a value then get array::() pushes the value and then true
-// on the stack, and if the entry does not exists or is not initialised it pushes false
+// on the stack, and if the entry does not exist or is not initialised it pushes false
 // on the stack.
 
 "hlvb" fq get array::() {
