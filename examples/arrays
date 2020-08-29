@@ -73,7 +73,7 @@ i.value a:: 987 =
 1 a:: println
 7 a:: println
 
-// If you check the btree output (see debugfing) you'll notice an entry "_$" a:: (as "/_$/a")
+// If you check the btree output (see debugging) you'll notice an entry "_$" a:: (as "/_$/a")
 // This is simply the count from when you used create array::(). You can use this
 // as well to iterate through the array, like this print function
 
