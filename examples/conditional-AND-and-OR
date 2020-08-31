@@ -1,0 +1,33 @@
+#!/usr/local/bin/shale
+
+// In most every language today the logical AND and OR operators
+// are conditional, meaning that the second clause of the AND or OR
+// is only evaluated if needed. In an RPN language like shale,
+// where you must push on the stack all the values that each
+// operator needs, you would think you can't have a conditional AND or OR.
+//
+// Not so.
+//
+// For brevity I'll use the && (and) operator here, but this works
+// for || (or) as well.
+//
+// To effect a conditional AND, push the first condition on the stack
+// as usual, then push a code fragment on the stack that, when executed,
+// will push your second condition on the stack.
+//
+// For example, something like this
+//
+//  cond1 cond2 and ...
+//
+// would turn into
+//
+//  cond1 { cond2 } and ...
+//
+// Both AND and OR will only executre the code fragment if the value
+// of the first condition does not already decide the value of the overall
+// AND or OR value.
+//
+// Conditional AND and OR can have profound functionality and performance
+// impacts on your code,
+
+"Please read this file rather than executing it." println
