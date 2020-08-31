@@ -1,0 +1,37 @@
+#!/usr/local/bin/shale
+
+// shale libraries are loaded with the "library" operator.
+// Each library will add functions you may call,
+// or variables you may reference.
+//
+// At the time of writing, there are three libraries avilable
+//
+//  array
+//  file
+//  maths
+//
+// To load a library, user the library operator
+
+array library
+file library
+maths library
+
+// Each library stores all they functions and variables under
+// a namespae of their name. So, for example, the maths
+// library uses the maths:: namespace.
+//
+// Every library provides a help function, always accessible
+// from within the library's namespace.
+
+help maths::()
+
+// Here's an example of using one of the maths library's functions
+
+2 sqrt maths::() "√2 = %0.15f\n" printf
+
+// Check out each librar's help function before use. Running shale
+// interactively is great for this - run shale with no arguments
+// and enter
+//
+//  file library
+//  help file::()
