@@ -130,8 +130,10 @@ cf()
 // This last cf() call will print 987. And that's because the i defined within the cf fragment
 // is visible to all fragments, including the call to printi(), until the cf() fragment ends.
 //
-// So, how to avoid these kind of problems? "Use the force, Luke!". Use the $ operator, along
-// with a good dose of coding standards.
+// So, how do you avoid these kind of problems? Use of the .value (or value) operator
+// when passing values in to, or out from, a code fragment goes a long way to solving this issue.
+// Another way to help is to use the $ operator to create non-standard variable names,
+// along with a coding standard that specifies how to name "local" variables.
 
 
 
