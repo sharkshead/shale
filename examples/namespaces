@@ -89,6 +89,8 @@ i.value j.value:: a:: println
 
 // will print the value of a[j][i], 987.
 //
+// There is an example of using multi-dimensional arrays in the sudoku-solver example.
+//
 // Taking it further, the index and namespace name can be strings
 // or floating point numbers, as well. Floating point numbers may
 // not be that useful, but strings are ueful whem your index or name

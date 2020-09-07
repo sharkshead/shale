@@ -30,7 +30,8 @@
 //  i.value a::
 //
 // You can roll your own array functions if you like, or you can use
-// the functions provided by the "array" library.
+// the functions provided by the "array" library. An example of a roll-your-own
+// array implementation can be found in the sudoku-solver example.
 
 array library
 
