@@ -12,7 +12,7 @@
 // for || (or) as well.
 //
 // To effect a conditional AND, push the first condition on the stack
-// as usual, then push a code fragment on the stack that, when executed,
+// as usual, then push a code fragment on the stack which, when executed,
 // will push your second condition on the stack.
 //
 // For example, something like this
