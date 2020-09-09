@@ -59,11 +59,11 @@ i ns:: println        // 3.141
 
 i a:: b:: var
 
-// creates i in namespace a in namespace b. Effectively b::a::i.
+// is i in namespace a, which is turn is in namespace b. Effectively b::a::i.
 // You can nest them as deep as you want, subject to variable name length limitations,
 // and again you can use this like any other variable.
 //
-// The index and namespac name don't have to be names, they can be numbers
+// The index and namespace name don't have to be names, they can be numbers
 // or strings.
 
 0 a:: var
@@ -93,12 +93,12 @@ i.value j.value:: a:: println
 //
 // Taking it further, the index and namespace name can be strings
 // or floating point numbers, as well. Floating point numbers may
-// not be that useful, but strings are ueful whem your index or name
+// not be that useful, but strings are ueful when your index or name
 // is not an integer, like a code composed of alphanumeric charaters.
 //
 // shale also uses the shale:: namespace to store a couple of things you may find useful
 
-file arg:: shale:: "file argument '%s'\n" printf
+file arg:: shale:: "script name '%s'\n" printf
 micro version:: shale:: minor version:: shale:: major version:: shale:: "shale version %d.%d.%d\n" printf
 
 // And finally, when you're developing a script that uses namespaces, it is handy to
@@ -106,3 +106,5 @@ micro version:: shale:: minor version:: shale:: major version:: shale:: "shale v
 // that stores the namespace entries. Here's what it looks like
 
 btree
+
+// See the debugging example for more details about btree, and debugging in general.
