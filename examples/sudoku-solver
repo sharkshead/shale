@@ -125,7 +125,7 @@ possible {
   } ifthen
 
   // Check for any other constraint.
-  ok { constraint initialised { r c n constraint->() not } and } and {
+  ok { constraint initialised { r c n constraint() not } and } and {
     ok false =
   } ifthen
 
@@ -304,7 +304,7 @@ solve {
 // Raspberry Pi3 Model A time: 54 seconds to the solution, and almost 7 minutes
 // to complete.
 //
-// constraint antiKnightConstraint &=
+// constraint antiKnightConstraint =
 // 0 0 0 0 0 0 6 0 0 0 setRow()
 // 1 0 0 3 0 0 0 0 0 7 setRow()
 // 2 2 0 0 3 0 0 4 9 0 setRow()
