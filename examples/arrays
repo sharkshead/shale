@@ -41,9 +41,9 @@ array library
 help array::()
 
 // It provides array create, scooch, get and set functions. Create and scooch
-// are to support fully populated arrays, where every index between 0 and the
+// are to support fully populated arrays, where every index between 0 and
 // maximum - 1 is created, and get and set are geared towards space arrays,
-// where you on;y create the indicies as needed.
+// where you only create the indicies as needed.
 //
 // Fully populated arrays.
 //
@@ -75,7 +75,7 @@ i.value a:: 987 =
 7 a:: println
 
 // If you check the btree output (see debugging) you'll notice an entry "_$" a:: (as "/_$/a")
-// This is simply the count from when you used create array::(). You can use this
+// This is the count from when you used create array::(). You can use this
 // as well to iterate through the array, like this print function
 
 printArray var
@@ -95,7 +95,7 @@ a printArray()
 //
 // Sparse arrays.
 //
-// A sparse array is one where you don't create every entry from 0 through to the maximum-1.
+// A sparse array is one where you don't create every entry from 0 through to maximum-1.
 // Indeed, a sparse array doesn't need to use integers as indicies. It can use integers,
 // float point numbers and strings.
 //
