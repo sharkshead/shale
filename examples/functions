@@ -90,9 +90,8 @@
 //  { once } {
 //    ... lots of nested if and ifthen operators
 //      break           // a break anywhere will exit the enclosing while loop
-//                      // if there are no breaks we still need the while loop to
-//                      // terminate, so we set return to false.
-//    once false =      // don't go around the loop again
+//    ...
+//    once false =      // last statement in the loop, ensure the loop terminates.
 //  } while
 //
 // There are millions of ways your function could return from
