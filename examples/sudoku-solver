@@ -1,6 +1,6 @@
 #!/usr/local/bin/shale
 
-// This solves a classic sudoku with standard row/column/box constraints.
+// This solves a classic sudoku with standard row/column/box constraints, or an anti-Knight variant.
 // It is based on the python code from the Computerphile video https://www.youtube.com/watch?v=G_UYXzGuqvM
 // The sudoku example from this video is used below.
 
@@ -132,7 +132,7 @@ possible {
   ok.value
 } =
 
-// This is a an anti-knight constraint.
+// This is an anti-Knight constraint.
 antiKnightConstraint var
 antiKnightConstraint {
   0$ var 0$ swap =  // n
@@ -229,7 +229,7 @@ antiKnightConstraint {
   ok.value
 } =
 
-// Leave this undefined to get the standard sudoku rules, or point this
+// Leave this undefined to get the standard sudoku rules, or set this
 // to constraint code such as antiKnightContraint defined above.
 constraint var
 
