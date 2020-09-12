@@ -29,7 +29,7 @@ help maths::()
 
 2 sqrt maths::() "√2 = %0.15f\n" printf
 
-// Check out each librar's help function before use. Running shale
+// Check out each library's help function before use. Running shale
 // interactively is great for this - run shale with no arguments
 // and enter
 //
