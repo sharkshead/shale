@@ -1,8 +1,8 @@
 #!/usr/local/bin/shale
 
-// This solves a classic sudoku with standard row/column/box constraints, or an anti-Knight variant.
+// This solves a classic sudoku with standard row/column/box constraints, optionally with an anti-Knight constraint.
 // It is based on the python code from the Computerphile video https://www.youtube.com/watch?v=G_UYXzGuqvM
-// The sudoku example from this video is used below.
+// The sudoku example from this video is used below, along with a couple of Cracking The Cryptic examples.
 
 // The sudoku grid is stored in a multi-dimensional array under the grid:: namespace.
 // The row and column of each cell is represented by:
@@ -300,7 +300,7 @@ solve {
 // 8 4 0 0 0 6 0 0 0 0 setRow()
 
 // From https://www.youtube.com/watch?v=rQHV-gIAG_0
-// Another Cracking the Cryptic video, this one with an anti-Knight move constraint.
+// Another Cracking The Cryptic video, this one with an anti-Knight move constraint.
 // Raspberry Pi3 Model A time: 54 seconds to the solution, and almost 7 minutes
 // to complete.
 //
