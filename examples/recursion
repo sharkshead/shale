@@ -19,7 +19,7 @@ n initialised not {
 factorial var
 factorial {
   i var i swap =
-  i 0 == {
+  i 2 < {
     1
   } {
     i 2 > {
