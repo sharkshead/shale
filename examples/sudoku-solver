@@ -103,30 +103,30 @@ possible {
       } ifthen
       i increment()
     } while
-  } ifthen
 
-  // Check that the box doesn't already contain this value.
-  ok {
-    r0 r 3 / 3 * =
-    c0 c 3 / 3 * =
-    i 0 =
-    { i 3 < } {
-      j 0 =
-      { j 3 < } {
-        r0 i + c0 j +:: grid:: n == {
-          ok false =
-          break
-        } ifthen
-        j increment()
+    // Check that the box doesn't already contain this value.
+    ok {
+      r0 r 3 / 3 * =
+      c0 c 3 / 3 * =
+      i 0 =
+      { i 3 < } {
+        j 0 =
+        { j 3 < } {
+          r0 i + c0 j +:: grid:: n == {
+            ok false =
+            break
+          } ifthen
+          j increment()
+        } while
+        ok not { break } ifthen
+        i increment()
       } while
-      ok not { break } ifthen
-      i increment()
-    } while
-  } ifthen
 
-  // Check for any other constraint.
-  ok { constraint initialised { r c n constraint() not } and } and {
-    ok false =
+      // Check for any other constraint.
+      ok { constraint initialised { r c n constraint() not } and } and {
+        ok false =
+      } ifthen
+    } ifthen
   } ifthen
 
   ok.value
