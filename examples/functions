@@ -31,7 +31,7 @@
 //    } ifthen
 //  } =
 //
-// shale does have a break operator that will break you out of the
+// shale does have a break operator that will break out of the
 // enclosing while loop, no matter how deep into other code fragments
 // you are:
 //
