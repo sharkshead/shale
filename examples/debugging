@@ -5,8 +5,10 @@
 
 
 
+// Printing the stack: stack
+
 "stack:" println
-{ "a code fragment" } 123 "abc123" 3.141 aName a namespace:: variable::
+{ "a code fragment" } 123 "abc123" 3.141 aName i a:: b::
 stack
 
 // This prints the contents of the stack, top-of-stack
@@ -16,6 +18,11 @@ stack
 
 
 
+// Printing namespaces: btree
+
+i ns:: var
+i ns:: 123 =
+j ns:: var
 "" println
 "btree:" println
 btree
@@ -32,6 +39,8 @@ btree
 // is stored in the BTree as /i/ns.
 
 
+
+// Printing internal counters: debug
 
 "" println
 "debug:" println
@@ -59,5 +68,5 @@ debug
 // but if you're not then you have a namespace blowout problem.
 //
 // If the stack and BTree numbers are static and the "Number, ..." numbers
-// are risinng then this is a pretty good indicator that there is
+// are rising then this is a pretty good indicator that there is
 // a memory leak within shale. If this happens, please let me know.
