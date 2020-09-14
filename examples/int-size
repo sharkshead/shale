@@ -1,7 +1,7 @@
 #!/usr/local/bin/shale
 
 // shale can compile on most Linux systems, AFAIK, but not all Linux
-// systems are the same, specifically around the size of on int.
+// systems are the same, specifically around the size of an int.
 // Internally shale uses a long int to represent integers. The size
 // of this varies between different cpu's.
 //
