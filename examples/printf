@@ -1,6 +1,6 @@
 #!/usr/local/bin/shale
 
-// printf, along with sprintf and fprintf from the file library, implements
+// printf, sprintf and fprintf from the file library, implement
 // a subset of the stdio.h printf's format specifiers, and includes
 // a couple of specifiers that are particular to shale.
 
@@ -34,6 +34,8 @@
 // set of formattting options. It is equivalent to the
 // print operator. It does not take a width specifier.
 
+123 3.141 "abc123" "%p %p %p\n" printf
+
 
 
 // %n
@@ -41,6 +43,8 @@
 // Another specifier that is particular to shale. This prints
 // the name of a variable on the stack. It does not take
 // a width specifier.
+
+i "%n\n" printf
 
 
 
