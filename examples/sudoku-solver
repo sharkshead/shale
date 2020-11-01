@@ -1,6 +1,6 @@
 #!/usr/local/bin/shale
 
-// This solves a classic sudoku with standard row/column/box constraints, optionally with an anti-Knight constraint.
+// This solves a classic sudoku with standard row/column/box constraints, optionally with an Knight's move constraint.
 // It is based on the python code from the Computerphile video https://www.youtube.com/watch?v=G_UYXzGuqvM
 // The sudoku example from this video is used below, along with a couple of Cracking The Cryptic examples.
 
@@ -132,9 +132,9 @@ possible {
   ok.value
 } =
 
-// This is an anti-Knight constraint.
-antiKnightConstraint var
-antiKnightConstraint {
+// This is an Knight's move constraint.
+knightsMoveConstraint var
+knightsMoveConstraint {
   0$ var 0$ swap =  // n
   1$ var 1$ swap =  // column
   2$ var 2$ swap =  // row
@@ -230,7 +230,7 @@ antiKnightConstraint {
 } =
 
 // Leave this undefined to get the standard sudoku rules, or set this
-// to constraint code such as antiKnightContraint defined above.
+// to constraint code such as knightsMoveConstraint defined above.
 constraint var
 
 solve var
@@ -300,11 +300,11 @@ solve {
 // 8 4 0 0 0 6 0 0 0 0 setRow()
 
 // From https://www.youtube.com/watch?v=rQHV-gIAG_0
-// Another Cracking The Cryptic video, this one with an anti-Knight move constraint.
+// Another Cracking The Cryptic video, this one with a Knight's move constraint.
 // Raspberry Pi3 Model A time: 54 seconds to the solution, and almost 7 minutes
 // to complete.
 //
-// constraint antiKnightConstraint =
+// constraint knightsMoveConstraint =
 // 0 0 0 0 0 0 6 0 0 0 setRow()
 // 1 0 0 3 0 0 0 0 0 7 setRow()
 // 2 2 0 0 3 0 0 4 9 0 setRow()
