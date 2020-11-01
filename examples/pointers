@@ -57,11 +57,11 @@ ppp->->->()
 // And one final note, you can have two or more pointers to the same object,
 // by either creating a new pointer with &= or assigning it directly with =
 
-p i &=
+p i &=    // pointer to i.
 p2 var
-p2 i &=
+p2 i &=   // another pointer to i.
 p3 var
-p3 p =    // could also do: p3 p2 =
+p3 p =    // yet another pointer to i. could also do: p3 p2 =
 p3-> p2-> p-> i "i = %d, p-> = %d, p2-> = %d, p3-> = %d\n" printf
 
 p3-> 123 =

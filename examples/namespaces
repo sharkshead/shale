@@ -59,7 +59,7 @@ i ns:: println        // 3.141
 
 i a:: b:: var
 
-// is i in namespace a, which is turn is in namespace b. Effectively b::a::i.
+// is i in namespace a, which in turn is in namespace b. Effectively b::a::i.
 // You can nest them as deep as you want, subject to variable name length limitations,
 // and again you can use this like any other variable.
 //

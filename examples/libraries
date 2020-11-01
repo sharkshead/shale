@@ -10,13 +10,13 @@
 //  file
 //  maths
 //
-// To load a library, user the library operator
+// To load a library, use the library operator
 
 array library
 file library
 maths library
 
-// Each library stores all they functions and variables under
+// Each library stores all their functions and variables under
 // a namespae of their name. So, for example, the maths
 // library uses the maths:: namespace.
 //
@@ -31,7 +31,7 @@ help maths::()
 
 // Check out each library's help function before use. Running shale
 // interactively is great for this - run shale with no arguments
-// and enter
+// and enter, for example
 //
 //  file library
 //  help file::()

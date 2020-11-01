@@ -139,15 +139,15 @@ cf()
 
 // The $ operator turns a number or string on the top of the stack into a variable name.
 // This lets you circumvent the "alphabetic, alphanumeric and underscore" rule applied to
-// simple variables. So, if you want a variable called //#.!@**&554@@() push it as
+// simple variables. So, if you want a variable called #!//.@**&554->() push it as
 // a string and use the $ operator
 
-"//#.!@**&554@@()"$ var
+"#!//.@**&554->()"$ var
 
 // and you can assign it any value you want like any other variable
 
-"//#.!@**&554@@()"$ 12345 =
-"//#.!@**&554@@()"$ println
+"#!//.@**&554->()"$ "Horrible variable name" =
+"#!//.@**&554->()"$ println
 
 // This give you lots of freedom, but to tame it a little you should apply a coding standard
 // that defines how a function's variables are named, and how you must use the value (or .value) operator
@@ -168,15 +168,15 @@ factorial {
 // I've done a simple text substitutiion of i snd res and the line length
 // has blown out significantly, but you get the idea. Use variable names
 // that are particular to the function name so they don't clash with the
-// variables in other function.
+// variables in other code fragments.
 //
-// However, there is another, less verbose way, and one that I occasionally use,
+// However, there is another less verbose way, and one that I occasionally use,
 // and that is to simply use numbers for the local variables. Another way to
 // write the factorial function is
 
 factorial {
-  0$ var 0$ swap =    // 0$ = the argument
-  1$ var              // 1$ = the result
+  0$ var 0$ swap =    // 0$ is the argument
+  1$ var              // 1$ is the result
   1$ 1 =              // initialise the result to 1
   { 0$ 1 > } { 1$ 1$ 0$ * = 0$ 0$ 1 - = } while
   1$.value            // return the result value

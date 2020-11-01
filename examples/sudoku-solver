@@ -315,8 +315,8 @@ solve {
 // 7 7 0 0 0 0 1 0 0 9 setRow()
 // 8 0 0 0 0 0 0 5 0 0 setRow()
 
-// Anither CTC sudoku: https://www.youtube.com/watch?v=vH-JooV8RA4&t=0s
-// On a Pi 3 Model A it takes a couple of minutes to produce the completed grid
+// Another CTC sudoku: https://www.youtube.com/watch?v=vH-JooV8RA4&t=0s
+// On a Pi3 Model A it takes a couple of minutes to produce the completed grid
 // but takes an hour to finish.
 // 0 0 0 0 0 0 0 0 0 0 setRow()
 // 1 0 0 9 8 0 0 0 0 7 setRow()
