@@ -1,0 +1,22 @@
+#!/usr/local/bin/shale
+
+// The way in which you get command line arguments into you shale script
+// is with replacements. A replacement on the command line looks like an assignment:
+//  abc=xyz
+// Anywhere in your script where the name abc appears will be replaced by xyz.
+// You can have any number of replaceents on the command line.
+
+// The "initialised" or "initialized" operators will check if a replacement has or has not
+// been included on the command line. Here's an example
+
+val var
+val
+  n initialised {
+    n
+  } {
+    file arg:: shale:: "The default value of n is 10. You can change this with a replacement, eg: %s n=5\n" printf
+    10
+  } if
+=
+
+val "Value given is %d\n" printf
