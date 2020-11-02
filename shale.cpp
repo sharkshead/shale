@@ -65,6 +65,7 @@ Keyword keyword[] = {
   { "value",          LEX_TOKEN_KEYWORD_VALUE           },
   { "defined",        LEX_TOKEN_KEYWORD_DEFINED         },
   { "initialised",    LEX_TOKEN_KEYWORD_INITIALISED     },
+  { "initialized",    LEX_TOKEN_KEYWORD_INITIALISED     },
   { "library",        LEX_TOKEN_KEYWORD_LIBRARY         },
   { "stack",          LEX_TOKEN_KEYWORD_STACK           },
   { "debug",          LEX_TOKEN_KEYWORD_DEBUG           },
