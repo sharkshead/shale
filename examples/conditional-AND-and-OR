@@ -3,13 +3,14 @@
 // In most every language today the logical AND and OR operators
 // are conditional, meaning that the second clause of the AND or OR
 // is only evaluated if needed. In an RPN language like shale,
-// where you must push on the stack all the values that each
-// operator needs, you would think you can't have a conditional AND or OR.
+// where you must push all the values on the stack that each
+// operator needs before calling the operator, you would think you
+// can't have a conditional AND or OR.
 //
 // Not so.
 //
-// For brevity I'll use the && (and) operator here, but this works
-// for || (or) as well.
+// For brevity I'll use the and (&&) operator here, but this works
+// for or (||) as well.
 //
 // To effect a conditional AND, push the first condition on the stack
 // as usual, then push a code fragment on the stack which, when executed,
