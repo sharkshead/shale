@@ -217,7 +217,7 @@ f()         // another, more familiar, form
 // There is a side effect of this type of "function" - there is no return statement.
 // A shale "function" is just a code fragment assigned to a variable. In effect, the variable
 // becomes a place holder for the code fragment. The lack of a return statement may
-// complicate some code and it may force you to arrange you code differently to how
+// complicate some code and it may force you to arrange your code differently to how
 // you would in a language with proper functions. See the "functions" example for
 // ideas on dealing with a return-less function.
 
