@@ -11,7 +11,7 @@
 // zero of more alphanumeric or undercore characters. For example
 //
 //  i
-//  loopCounter
+//  loopCounter2
 //  loop_counter
 //
 // To create a variable, push its name on the stack and call the var operator
@@ -22,21 +22,17 @@ i var
 
 i 123 =
 
-// using the assignment operator =.
+// by using the assignment operator =.
 //
 // Most operators, when given i as an operand, will use the value
 // stored in i. So for example, to print the value of i
 
 i println
 
-// or to print the value of i + 2
-
-i 2 + println
-
-// and so on for most of the operators. If you give an operator
-// a name, it will use the named variable's value instead.
+// If you give most operators a name they will use the named variable's
+// value instead.
 // As you can see from the above code, the var and = (and &=) operators
-// do not use the variable's value, they use the variable itself.
+// do not use the variable's value, they use the variable's name.
 //
 // Variables can be created within a code fragment. So, for example, if a
 // function needs local variables, it can create and use them,
@@ -87,7 +83,7 @@ factorial {
 // the i from outside the code block, it only sees the new i created within this code fragment.
 //
 // There are a couple of ways of avoiding this problem. The simplest is to not push
-// the name i in the stack before calling factorial(), but instead pushing its value.
+// the name i on the stack before calling factorial(), but push its value.
 // You do this with the value or .value operator. So if we had said
 //
 //  i.value factorial() println
@@ -127,10 +123,10 @@ cf {
 } =
 cf()
 
-// This last cf() call will print 987. And that's because the i defined within the cf fragment
-// is visible to all fragments, including the call to printi(), until the cf() fragment ends.
+// The cf() call will print 987 s because the i defined within the cf fragment is visible
+// to all fragments, including the call to printi(), until the cf() fragment ends.
 //
-// So, how do you avoid these kind of problems? Use of the .value (or value) operator
+// So, how do you avoid these kind of problems? Using the .value (or value) operator
 // when passing values in to, or out from, a code fragment goes a long way to solving this issue.
 // Another way to help is to use the $ operator to create non-standard variable names,
 // along with a coding standard that specifies how to name "local" variables.
@@ -139,7 +135,7 @@ cf()
 
 // The $ operator turns a number or string on the top of the stack into a variable name.
 // This lets you circumvent the "alphabetic, alphanumeric and underscore" rule applied to
-// simple variables. So, if you want a variable called #!//.@**&554->() push it as
+// variables. So, if you want a variable called #!//.@**&554->() push it as
 // a string and use the $ operator
 
 "#!//.@**&554->()"$ var
