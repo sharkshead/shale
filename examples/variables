@@ -123,7 +123,7 @@ cf {
 } =
 cf()
 
-// The cf() call will print 987 s because the i defined within the cf fragment is visible
+// The cf() call will print 987 because the i defined within the cf fragment is visible
 // to all fragments, including the call to printi(), until the cf() fragment ends.
 //
 // So, how do you avoid these kind of problems? Using the .value (or value) operator
