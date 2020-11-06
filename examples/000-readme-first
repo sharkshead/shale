@@ -214,7 +214,7 @@ f()         // another, more familiar, form
 //
 // You can see, I hope, why I space things out.
 //
-// There is a side effect of this type of "function" - there is no return statement.
+// There is a side effect to this type of "function" - there is no return statement.
 // A shale "function" is just a code fragment assigned to a variable. In effect, the variable
 // becomes a place holder for the code fragment. The lack of a return statement may
 // complicate some code and it may force you to arrange your code differently to how
