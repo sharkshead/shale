@@ -731,7 +731,7 @@ void syntax() {
   printf("  int             {n} int                     - convert to int\n");
   printf("  double          {n} double                  - convert to floating point\n");
   printf("  float                                       - same as double\n");
-  printf("  break                                       - exit a repeat or while loop\n");
+  printf("  break                                       - exit a while loop\n");
   printf("  exit            {n} exit                    - terminte the process with the given exit code\n");
   printf("  value           {name} value                - replace a name with its value\n");
   printf("  .value                                      - same as value\n");
