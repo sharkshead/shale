@@ -1,8 +1,11 @@
 #!/usr/local/bin/shale
 
-// This solves a classic sudoku with standard row/column/box constraints, optionally with an Knight's move constraint.
-// It is based on the python code from the Computerphile video https://www.youtube.com/watch?v=G_UYXzGuqvM
-// The sudoku example from this video is used below, along with a couple of Cracking The Cryptic examples.
+// This solves a classic sudoku with standard row/column/box constraints,
+// optionally with a Chess Knight's move constraint.
+// It is based on the python code from the Computerphile video
+//    https://www.youtube.com/watch?v=G_UYXzGuqvM
+// The sudoku example from this video is used below, along with
+// a couple of (commented-out) Cracking The Cryptic examples.
 
 // The sudoku grid is stored in a multi-dimensional array under the grid:: namespace.
 // The row and column of each cell is represented by:
@@ -132,7 +135,7 @@ possible {
   ok.value
 } =
 
-// This is an Knight's move constraint.
+// This is a Knight's move constraint.
 knightsMoveConstraint var
 knightsMoveConstraint {
   0$ var 0$ swap =  // n
