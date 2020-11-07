@@ -46,7 +46,7 @@
 // with a newline.
 //
 // Another way to do this calculation is to push all the numbers on the stack
-// bfore calling the operators
+// before calling the operators
 
 3 1 2 + * println
 
