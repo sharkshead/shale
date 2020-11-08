@@ -26,8 +26,8 @@
 // You'd have to write the numbers down before doing the addition, and then
 // write the multiplier down before doing the multiplication.
 //
-// And so it is with shale. Before you invoke any operator you have to
-// "write down" the operands it requires before you call the operator.
+// And so it is with shale. You have to "write down" the operands
+// before you call the operator.
 //
 // Let's start with a simple (1 + 2) * 3 example, and print the result:
 
@@ -98,19 +98,18 @@ i 123 =
 
 i println
 
-// (123 will be the second output line of this script).
+// (123 will be the third output line of this script).
 //
 // It's worth pointing out that there's something going on here, because
-// in both cases (the assignment and the println) i is pushed on the stack,
+// in both cases above, the assignment and the println, i is pushed on the stack,
 // and yet they are treated differently, one as the destination of the value 123,
 // and one as the value 123. In all cases, when you push the name of a variable
 // on the stack, you are pushing the name, not its value, on the stack.
-// It is up to the operator that you've called to use either the name or its
-// value based on the operator's context. That's why the assignment took
-// the name and used it to assign a value, and the println took the value of
-// the name.
+// It is up to the operator that you've called to use either the name or its value
+// based on the operator's context. That's why the assignment took
+// the name and used it to assign a value, and the println took the name's value.
 //
-// Back to the assignment, lets say we have another variable j
+// Back to assignment. Lets say we have another variable j
 
 j var
 j 987 =
@@ -161,7 +160,7 @@ i 100 < {     // the boolean and opening the then-code fragment
   "i is greater then or equal to 100" println
 } if          // closing the else fragment and the calling the if operator
 
-// There is also an ifthen operator where you don't sepcify the else fragment.
+// There is also an ifthen operator where you only specify the then-code fragment.
 
 i j != {
   "i and j are different" println
@@ -220,6 +219,16 @@ f()         // another, more familiar, form
 // complicate some code and it may force you to arrange your code differently to how
 // you would in a language with proper functions. See the "functions" example for
 // ideas on dealing with a return-less function.
+//
+// And to complete the circle, the if, ifthen, while and = operators can also take a
+// variable which has been assigned to a code fragment.
+// For example, this is also fine
+
+then var
+then { "i is less than 100" } =
+else var
+else { "i is greater ot equal to 100" } =
+i 100 < then else if println
 
 
 
