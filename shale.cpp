@@ -77,6 +77,7 @@ Keyword dotKeyword[] = {
   { ".value",           LEX_TOKEN_KEYWORD_VALUE           },
   { ".defined",         LEX_TOKEN_KEYWORD_DEFINED         },
   { ".initialised",     LEX_TOKEN_KEYWORD_INITIALISED     },
+  { ".initialized",     LEX_TOKEN_KEYWORD_INITIALISED     },
   { (const char *) 0,   0                                 }
 };
 
@@ -738,7 +739,9 @@ void syntax() {
   printf("  defined         {name} defined              - pushes true on the stack if the name is defined, false otherwise\n");
   printf("  .defined                                    - same as defined\n");
   printf("  initialised     {name} initialised          - pushes true on the stack if the name is defined and initialised, false otherwise.\n");
+  printf("  initialized                                 - same as initialised\n");
   printf("  .initialised                                - same as initialised\n");
+  printf("  .initialized                                - same as initialised\n");
   printf("  debug                                       - prints various internal counters\n");
   printf("  stack                                       - prints the stack, top of the stack first. does not change the stack contents\n");
   printf("  btree                                       - prints the namespace contents\n");
