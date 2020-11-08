@@ -14,7 +14,7 @@ stack
 // This prints the contents of the stack, top-of-stack
 // first through to the end, and does not change anything.
 // At the moment it can't print code fragments, but it can
-// print names, numbers, and strings.
+// print names, numbers and strings.
 
 
 
