@@ -900,26 +900,15 @@ PointerDereference::PointerDereference(LexInfo *li) : Operation(li) { }
 bool PointerDereference::action() {
   Object *var;
   Pointer *p;
-  Variable *v;
   Object *o;
-  bool found;
 
   var = stack.pop(getLexInfo());
-  found = false;
 
-  try {
-    v = variableStack.findVariable(var->getName(getLexInfo())->getValue());
-    if(v != (Variable *) 0) {
-      p = v->getObject()->getPointer(getLexInfo());
-      o = p->getObject();
-      o->hold();
-      stack.push(o);
-      p->release(getLexInfo());
-      found = true;
-    }
-  } catch(Exception *e) { }
-
-  if(! found) slexception.chuck("pointer dereference error", getLexInfo());
+  p = var->getPointer(getLexInfo());
+  o = p->getObject();
+  o->hold();
+  stack.push(o);
+  p->release(getLexInfo());
 
   var->release(getLexInfo());
 
