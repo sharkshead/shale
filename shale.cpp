@@ -700,16 +700,18 @@ void usage() {
 }
 
 void syntax() {
-  printf("Maths ops\n");
-  printf("  + - * / & | ^ ~ = &= ->                     - &= is pointer assignment, -> is pointer dereference.\n");
-  printf("                                                see below for generating shale code from within shale\n"); 
-  printf("Logical ops\n");
+  printf("Maths operators\n");
+  printf("  + - * / & | ^ ~                             - plus, minus, times, divide, bit-wise and, or, xor, not\n");
+  printf("Logical operators\n");
   printf("  < <= == != >= > && || !                     - see below for 'conditional and' and 'conditional or'\n");
   printf("Keywords\n");
   printf("  and             same as &&\n");
   printf("  or              same as ||\n");
   printf("  not             same as !\n");
-  printf("  { ... }                                     - pushes a code block, sometimes called a code fragment, onto the stack.\n");
+  printf("  =               {v} {n} =                   - assign variable v the value n\n");
+  printf("  &=              {v} {o} &=                  - assign variable v to a pointer to o\n");
+  printf("  ->              {p} ->                      - dereference the pointer p\n");
+  printf("  { ... }                                     - pushes a code fragment, onto the stack.\n");
   printf("                                                see below for generating shale code from within shale\n"); 
   printf("  dup             {value} dup                 - duplicate the top of the stack\n");
   printf("  pop             {value} pop                 - pops the top of the stack off\n");
@@ -747,12 +749,12 @@ void syntax() {
   printf("  btree                                       - prints the namespace contents\n");
   printf("\n");
   printf("Conditional AND and Conditional OR\n");
-  printf("  To effect a conditional and or a conditional or, push the second argument on as a code block. For example\n");
+  printf("  To effect a conditional and or a conditional or, push the second argument on as a code fragment. For example\n");
   printf("    cond1 { cond2 } and     or\n");
   printf("    cond1 { cond2 } or\n");
   printf("  will have the same result as this code\n");
   printf("    cond1 cond2 and      (likewise for the or operator)\n");
-  printf("  except that because the second condition is enclosed within a code block it will only be evaluated if required.\n");
+  printf("  except that because the second condition is enclosed within a code fragment it will only be evaluated if required.\n");
   printf("\n");
   printf("Printf and sprintf operator\n");
   printf("  Takes the following %% specifiers and passes them, complete with any field width and decimal place specs, to printf:\n");
@@ -770,7 +772,7 @@ void syntax() {
   printf("\n");
   printf("Namespaces and arrays\n");
   printf("  Namespaces store globally accessible variables, separate from 'standard' variables that may be\n");
-  printf("  rescoped by subesquent code blocks. C++ namespaces use the :: operator, such as std::syslog, and so shale\n");
+  printf("  rescoped by subesquent code fragments. C++ namespaces use the :: operator, such as std::syslog, and so shale\n");
   printf("  uses :: as the namespace operator. The equivalent to C++ std::syslog is 'syslog std::'.\n");
   printf("  The :: operator takes two arguments, the namespace name and an index.\n");
   printf("  The index and name can be a name, a number or a string. Numbers can be either an integer or a float (to 3 decimal places).\n");
@@ -806,9 +808,9 @@ void syntax() {
   printf("    maths       - pi, e, log functions, etc. See help maths::() for details.\n");
   printf("\n");
   printf("Generating new shale code from within shale\n");
-  printf("  You can generate new shale code by adding code blocks together with the + operator.\n");
-  printf("  The + operator will take two code blocks, or variables whose value is a code block,\n");
-  printf("  and push on the stack a code block that combines both. For example\n");
+  printf("  You can generate new shale code by adding code fragments together with the + operator.\n");
+  printf("  The + operator will take two code fragments, or variables whose value is a code fragment,\n");
+  printf("  and push on the stack a code fragment that combines both. For example\n");
   printf("    { 6 7 } { * println } + execute\n");
   printf("  will output 42\n");
   printf("\n");
