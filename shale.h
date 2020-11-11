@@ -34,7 +34,7 @@ SOFTWARE.
 
 #define MAJOR ((INT) 1)
 #define MINOR ((INT) 0)
-#define MICRO ((INT) 5)
+#define MICRO ((INT) 6)
 
 // Lexical analyser stuff.
 
@@ -55,13 +55,14 @@ SOFTWARE.
 #define LEX_TOKEN_MATHS_OP_MINUS            1
 #define LEX_TOKEN_MATHS_OP_TIMES            2
 #define LEX_TOKEN_MATHS_OP_DIVIDE           3
-#define LEX_TOKEN_MATHS_OP_AND              4
-#define LEX_TOKEN_MATHS_OP_OR               5
-#define LEX_TOKEN_MATHS_OP_XOR              6
-#define LEX_TOKEN_MATHS_OP_NOT              7
-#define LEX_TOKEN_MATHS_OP_ASSIGN           8
-#define LEX_TOKEN_MATHS_OP_POINTER_ASSIGN   9
-#define LEX_TOKEN_MATHS_OP_POINTER_DEREF   10
+#define LEX_TOKEN_MATHS_OP_MOD              4
+#define LEX_TOKEN_MATHS_OP_AND              5
+#define LEX_TOKEN_MATHS_OP_OR               6
+#define LEX_TOKEN_MATHS_OP_XOR              7
+#define LEX_TOKEN_MATHS_OP_NOT              8
+#define LEX_TOKEN_MATHS_OP_ASSIGN           9
+#define LEX_TOKEN_MATHS_OP_POINTER_ASSIGN  10
+#define LEX_TOKEN_MATHS_OP_POINTER_DEREF   11
 
 #define LEX_TOKEN_LOGICAL_OP_LT             0
 #define LEX_TOKEN_LOGICAL_OP_LE             1

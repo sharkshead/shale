@@ -212,6 +212,12 @@ void lexNextToken(Lex &lex) {
         }
         break;
 
+      case '%':
+        lex.token = LEX_TOKEN_MATHS_OP;
+        lex.mathsOp = LEX_TOKEN_MATHS_OP_MOD;
+        lexGetChar();
+        break;
+
       case '$':
         lex.token = LEX_TOKEN_KEYWORD;
         lex.keyword = LEX_TOKEN_KEYWORD_TONAME;
@@ -574,6 +580,7 @@ void olBuild(Lex &lex) {
         case LEX_TOKEN_MATHS_OP_MINUS: op = new Minus(li); break;
         case LEX_TOKEN_MATHS_OP_TIMES: op = new Times(li); break;
         case LEX_TOKEN_MATHS_OP_DIVIDE: op = new Divide(li); break;
+        case LEX_TOKEN_MATHS_OP_MOD: op = new Mod(li); break;
         case LEX_TOKEN_MATHS_OP_AND: op = new BitwiseAnd(li); break;
         case LEX_TOKEN_MATHS_OP_OR: op = new BitwiseOr(li); break;
         case LEX_TOKEN_MATHS_OP_XOR: op = new BitwiseXor(li); break;
@@ -701,7 +708,7 @@ void usage() {
 
 void syntax() {
   printf("Maths operators\n");
-  printf("  + - * / & | ^ ~                             - plus, minus, times, divide, bit-wise and, or, xor, not\n");
+  printf("  + - * / % & | ^ ~                           - plus, minus, times, divide, bit-wise and, or, xor, not\n");
   printf("Logical operators\n");
   printf("  < <= == != >= > && || !                     - see below for 'conditional and' and 'conditional or'\n");
   printf("Keywords\n");
@@ -711,7 +718,7 @@ void syntax() {
   printf("  =               {v} {n} =                   - assign variable v the value n\n");
   printf("  &=              {v} {o} &=                  - assign variable v to a pointer to o\n");
   printf("  ->              {p} ->                      - dereference the pointer p\n");
-  printf("  { ... }                                     - pushes a code fragment, onto the stack.\n");
+  printf("  { ... }                                     - pushes a code fragment on the stack.\n");
   printf("                                                see below for generating shale code from within shale\n"); 
   printf("  dup             {value} dup                 - duplicate the top of the stack\n");
   printf("  pop             {value} pop                 - pops the top of the stack off\n");
@@ -756,7 +763,7 @@ void syntax() {
   printf("    cond1 cond2 and      (likewise for the or operator)\n");
   printf("  except that because the second condition is enclosed within a code fragment it will only be evaluated if required.\n");
   printf("\n");
-  printf("Printf and sprintf operator\n");
+  printf("Printf and sprintf operators\n");
   printf("  Takes the following %% specifiers and passes them, complete with any field width and decimal place specs, to printf:\n");
   printf("    %%d %%x %%f %%s %%%%\n");
   printf("  Takes %%p to print any object, ala the print keyword.\n");
@@ -767,8 +774,8 @@ void syntax() {
   printf("  The sprintf operator takes the same format specifier as printf and pushes the resulting output on the stack as a string.\n");
   printf("\n");
   printf("Pointer assignment and dereference\n");
-  printf("  {var} {anything} &=                         - a pointer to {anything} is assigned to {var}, eg: i var i 123 = p var p i &=\n");
-  printf("  {var} ->                                    - dereference the {var} pointer, eg p-> 987 = (will assign 987 to i)\n");
+  printf("  {var} {anything} &=                         - a pointer to {anything} is assigned to {var}\n");
+  printf("  {var} ->                                    - dereference the {var} pointer\n");
   printf("\n");
   printf("Namespaces and arrays\n");
   printf("  Namespaces store globally accessible variables, separate from 'standard' variables that may be\n");

@@ -327,6 +327,12 @@ class Divide : public Operation {
     bool action();
 };
 
+class Mod : public Operation {
+  public:
+    Mod(LexInfo *);
+    bool action();
+};
+
 class BitwiseAnd : public Operation {
   public:
     BitwiseAnd(LexInfo *);
