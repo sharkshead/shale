@@ -708,7 +708,7 @@ void usage() {
 
 void syntax() {
   printf("Maths operators\n");
-  printf("  + - * / %% & | ^ ~                           - plus, minus, times, divide, bit-wise and, or, xor, not\n");
+  printf("  + - * / %% & | ^ ~                           - plus, minus, times, divide, modulus, bit-wise and, or, xor, not\n");
   printf("Logical operators\n");
   printf("  < <= == != >= > && || !                     - see below for 'conditional and' and 'conditional or'\n");
   printf("Keywords\n");
