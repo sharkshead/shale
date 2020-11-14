@@ -5,8 +5,11 @@
 // Namespaces can be used for arrays, both fully populated and sparse,
 // and for something similar to structs and classes.
 //
-// Described here is an example of using namespaces to implement
-// fully populated arrays, meaning the equivalent of, for example, int a[10]; in C.
+// Check the namespaces example file for how to create your own arrays.
+// The sudoku-solver contains uses multi-dimensional arrays.
+//
+// Described here is an example of using the array library to implement
+// fully populated and sparse arrays.
 //
 // To recap namespaces, the :: operator takes an index and a name, as in
 //
@@ -29,9 +32,8 @@
 //
 //  i.value a::
 //
-// You can roll your own array functions if you like, or you can use
-// the functions provided by the "array" library. An example of a roll-your-own
-// array implementation can be found in the sudoku-solver example.
+// The array library provides functions that might make using fully-populated
+// and sparse arrays easier.
 
 array library
 
@@ -42,7 +44,7 @@ help array::()
 
 // It provides array create, scooch, get and set functions. Create and scooch
 // are to support fully populated arrays, where every index between 0 and
-// maximum - 1 is created, and get and set are geared towards space arrays,
+// maximum - 1 is created, and get and set are geared towards sparse arrays,
 // where you only create the indicies as needed.
 //
 // Fully populated arrays.
