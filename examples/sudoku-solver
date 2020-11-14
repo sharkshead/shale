@@ -109,7 +109,7 @@ irregularRegions {
 
   0 r:: 1:: region:: initialised not { optimiseRegions() } ifthen
 
-  region r.value c.value:: regions:: =   // Ths region we are in.
+  region r.value c.value:: regions:: =   // The region we are in.
 
   i 0 =
   { i 9 < } {
