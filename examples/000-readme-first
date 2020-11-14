@@ -60,11 +60,9 @@
 //  pointers
 //  if statements
 //  while loops
-//  conditional AND and OR operators
 //  functions
-//
-// And with some helper functions you can create multi-dimensional arrays
-// and something that looks kind of like accessing a struct or C++ class (but it isn't.)
+//  arrays, single- and multi-dimentional
+//  conditional AND and OR operators
 //
 // Yeah, I know you're saying all programming languages give you these features.
 //
