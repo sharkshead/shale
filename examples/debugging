@@ -68,5 +68,5 @@ debug
 // but if you're not then you have a namespace blowout problem.
 //
 // If the stack and BTree numbers are static and the "Number, ..." numbers
-// are rising then this is a pretty good indicator that there is
+// are rising then this is a pretty good indication that there is
 // a memory leak within shale. If this happens, please let me know.
