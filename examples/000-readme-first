@@ -225,7 +225,7 @@ f()         // another, more familiar, form
 then var
 then { "i is less than 100" } =
 else var
-else { "i is greater ot equal to 100" } =
+else { "i is greater or equal to 100" } =
 i 100 < then else if println
 
 
