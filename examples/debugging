@@ -8,7 +8,7 @@
 // Printing the stack: stack
 
 "stack:" println
-{ "a code fragment" } 123 "abc123" 3.141 aName i a:: b::
+{ "a code fragment" } 123 "abc123" 3.141 aVariable i a:: b::
 stack
 
 // This prints the contents of the stack, top-of-stack
@@ -20,11 +20,11 @@ stack
 
 // Printing namespaces: btree
 
+"" println
+"btree:" println
 i ns:: var
 i ns:: 123 =
 j ns:: var
-"" println
-"btree:" println
 btree
 
 // All namespace variables are stored in a BTree (as opposed
@@ -46,8 +46,9 @@ btree
 "debug:" println
 debug
 
-// This is really useful for diagnosing stack and namespace blowouts,
-// and shale memory leaks.
+// This is really useful for diagnosing stack and namespace leaks,
+// and shale memory leaks. You should execute this script before reading
+// further because I refer to the output of the debug operator.
 //
 // These numbers are all interrelated to some degree.
 //
@@ -65,7 +66,7 @@ debug
 // entries in namespace variables. You will quite possibly get a similar
 // rise in the "Number, ..." numbers. If you're expecting your script to
 // store more and more data in namespace variables then this is OK,
-// but if you're not then you have a namespace blowout problem.
+// but if you're not then you have a namespace leak problem.
 //
 // If the stack and BTree numbers are static and the "Number, ..." numbers
 // are rising then this is a pretty good indication that there is
