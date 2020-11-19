@@ -124,7 +124,7 @@ i println
 // detail in another example file. To create a pointer you use the pointer assignment
 // operator, and to access the thing pointed to you use the dereference operator.
 
-i j &=        // the pointer assinment operator. i ia a pointer to j
+i j &=        // the pointer assinment operator. i is a pointer to j
 i-> println   // the pointer dereference operator. 987 will be output
 i-> 3.141 =   // another pointer dereference. this will assign 3.141 to j
 j println     // 3.141 will be output
@@ -149,14 +149,14 @@ j println     // 3.141 will be output
 // 
 //  { 1 2 + println }
 //
-// Here's an if operator example, using the boolean less-then operator.
+// Here's an if operator example, using the boolean less-than operator.
 
 i 99 =        // reassign i to 99
 i 100 < {     // the boolean and opening the then-code fragment
   "i is less than 100" println
 } {           // closing the then fragment and opening the else-code fragment
-  "i is greater then or equal to 100" println
-} if          // closing the else fragment and the calling the if operator
+  "i is greater than or equal to 100" println
+} if          // closing the else fragment and calling the if operator
 
 // There is also an ifthen operator where you only specify the then-code fragment.
 
@@ -200,7 +200,7 @@ f {
 f execute   // one form of the execute operator
 f()         // another, more familiar, form
 
-// You'll notice there's no space between the f and (). You can put a space in if you like,
+// You'll notice there's no space between the f and (). You can put in a space if you like,
 // but it's not neccessary becaue a name cannot contain a ( character, so shale
 // stops interpreting the name as soon as it hits the (.
 //
