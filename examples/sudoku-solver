@@ -23,7 +23,7 @@ increment {
   dup 1 + =
 } =
 
-// Prnts the sudoku grid.
+// Prints the sudoku grid.
 printGrid var
 printGrid {
   r var
@@ -107,8 +107,6 @@ irregularRegions {
   region var
   i var
 
-  0 r:: 1:: region:: initialised not { optimiseRegions() } ifthen
-
   region r.value c.value:: regions:: =   // The region we are in.
 
   i 0 =
@@ -122,33 +120,40 @@ irregularRegions {
 } =
 
 // Convert the regions:: namespace into somethiing a little more cpu-time friendly.
+// Only optimise if there are irregular regions defined.
 optimiseRegions var
 optimiseRegions {
-  region var
-  r var
-  c var
-  i var
+  0 0:: regions:: initialised {
+    region var
+    r var
+    c var
+    i var
 
-  region 1 =
-  { region 10 < } {
-    i 0 =
-    r 0 =
-    { r 9 < } {
-      c 0 =
-      { c 9 < } {
-        r.value c.value:: regions:: region == {
-          i.value r:: region.value:: region:: var
-          i.value c:: region.value:: region:: var
-          i.value r:: region.value:: region:: r.value =
-          i.value c:: region.value:: region:: c.value =
-          i increment()
-        } ifthen
-        c increment()
+    region 1 =
+    { region 10 < } {
+      i 0 =
+      r 0 =
+      { r 9 < } {
+        c 0 =
+        { c 9 < } {
+          r.value c.value:: regions:: region == {
+            i.value r:: region.value:: region:: var
+            i.value c:: region.value:: region:: var
+            i.value r:: region.value:: region:: r.value =
+            i.value c:: region.value:: region:: c.value =
+            i increment()
+          } ifthen
+          c increment()
+        } while
+        r increment()
       } while
-      r increment()
+      i 9 != {
+        i region "Region %d contains the wrong number of cells (%d)\n" printf
+        1 exit
+      } ifthen
+      region increment()
     } while
-    region increment()
-  } while
+  } ifthen
 } =
 
 // Is it possible to place a digit in a given cell?
@@ -409,7 +414,7 @@ grid 8 0 0 0 0 8 0 0 7 9 setRow()
 // The region layout is called "Andrew Stuart 24" and the numbering is taken directly
 // from Andrew's solver page.
 // The region numbers must be between 1 and 9 inclusive.
-// Pi3 model A time: 33 minutes to the completed grid and 1h 35m to finish.
+// Pi3 model A time: 33 minutes to the completed grid and 1h 37m to finish.
 //
 // regionChecker irregularRegions =
 // regions 0 1 1 2 2 2 2 3 3 4 setRow()
@@ -431,9 +436,16 @@ grid 8 0 0 0 0 8 0 0 7 9 setRow()
 // grid 7 1 0 0 7 2 0 0 0 0 setRow()
 // grid 8 0 9 0 0 0 0 0 0 0 setRow()
 
+// If you want to add your own sudoku, add it here, and comment out
+// any above that are in.
+
+// Don't change anything from here to the end.
+
+optimiseRegions()
+
 "Initial grid" println
 printGrid()
 
 solve()
 
-// I'd like to see an irregular sudoku with a knight's constraint. Any takers...
+// I'd like to see an irregular sudoku with a knight's move constraint. Any takers...
