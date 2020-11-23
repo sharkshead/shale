@@ -11,10 +11,10 @@
 // rather than a lexical scope you'd expect in a C-like language.
 // You can read more about this in the variables example file.
 //
-// Namespaces can be used to store variables that are global. They are not
+// Namespaces can be used to create variables that are global. They are not
 // tied to a code fragment's execution. And namespaces have features that
 // mean they can be used to implement arrays (single or multi-dimensional,
-// fully populated and sparse). You can even think of namespaces as
+// fully populated and sparse). You can think of namespaces as
 // something like a perl hash, or even a struct or class if you really
 // squint your eyes. shale doesn't have structs or classes, but you can
 // use namespaces to achieve something resembling them.
@@ -103,7 +103,7 @@ micro version:: shale:: minor version:: shale:: major version:: shale:: "shale v
 
 // And finally, when you're developing a script that uses namespaces, it is handy to
 // know about the btree operator. It prints the contents of the BTree
-// that stores the namespace entries. Here's what it looks like
+// that stores the namespace variables. Here's what it looks like
 
 btree
 
