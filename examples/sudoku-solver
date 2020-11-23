@@ -7,8 +7,7 @@
 // It is based on the python code from the Computerphile video
 //  https://www.youtube.com/watch?v=G_UYXzGuqvM
 // The sudoku example from this video is used below, along with
-// a couple of (commented-out) Cracking The Cryptic examples,
-// and one irregular sudoku from Andrew Stuart's web page.
+// a couple of Cracking The Cryptic examples.
 
 // The sudoku grid is stored in a multi-dimensional array under the grid:: namespace.
 // The row and column of each cell is represented by:
@@ -16,6 +15,29 @@
 //  row column:: grid::
 //
 // A 0 value represents an empty cell, and a 1 to 9 value represents a cell value.
+
+// You can specify which of the sudokus to solve by specifying s={n} on the command line.
+// If it is not specified then you get a text explaining how to specify an option
+// and what the options are and the default (s=1) option is solved.
+
+whichSudoku var
+
+s initialised {
+  whichSudoku s =
+} {
+  "You can choose to solve one of several sudoku's by adding s=n to the command line," println
+  "where n is" println
+  "  1: standard sudoku from Computerphile (the default)" println
+  "  2: standard sudoku from Cracking The Cryptic" println
+  "  3: standard sudoku from Cracking The Cryptic, with Knight's move constraint" println
+  "  4: standard sudoku from Cracking The Cryptic" println
+  "" println
+  "For example," println
+  file arg:: shale:: "  %s s=3\n" printf
+  "will solve the CTC sudoku with the Knight's move constraint" println
+  "" println
+  whichSudoku 1 =
+} if
 
 // Increment a variable. Expects a variable name on the stack.
 increment var
@@ -345,107 +367,104 @@ solve {
   } ifthen
 } =
 
+found var
+found false =
+
 // As mentioned above, this is the example taken from the Computerphile video.
 // Raspberry Pi3 Model A time: 22 seconds to finish, but the solution is output
 // a little less than this.
-//
-regionChecker standardRegions =
-grid 0 5 3 0 0 7 0 0 0 0 setRow()
-grid 1 6 0 0 1 9 5 0 0 0 setRow()
-grid 2 0 9 8 0 0 0 0 6 0 setRow()
-grid 3 8 0 0 0 6 0 0 0 3 setRow()
-grid 4 4 0 0 8 0 3 0 0 1 setRow()
-grid 5 7 0 0 0 2 0 0 0 6 setRow()
-grid 6 0 6 0 0 0 0 2 8 0 setRow()
-grid 7 0 0 0 4 1 9 0 0 5 setRow()
-grid 8 0 0 0 0 8 0 0 7 9 setRow()
+whichSudoku 1 == {
+  found true =
+  "From Computerphile: https://www.youtube.com/watch?v=G_UYXzGuqvM" println
+  regionChecker standardRegions =
+  grid 0 5 3 0 0 7 0 0 0 0 setRow()
+  grid 1 6 0 0 1 9 5 0 0 0 setRow()
+  grid 2 0 9 8 0 0 0 0 6 0 setRow()
+  grid 3 8 0 0 0 6 0 0 0 3 setRow()
+  grid 4 4 0 0 8 0 3 0 0 1 setRow()
+  grid 5 7 0 0 0 2 0 0 0 6 setRow()
+  grid 6 0 6 0 0 0 0 2 8 0 setRow()
+  grid 7 0 0 0 4 1 9 0 0 5 setRow()
+  grid 8 0 0 0 0 8 0 0 7 9 setRow()
+} ifthen
 
 // From https://www.youtube.com/watch?v=MXUgYxHmKq4&t=0s
 // This sudoku was featured on Cracking The Cryptic, and takes considerably longer than the one above.
 // Raspberry Pi3 Model A time: 18 minutes total elapsed time, although the
 // solution only takes a couple of minutes to be produced. The rest of the time is spent
 // looking for other, non-existant, solutions.
-//
-// regionChecker standardRegions =
-// grid 0 0 6 8 0 0 0 0 1 3 setRow()
-// grid 1 0 0 0 9 0 1 0 0 0 setRow()
-// grid 2 0 0 0 0 0 8 0 0 4 setRow()
-// grid 3 0 1 0 0 4 0 5 0 0 setRow()
-// grid 4 0 3 0 0 0 9 0 0 0 setRow()
-// grid 5 0 8 5 0 0 0 0 7 0 setRow()
-// grid 6 0 2 0 0 0 7 3 0 0 setRow()
-// grid 7 0 0 0 0 9 4 0 0 6 setRow()
-// grid 8 4 0 0 0 6 0 0 0 0 setRow()
+whichSudoku 2 == {
+  found true =
+  "From Cracking The Cryptic: https://www.youtube.com/watch?v=MXUgYxHmKq4&t=0s" println
+  regionChecker standardRegions =
+  grid 0 0 6 8 0 0 0 0 1 3 setRow()
+  grid 1 0 0 0 9 0 1 0 0 0 setRow()
+  grid 2 0 0 0 0 0 8 0 0 4 setRow()
+  grid 3 0 1 0 0 4 0 5 0 0 setRow()
+  grid 4 0 3 0 0 0 9 0 0 0 setRow()
+  grid 5 0 8 5 0 0 0 0 7 0 setRow()
+  grid 6 0 2 0 0 0 7 3 0 0 setRow()
+  grid 7 0 0 0 0 9 4 0 0 6 setRow()
+  grid 8 4 0 0 0 6 0 0 0 0 setRow()
+} ifthen
 
 // From https://www.youtube.com/watch?v=rQHV-gIAG_0
 // Another Cracking The Cryptic video, this one with a Knight's move constraint.
 // Raspberry Pi3 Model A time: 54 seconds to the solution, and almost 7 minutes
 // to complete.
-//
-// regionChecker standardRegions =
-// constraint knightsMoveConstraint =
-// grid 0 0 0 0 0 0 6 0 0 0 setRow()
-// grid 1 0 0 3 0 0 0 0 0 7 setRow()
-// grid 2 2 0 0 3 0 0 4 9 0 setRow()
-// grid 3 6 0 0 0 0 0 0 4 5 setRow()
-// grid 4 0 0 2 0 0 0 8 0 0 setRow()
-// grid 5 0 0 0 1 0 0 0 0 0 setRow()
-// grid 6 3 0 0 0 0 0 0 0 0 setRow()
-// grid 7 7 0 0 0 0 1 0 0 9 setRow()
-// grid 8 0 0 0 0 0 0 5 0 0 setRow()
+whichSudoku 3 == {
+  found true =
+  "From Cracking The Cryptic: https://www.youtube.com/watch?v=rQHV-gIAG_0" println
+  "This includes a Chess Knight's move constraint." println
+  regionChecker standardRegions =
+  constraint knightsMoveConstraint =
+  grid 0 0 0 0 0 0 6 0 0 0 setRow()
+  grid 1 0 0 3 0 0 0 0 0 7 setRow()
+  grid 2 2 0 0 3 0 0 4 9 0 setRow()
+  grid 3 6 0 0 0 0 0 0 4 5 setRow()
+  grid 4 0 0 2 0 0 0 8 0 0 setRow()
+  grid 5 0 0 0 1 0 0 0 0 0 setRow()
+  grid 6 3 0 0 0 0 0 0 0 0 setRow()
+  grid 7 7 0 0 0 0 1 0 0 9 setRow()
+  grid 8 0 0 0 0 0 0 5 0 0 setRow()
+} ifthen
 
 // Another CTC sudoku: https://www.youtube.com/watch?v=vH-JooV8RA4&t=0s
 // On a Pi3 Model A it takes a couple of minutes to produce the completed grid
 // but takes an hour to finish.
-//
-// regionChecker standardRegions =
-// grid 0 0 0 0 0 0 0 0 0 0 setRow()
-// grid 1 0 0 9 8 0 0 0 0 7 setRow()
-// grid 2 0 8 0 0 6 0 0 5 0 setRow()
-// grid 3 0 5 0 0 4 0 0 3 0 setRow()
-// grid 4 0 0 7 9 0 0 0 0 2 setRow()
-// grid 5 0 0 0 0 0 0 0 0 0 setRow()
-// grid 6 0 0 2 7 0 0 0 0 9 setRow()
-// grid 7 0 4 0 0 5 0 0 6 0 setRow()
-// grid 8 3 0 0 0 0 6 2 0 0 setRow()
+whichSudoku 4 == {
+  found true =
+  "From Cracking The Cryptic: https://www.youtube.com/watch?v=vH-JooV8RA4&t=0s" println
+  regionChecker standardRegions =
+  grid 0 0 0 0 0 0 0 0 0 0 setRow()
+  grid 1 0 0 9 8 0 0 0 0 7 setRow()
+  grid 2 0 8 0 0 6 0 0 5 0 setRow()
+  grid 3 0 5 0 0 4 0 0 3 0 setRow()
+  grid 4 0 0 7 9 0 0 0 0 2 setRow()
+  grid 5 0 0 0 0 0 0 0 0 0 setRow()
+  grid 6 0 0 2 7 0 0 0 0 9 setRow()
+  grid 7 0 4 0 0 5 0 0 6 0 setRow()
+  grid 8 3 0 0 0 0 6 2 0 0 setRow()
+} ifthen
 
-// This is taken from Andrew Stuart's web site https://www.sudokuwiki.org/Daily_Jigsaw_Sudoku
-// dated 13 Nov 2020. It is rated 5-star out of 6.
-// The region layout is called "Andrew Stuart 24" and the numbering is taken directly
-// from Andrew's solver page.
-// The region numbers must be between 1 and 9 inclusive.
-// Pi3 model A time: 33 minutes to the completed grid and 1h 37m to finish.
-//
-// regionChecker irregularRegions =
-// regions 0 1 1 2 2 2 2 3 3 4 setRow()
-// regions 1 1 1 2 2 2 3 3 3 4 setRow()
-// regions 2 1 1 1 2 3 3 3 4 4 setRow()
-// regions 3 1 1 5 2 3 7 4 4 4 setRow()
-// regions 4 5 5 5 6 6 7 7 4 4 setRow()
-// regions 5 5 5 5 6 6 7 7 7 9 setRow()
-// regions 6 8 5 5 6 6 7 7 7 9 setRow()
-// regions 7 8 8 6 6 6 9 9 9 9 setRow()
-// regions 8 8 8 8 8 8 8 9 9 9 setRow()
-// grid 0 0 0 0 0 0 0 0 9 0 setRow()
-// grid 1 5 0 0 0 8 1 0 0 0 setRow()
-// grid 2 0 0 0 9 0 4 5 0 0 setRow()
-// grid 3 0 0 0 0 0 0 0 0 5 setRow()
-// grid 4 0 1 0 0 0 8 0 0 0 setRow()
-// grid 5 7 0 6 0 0 0 0 0 0 setRow()
-// grid 6 0 0 0 1 0 0 6 0 0 setRow()
-// grid 7 1 0 0 7 2 0 0 0 0 setRow()
-// grid 8 0 9 0 0 0 0 0 0 0 setRow()
-
-// If you want to add your own sudoku, add it here, and comment out
-// any above that are in.
+// If you want to add your own sudoku, add it here.
+whichSudoku 5 == {
+  found true =
+  // add it here
+} ifthen
 
 // Don't change anything from here to the end.
 
-optimiseRegions()
+found {
+  optimiseRegions()
 
-"Initial grid" println
-printGrid()
+  "" println
+  "Initial grid" println
+  printGrid()
 
-solve()
+  solve()
+} {
+  whichSudoku "Sudoku %d not found\n" printf
+} if
 
 // I'd like to see an irregular sudoku with a knight's move constraint. Any takers...
