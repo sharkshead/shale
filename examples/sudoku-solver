@@ -31,6 +31,7 @@ s initialised {
   "  2: standard sudoku from Cracking The Cryptic" println
   "  3: standard sudoku from Cracking The Cryptic, with Knight's move constraint" println
   "  4: standard sudoku from Cracking The Cryptic" println
+  "  5: irregular sudoku from Cracking The Cryptic" println
   "" println
   "For example," println
   file arg:: shale:: "  %s s=3\n" printf
@@ -447,8 +448,35 @@ whichSudoku 4 == {
   grid 8 3 0 0 0 0 6 2 0 0 setRow()
 } ifthen
 
-// If you want to add your own sudoku, add it here.
+// Another Cracking The Cryptic sudoku: https://www.youtube.com/watch?v=eJIu8w3ZXo8
+// This is an irregular (jigsaw) sodoku.
 whichSudoku 5 == {
+  found true =
+  "From Cracking The Cryptic: https://www.youtube.com/watch?v=eJIu8w3ZXo8" println
+  "An irregular sudoku." println
+  regionChecker irregularRegions =
+  regions 0 1 1 1 1 1 2 2 2 2 setRow()
+  regions 1 1 3 3 3 6 6 2 2 2 setRow()
+  regions 2 1 3 3 3 6 7 7 7 2 setRow()
+  regions 3 1 3 3 3 6 7 7 7 2 setRow()
+  regions 4 1 6 6 6 6 7 7 7 8 setRow()
+  regions 5 9 6 4 4 4 8 8 8 8 setRow()
+  regions 6 9 9 4 4 4 8 5 5 5 setRow()
+  regions 7 9 9 4 4 4 8 5 5 5 setRow()
+  regions 8 9 9 9 9 8 8 5 5 5 setRow()
+  grid 0 3 0 0 0 0 0 0 0 1 setRow()
+  grid 1 0 9 0 1 7 2 0 0 0 setRow()
+  grid 2 0 0 3 0 0 0 9 0 0 setRow()
+  grid 3 0 7 0 0 0 0 0 4 0 setRow()
+  grid 4 0 4 0 0 3 0 0 6 0 setRow()
+  grid 5 0 5 0 0 0 0 0 9 0 setRow()
+  grid 6 0 0 6 0 0 0 5 0 0 setRow()
+  grid 7 0 0 0 8 5 6 0 2 0 setRow()
+  grid 8 7 0 0 0 0 0 0 0 8 setRow()
+} ifthen
+
+// If you want to add your own sudoku, add it here.
+whichSudoku 6 == {
   found true =
   // add it here
 } ifthen
