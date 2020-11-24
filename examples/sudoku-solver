@@ -32,6 +32,7 @@ s initialised {
   "  3: standard sudoku from Cracking The Cryptic, with Knight's move constraint" println
   "  4: standard sudoku from Cracking The Cryptic" println
   "  5: irregular sudoku from Cracking The Cryptic" println
+  "  6: irregular sudoku from Andrew Stuart's web page" println
   "" println
   "For example," println
   file arg:: shale:: "  %s s=3\n" printf
@@ -475,8 +476,41 @@ whichSudoku 5 == {
   grid 8 7 0 0 0 0 0 0 0 8 setRow()
 } ifthen
 
-// If you want to add your own sudoku, add it here.
+// This is taken from Andrew Stuart's web site https://www.sudokuwiki.org/Daily_Jigsaw_Sudoku
+// No. 4294, dated 13 Nov 2020. It is rated 5-star out of 6: Diabolical.
+// The archived version is here: https://www.sudokuwiki.org/Print_Daily_Jigsaw.asp?day=13/11/2020
+// At the time of writing, Andrew only archives sudoku's for 31 days, then they are deleted.
+// The region layout is called "Andrew Stuart 24" and the numbering is taken directly
+// from Andrew's solver page. A big thanks goes to Andrew for giving me permission to include this sudoku.
+// The region numbers must be between 1 and 9 inclusive.
+// Pi3 model A time: 33 minutes to the completed grid and 1h 37m to finish.
 whichSudoku 6 == {
+  found true =
+  "From Andrew Stuart's web page: https://www.sudokuwiki.org/Daily_Jigsaw_Sudoku" println
+  "No. 4294, dated 13 Nov 2020" println
+  regionChecker irregularRegions =
+  regions 0 1 1 2 2 2 2 3 3 4 setRow()
+  regions 1 1 1 2 2 2 3 3 3 4 setRow()
+  regions 2 1 1 1 2 3 3 3 4 4 setRow()
+  regions 3 1 1 5 2 3 7 4 4 4 setRow()
+  regions 4 5 5 5 6 6 7 7 4 4 setRow()
+  regions 5 5 5 5 6 6 7 7 7 9 setRow()
+  regions 6 8 5 5 6 6 7 7 7 9 setRow()
+  regions 7 8 8 6 6 6 9 9 9 9 setRow()
+  regions 8 8 8 8 8 8 8 9 9 9 setRow()
+  grid 0 0 0 0 0 0 0 0 9 0 setRow()
+  grid 1 5 0 0 0 8 1 0 0 0 setRow()
+  grid 2 0 0 0 9 0 4 5 0 0 setRow()
+  grid 3 0 0 0 0 0 0 0 0 5 setRow()
+  grid 4 0 1 0 0 0 8 0 0 0 setRow()
+  grid 5 7 0 6 0 0 0 0 0 0 setRow()
+  grid 6 0 0 0 1 0 0 6 0 0 setRow()
+  grid 7 1 0 0 7 2 0 0 0 0 setRow()
+  grid 8 0 9 0 0 0 0 0 0 0 setRow()
+} ifthen
+
+// If you want to add your own sudoku, add it here.
+whichSudoku 7 == {
   found true =
   // add it here
 } ifthen
