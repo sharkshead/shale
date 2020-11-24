@@ -451,6 +451,7 @@ whichSudoku 4 == {
 
 // Another Cracking The Cryptic sudoku: https://www.youtube.com/watch?v=eJIu8w3ZXo8
 // This is an irregular (jigsaw) sodoku.
+// Ri3 Modal A time to finish: 8m. Completed grid in about 4m.
 whichSudoku 5 == {
   found true =
   "From Cracking The Cryptic: https://www.youtube.com/watch?v=eJIu8w3ZXo8" println
