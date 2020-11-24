@@ -47,16 +47,19 @@ btree
 debug
 
 // This is really useful for diagnosing stack and namespace leaks,
-// and shale memory leaks. You should execute this script before reading
-// further because I refer to the output of the debug operator.
+// and shale memory leaks. The debug output looks like this
 //
-// These numbers are all interrelated to some degree.
+//  Number: free 0, new 0.  String: free 0, new 0.  Pointer: free 0, new 0.  Free bags: 0
+//  Stack: size 6, free 2
+//  BTree: depth 1, nodes 1, entries 6
 //
-// If your stack number (size minus free) rises as your script runs then
+// These numbers are interrelated to some degree.
+//
+// If your stack depth (size minus free) rises as your script runs then
 // you are pushing objects on the stack without calling an operator
 // to deal with those objects. You'll need to work out where these
 // pushes are occuring and either remove them or work out why you're
-// not calling the intended operator. If your stack numbers are rising
+// not calling the intended operator. If your stack depth is rising
 // you may also find that the "Number, String, Pointer" numbers also rise.
 // This is an artifact of pushing something on the stack and never processing it.
 // It wont always be the case that the "Number, ..." numbers will rise,
