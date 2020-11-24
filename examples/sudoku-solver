@@ -32,7 +32,7 @@ s initialised {
   "  3: standard sudoku from Cracking The Cryptic, with Knight's move constraint" println
   "  4: standard sudoku from Cracking The Cryptic" println
   "  5: irregular sudoku from Cracking The Cryptic" println
-  "  6: irregular sudoku from Andrew Stuart's web page" println
+  "  6: irregular sudoku from Andrew Stuart" println
   "" println
   "For example," println
   file arg:: shale:: "  %s s=3\n" printf
