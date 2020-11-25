@@ -101,12 +101,11 @@ cf {
 } =
 
 i 123 =
-
 printi()      // 123
 cf()          // 987
 
 // It is important to recognise that executing printi() from within cf()
-// is simply eecuting another code fragment (that is "i println").
+// is simply executing another code fragment (that is "i println").
 // There is no such thing as a function in shale, although I make it look
 // like there is. There's more on this in the functions file.
 
@@ -134,7 +133,7 @@ cf()          // 987
 // getting a variable name. function() might create its own variable called i,
 // hiding the calling code's i.
 //
-// There's a couple of ways of dealing with this.
+// There're a couple of ways of dealing with this.
 //
 // The first way is to push the variable's value rather than its name.
 // You do with the value or .value operator. So you could do:
@@ -142,8 +141,8 @@ cf()          // 987
 //  i.value function()
 //
 // The second way is for function() to call the value or .value operator before
-// creating any of its own variables, thereby turning any name into the
-// respective values. Unfortunately this on;y works when the function()
+// creating any of its own variables, thereby turning any name into its value.
+// Unfortunately, this on;y works when the function()
 // has one argument on the stack. For two or more arguments this cannot
 // be relied upon. So I call this deprecated.
 //
@@ -153,6 +152,6 @@ cf()          // 987
 //
 // Passing values out of a function.
 //
-// If your function returs a result or results on the stack then always
+// If your function returns a result or results on the stack then always
 // use the value or .value operator to push local variable's values rather
 // than their names.
