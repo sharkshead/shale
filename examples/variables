@@ -1,185 +1,158 @@
 #!/usr/local/bin/shale
 
-// There are two types of variables, simple and namespace.
+// Variables.
+
+// There are two types of variables: simple and namespace.
 //
-// This file only deals with simple variables. See the namespace
-// example file for details.
+// Here are some examples of variable names
 //
-// Simple variables. 
+//  i                               <-- simple variable, standard
+//  loopCounter_2                   <-- simple variable, standard
+//  "_factorial_loop_counter"$      <-- simple variable, user-defined (note the $ operator)
+//  3$                              <-- simple variable, user-defined
+//  i ns::                          <-- namespace variable
+//  i.value j.value:: a::           <-- namespace variable
 //
-// A simple variable name starts with an alphabetic character followed by
-// zero of more alphanumeric or undercore characters. For example
+// Simple variables are for general use within code fragments,
+// and namespace variables are global and are not tied to a code fragment.
 //
-//  i
-//  loopCounter2
-//  loop_counter
+// All variables are limited in length to 63 characters.
 //
-// To create a variable, push its name on the stack and call the var operator
+// Referring to a variable pushes the variable name on the stack.
+// It does not push the value on the stack. It always pushes the name on the stack.
+//
+// In this file we'll discuss simple variables. See the "namespaces"
+// file for a discussion of namespace variables.
+
+
+
+// Simple variable names.
+
+// There are two ways of creating simple variable names: standard and user-defined.
+//
+// Standard names.
+//
+// A standard variable name starts with an alphabetic character followoed
+// by zero of more alphanumeric or underscoee characters. You can't create
+// a standard variable name that is the same as one of shale's 30 or so operators,
+// like if or while, but everything else is fine. If you really want a variable called if
+// then use a user-defined variable.
+//
+// User-defined names.
+//
+// You can create any variable name you like by using the $ operator.
+// This takes a number (integer or floating point) or a string on the stack
+// and turns it into a variable name. So to get that if variable name, use "if"$.
+
+
+
+// The scope of a simple variable.
+
+// A simple variable created in a code fragment is accessible to all code fragments
+// that this and subsequent fragments executes. When the code fragment exits
+// the variable is removed.
+//
+// A variable's scope is defined by the code fragment's execution,
+// and not the lexical scope of the fragment as it is in C.
+// This really impacts "functions". shale doesn't have functions. It has
+// the ability to assign a code fragment to a variable.
+//
+// A variable defined in a code fragment will hide a
+// variable of the same name created in an enclosing fragment.
+//
+// Here's how this plays out.
+//
+// The easiest thing to see is some nested fragments.
 
 i var
-
-// This creates i but does not give it a value. Here's how
-
 i 123 =
+i 100 > {
+  i var           // hides the "123" i
+  i 987 =
+  i println       // 987
+  i 987 == {
+    i var         // hides the "987" i
+    i 3.141 =
+    i println     // 3.141
+  } ifthen
+} {
+  i var           // hides the "123" i
+  i "abc123" =
+  i println       // abc123 (won't be output)
+} if
+i println         // 123
 
-// by using the assignment operator =.
+// When if comes to "functions" it is important to remember
+// that shale doesn't have functions but rather you can assign
+// a code fragment to a variable and execute that code fragment.
 //
-// Most operators, when given i as an operand, will use the value
-// stored in i. So for example, to print the value of i
-
-i println
-
-// If you give most operators a name they will use the named variable's
-// value instead.
-// As you can see from the above code, the var and = (and &=) operators
-// do not use the variable's value, they use the variable's name.
-//
-// Variables can be created within a code fragment. So, for example, if a
-// function needs local variables, it can create and use them,
-// and they will be removed when that code fragment terminates.
-// For example, here's a while-loop version of the factorial function.
-
-factorial var
-factorial {
-  i var
-  res var
-  i swap =
-  res 1 =
-  { i 1 > } { res res i * = i i 1 - = } while
-  res.value
-} =
-10 factorial() "10! = %d\n" printf
-
-
-
-// Variable scope.
-//
-// Variables can be defined within a code fragment, and they are accessible for
-// the duration of that code fragment's execution, then they are removed.
-// Notice that I said "for the duration of that code fragment's execution".
-// I did not say they are only available within that code fragment. Big different.
-//
-// Just to recap, pushing a variable on the stack does not push its value on the stack,
-// it pushes its name on the stack. With this in mind, lets look at a few scenarios
-// where "a name on the stack" can cause a problem, and how you go about avoiding
-// these problems.
-//
-// First, passing values into a code block (same as a function.)
-// In the factorial example above, lets say that instead of pushing
-// 10 on the stack and calling factorial(), we create a variable i, assigned it the value 10,
-// then push i on the stack and call factorial(). What would happen?
-//
-//  i var
-//  i 10 =
-//  i factorial() println
-//
-// Looking at factorial(), the first thing it does is create a new variable
-// called i. This is an entirely new variable, and will last until the code fragment ends.
-// Now consider the third line, "i swap =". i (the name) is already on the stack from
-// before we called factorial(), then this line will push i (the name) on the stack,
-// swap the top two stack entries, and call the assignment operator.
-// Essentially this is equivalent to i i =. Problem is, within this code block i has
-// been defined but is yet to be initialised. The = operator cannot see
-// the i from outside the code block, it only sees the new i created within this code fragment.
-//
-// There are a couple of ways of avoiding this problem. The simplest is to not push
-// the name i on the stack before calling factorial(), but push its value.
-// You do this with the value or .value operator. So if we had said
-//
-//  i.value factorial() println
-//
-// there would not be any problem. Another way would be to not use i as a variable name within
-// the fctorial code fragment. The way I'm advocating is to use a coding standard and
-// the $ operator, but more on this later.
-//
-// The second problem is getting values out of a code fragment. You can see how I've
-// done this in the fractorial() code above - use the .value (or value) operator.
-// If the .value operator had not been used then the name res would be left on the stack
-// when this code fragment finished, then the following code will have to deal with a
-// name res rather than the value of res as calculated within the factorial() code.
-//
-// The third issue is a function that uses a variable that it hasn't created and does
-// not know where that variable has been created. Consider a simple function that
-// prints the value of the variable i
+// Here's how this plays out.
 
 printi var
 printi {
   i println
 } =
 
-i 123 =
-printi()
-
-// This code will print 123.
-//
-// And now we introduce another code fragment, which could be a function or
-// part of an if or while, that defines another i, as in
-
 cf var
 cf {
-  i var     // this code fragment defines i again, effectively shadowing the earlier i
+  i var
   i 987 =
   printi()
 } =
-cf()
 
-// The cf() call will print 987 because the i defined within the cf fragment is visible
-// to all fragments, including the call to printi(), until the cf() fragment ends.
+i 123 =
+
+printi()      // 123
+cf()          // 987
+
+// It is important to recognise that executing printi() from within cf()
+// is simply eecuting another code fragment (that is "i println").
+// There is no such thing as a function in shale, although I make it look
+// like there is. There's more on this in the functions file.
+
+
+
+// The problems.
+
+// Pushing a variable's name on the stack rather than its value can lead
+// to some problems when calling functions. I know shale doesn't have functions,
+// but I'll still refer to them like this. Everything I say here also
+// applies to any code fragment, but it is most likely to show up
+// when calling functions. And it all relates to passing values in to,
+// or out from, functions.
 //
-// So, how do you avoid these kind of problems? Using the .value (or value) operator
-// when passing values in to, or out from, a code fragment goes a long way to solving this issue.
-// Another way to help is to use the $ operator to create non-standard variable names,
-// along with a coding standard that specifies how to name "local" variables.
-
-
-
-// The $ operator turns a number or string on the top of the stack into a variable name.
-// This lets you circumvent the "alphabetic, alphanumeric and underscore" rule applied to
-// variables. So, if you want a variable called #!//.@**&554->() push it as
-// a string and use the $ operator
-
-"#!//.@**&554->()"$ var
-
-// and you can assign it any value you want like any other variable
-
-"#!//.@**&554->()"$ "Horrible variable name" =
-"#!//.@**&554->()"$ println
-
-// This give you lots of freedom, but to tame it a little you should apply a coding standard
-// that defines how a function's variables are named, and how you must use the value (or .value) operator
-// when pushing any value on the stack to live on after the code fragment terminates.
+// Passing values in to a function.
 //
-// For example, to recast the factorial() code from above, you might do this
-
-factorial {
-  "_factorial_loop_counter"$ var
-  "_factorial_res"$ var
-  "_factorial_loop_counter"$ swap =
-  "_factorial_res"$ 1 =
-  { "_factorial_loop_counter"$ 1 > } { "_factorial_res"$ "_factorial_res"$ "_factorial_loop_counter"$ * = "_factorial_loop_counter"$ "_factorial_loop_counter"$ 1 - = } while
-  "_factorial_res"$.value
-} =
-10 factorial() "10! = %d\n" printf
-
-// I've done a simple text substitutiion of i snd res and the line length
-// has blown out significantly, but you get the idea. Use variable names
-// that are particular to the function name so they don't clash with the
-// variables in other code fragments.
+// Consider the following code
 //
-// However, there is another less verbose way, and one that I occasionally use,
-// and that is to simply use numbers for the local variables. Another way to
-// write the factorial function is
-
-factorial {
-  0$ var 0$ swap =    // 0$ is the argument
-  1$ var              // 1$ is the result
-  1$ 1 =              // initialise the result to 1
-  { 0$ 1 > } { 1$ 1$ 0$ * = 0$ 0$ 1 - = } while
-  1$.value            // return the result value
-} =
-10 factorial() "10! = %d\n" printf
-
-
-
-// So that's it for simple variables and the $ operator. The next installment
-// of variables relates to namespaces, and is covered in another example file.
+//  i var
+//  i 123 =
+//  i function()
+//
+// where function() is meant to perform some calculation based on the
+// passed-in value. Problem is, function() is not getting a value, it is
+// getting a variable name. function() might create its own variable called i,
+// hiding the calling code's i.
+//
+// There's a couple of ways of dealing with this.
+//
+// The first way is to push the variable's value rather than its name.
+// You do with the value or .value operator. So you could do:
+//
+//  i.value function()
+//
+// The second way is for function() to call the value or .value operator before
+// creating any of its own variables, thereby turning any name into the
+// respective values. Unfortunately this on;y works when the function()
+// has one argument on the stack. For two or more arguments this cannot
+// be relied upon. So I call this deprecated.
+//
+// The third way is to use user-defined variables along with a coding standard,
+// like the Barr Group standard, where there are clear rules around how you
+// name all variables.
+//
+// Passing values out of a function.
+//
+// If your function returs a result or results on the stack then always
+// use the value or .value operator to push local variable's values rather
+// than their names.
