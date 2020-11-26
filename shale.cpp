@@ -721,8 +721,8 @@ void syntax() {
   printf("  { ... }                                     - pushes a code fragment on the stack.\n");
   printf("                                                see below for generating shale code from within shale\n"); 
   printf("  dup             {value} dup                 - duplicate the top of the stack\n");
-  printf("  pop             {value} pop                 - pops the top of the stack off\n");
   printf("  swap            {a} {b} swap                - swap the two top elements of the stack\n");
+  printf("  pop             pop                         - pops the top of the stack off\n");
   printf("  var             {name} var                  - defines a variable\n");
   printf("  $                                           - turns a number or string into a name\n");
   printf("  ::              {index} {name} ::           - create the variable {index} in namespace {name}\n");
