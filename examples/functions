@@ -60,7 +60,7 @@
 //    j 0 =
 //    { j 10 < }
 //      some-condition {
-//        return true =   // set our return valiable to true
+//        return true =   // set our return variable to true
 //        break           // break from the "j" while
 //      } ifthen
 //      j j 1 + =

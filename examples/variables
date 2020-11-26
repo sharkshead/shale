@@ -33,7 +33,7 @@
 // Standard names.
 //
 // A standard variable name starts with an alphabetic character followoed
-// by zero of more alphanumeric or underscoee characters. You can't create
+// by zero of more alphanumeric or underscore characters. You can't create
 // a standard variable name that is the same as one of shale's 30 or so operators,
 // like if or while, but everything else is fine. If you really want a variable called if
 // then use a user-defined variable.
@@ -42,7 +42,13 @@
 //
 // You can create any variable name you like by using the $ operator.
 // This takes a number (integer or floating point) or a string on the stack
-// and turns it into a variable name. So to get that if variable name, use "if"$.
+// and turns it into a variable name. To get that if variable name, use "if"$.
+// There are no holds barred here, so if you want a variable called #!//.@**&554->()
+// do this
+
+"#!//.@**&554->()"$ var
+"#!//.@**&554->()"$ 123456 =
+"#!//.@**&554->()"$ println
 
 
 
@@ -75,14 +81,16 @@ i 100 > {
     i 3.141 =
     i println     // 3.141
   } ifthen
+  i println       // 987 again because the "3.141" i has been removed
 } {
   i var           // hides the "123" i
   i "abc123" =
   i println       // abc123 (won't be output)
 } if
-i println         // 123
+i println         // 123, because all the code fragments have exited,
+                  // and so all their i's have been removed.
 
-// When if comes to "functions" it is important to remember
+// When it comes to "functions" it is important to remember
 // that shale doesn't have functions but rather you can assign
 // a code fragment to a variable and execute that code fragment.
 //
@@ -129,7 +137,7 @@ cf()          // 987
 //  i function()
 //
 // where function() is meant to perform some calculation based on the
-// passed-in value. Problem is, function() is not getting a value, it is
+// top of the stack. Problem is, function() is not getting a value, it is
 // getting a variable name. function() might create its own variable called i,
 // hiding the calling code's i.
 //
@@ -142,8 +150,8 @@ cf()          // 987
 //
 // The second way is for function() to call the value or .value operator before
 // creating any of its own variables, thereby turning any name into its value.
-// Unfortunately, this on;y works when the function()
-// has one argument on the stack. For two or more arguments this cannot
+// Unfortunately, this only works when the function()
+// has one or two arguments on the stack. For three or more arguments this cannot
 // be relied upon. So I call this deprecated.
 //
 // The third way is to use user-defined variables along with a coding standard,
