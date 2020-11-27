@@ -480,6 +480,8 @@ void lexNextToken(Lex &lex) {
         if((lex.str[0] == '0') && (lexChar == 'x')) {
           // A hex number
           lexGetChar();
+          lex.number.intRepresentation = true;
+          lex.number.valueInt = 0;
           if(((lexChar >= '0') && (lexChar <= '9')) || ((lexChar >= 'a') && (lexChar <= 'f')) || ((lexChar >= 'A') && (lexChar <= 'F'))) {
             p = lex.str;
             *p++ = lexChar;
@@ -489,7 +491,6 @@ void lexNextToken(Lex &lex) {
               lexGetChar();
             }
             *p = 0;
-            lex.number.intRepresentation = true;
             lex.number.valueInt = hextoi(lex.str);
           }
         } else {
