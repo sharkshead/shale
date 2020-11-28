@@ -1,0 +1,20 @@
+#!/usr/local/bin/shale
+
+// OL Stack not empty
+
+// This is a parsing problem. No code has been executed.
+// It means there are one or more code fragments that have not been closed.
+
+// Like this
+
+{ 1 2 + println
+
+// This relates to the way shale parses code fragments.
+// Every opening curly brace (a new code fragment) causes a new Object List
+// (the OL in the error message) to be pushed on the object list stack,
+// and when that code fragment is closed (with a closing curly brace)
+// the object list is processed and removed from the stack.
+// A program must close all code fragments before it can be executed.
+
+// shale doesn't enforce this when run interactively. Instead, it shows you
+// how deep into code fragments you are with the number before the ">" prompt.
