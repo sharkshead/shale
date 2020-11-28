@@ -2,7 +2,7 @@
 
 // Variables.
 
-// There are two types of variables: simple and namespace.
+// shale has two types of variables: simple and namespace.
 //
 // Here are some examples of variable names
 //
@@ -32,8 +32,8 @@
 //
 // Standard names.
 //
-// A standard variable name starts with an alphabetic character followoed
-// by zero of more alphanumeric or underscore characters. You can't create
+// A standard variable name starts with an alphabetic character followed by
+// zero of more alphanumeric or underscore characters. You can't create
 // a standard variable name that is the same as one of shale's 30 or so operators,
 // like if or while, but everything else is fine. If you really want a variable called if
 // then use a user-defined variable.
@@ -91,7 +91,7 @@ i println         // 123, because all the code fragments have exited,
                   // and so all their i's have been removed.
 
 // When it comes to "functions" it is important to remember
-// that shale doesn't have functions but rather you can assign
+// that shale doesn't have functions but rather you assign
 // a code fragment to a variable and execute that code fragment.
 //
 // Here's how this plays out.
@@ -113,13 +113,13 @@ printi()      // 123
 cf()          // 987
 
 // It is important to recognise that executing printi() from within cf()
-// is simply executing another code fragment (that is "i println").
+// is simply executing another code fragment ("i println").
 // There is no such thing as a function in shale, although I make it look
 // like there is. There's more on this in the functions file.
 
 
 
-// The problems.
+// The problems and their solutions.
 
 // Pushing a variable's name on the stack rather than its value can lead
 // to some problems when calling functions. I know shale doesn't have functions,
@@ -146,7 +146,8 @@ cf()          // 987
 // The first way is to push the variable's value rather than its name.
 // You do with the value or .value operator. So you could do:
 //
-//  i.value function()
+//  i value function()      or
+//  i.value function()      I prefer this from a purely visual point of view
 //
 // The second way is for function() to call the value or .value operator before
 // creating any of its own variables, thereby turning any name into its value.
