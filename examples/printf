@@ -1,7 +1,7 @@
 #!/usr/local/bin/shale
 
 // printf, sprintf and fprintf from the file library, implement
-// a subset of the stdio.h printf's format specifiers, and includes
+// a subset of stdio.h's printf format specifiers, and includes
 // a couple of specifiers that are particular to shale.
 
 
@@ -31,7 +31,7 @@
 //
 // %p is particular to shale and prints the object on
 // the stack no matter what type it is, using a default
-// set of formattting options. It is equivalent to the
+// set of formatting options. It is equivalent to the
 // print operator. It does not take a width specifier.
 
 123 3.141 "abc123" "%p %p %p\n" printf
