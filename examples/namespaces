@@ -25,9 +25,8 @@
 //  i ns::
 //
 // is the variable i in the namespace ns.
-// All this does is create a variable name. It doesn't create the variable.
-// You create the variable with the var operator as you would with
-// simple variables
+// All this does is push a variable name on the stack. It doesn't create the variable.
+// You create the variable with the var operator as you would with simple variables
 
 i ns:: var
 
@@ -61,7 +60,7 @@ i a:: b:: var
 
 // is i in namespace a, which in turn is in namespace b. Effectively b::a::i.
 // You can nest them as deep as you want, subject to variable name length limitations,
-// and again you can use this like any other variable.
+// and again you can use this like a simple variable.
 //
 // The index and namespace name don't have to be names, they can be numbers
 // or strings.
@@ -89,7 +88,7 @@ i.value j.value:: a:: println
 
 // will print the value of a[j][i], 987.
 //
-// There is an example of using multi-dimensional arrays in the sudoku-solver example.
+// There is an example of using multi-dimensional arrays in the sudoku-solver.
 //
 // Taking it further, the index and namespace name can be strings
 // or floating point numbers, as well. Floating point numbers may
@@ -103,7 +102,7 @@ micro version:: shale:: minor version:: shale:: major version:: shale:: "shale v
 
 // And finally, when you're developing a script that uses namespaces, it is handy to
 // know about the btree operator. It prints the contents of the BTree
-// that stores the namespace variables. Here's what it looks like
+// that stores the namespace variables.
 
 btree
 
