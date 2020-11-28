@@ -59,8 +59,8 @@ debug
 // you are pushing objects on the stack without calling an operator
 // to deal with those objects. You'll need to work out where these
 // pushes are occuring and either remove them or work out why you're
-// not calling the intended operator. If your stack depth is rising
-// you may also find that the "Number, String, Pointer" numbers also rise.
+// not calling the intended operator. If your stack depth is rising you may
+// also find the "Number, String, Pointer" numbers (new minus free) also rise.
 // This is an artifact of pushing something on the stack and never processing it.
 // It wont always be the case that the "Number, ..." numbers will rise,
 // it's just more likely that they will.
