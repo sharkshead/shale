@@ -62,7 +62,7 @@
 //  while loops
 //  functions
 //  arrays, single- and multi-dimentional
-//  conditional AND and OR operators
+//  conditional logical AND and OR operators
 //
 // Yeah, I know you're saying all programming languages give you these features.
 //
@@ -80,8 +80,7 @@ i var
 
 // This creates the variable called i. Simple variables start with an alphabetic
 // character followed by zero or more alphanumeric or underscore characters.
-// You can create variables that don't follow these rules, which will be
-// explained in another example file, however we'll stick to simple variable names for now.
+// shale variables are explaind in more detail in the variables example file.
 
 
 
@@ -120,8 +119,8 @@ i println
 // (987 will be output). In this case the assignment operator will take
 // the i on the stack as a name, and the j as its value.
 //
-// I'll mention pointers here quickly. They will be explained in more
-// detail in another example file. To create a pointer you use the pointer assignment
+// I'll mention pointers here quickly. They are explained in more detail in
+// the pointers example file. To create a pointer you use the pointer assignment
 // operator, and to access the thing pointed to you use the dereference operator.
 
 i j &=        // the pointer assinment operator. i is a pointer to j
@@ -135,23 +134,24 @@ j println     // 3.141 will be output
 //
 // Here's where we get into something cool. You've seen how you can push
 // numbers and names on the stack (strings as well, like "abc123"), you can
-// also push code fragments on the stack. Yes, a code fragment. The code
-// isn't executed, just pushed on the stack. There are a couple of operators
-// that will execute a code fragment on the stack, and the first of these
-// we'll look at is the if operator.
+// also push a code fragment on the stack. The code isn't executed,
+// just pushed on the stack as a single object.
+//
+// You push a code fragment on the stack by enclosing it within curly braces
+//
+//  { 1 2 + println }
+//
+// There are a couple of operators that will execute a code fragment on the stack,
+// and the first of these we'll look at is the if operator.
 //
 // The if operator needs three things on the stack. The first thing you
 // push on the stack is a boolean, the second is a code fragment which will
 // be executed if the boolean is true, and the third is a code fragment
 // to be executed if the boolean is false. Then you call the if operator.
 //
-// You push a code fragment on the stack by enclosing it within curly braces
-// 
-//  { 1 2 + println }
-//
 // Here's an if operator example, using the boolean less-than operator.
 
-i 99 =        // reassign i to 99
+i 99 =        // assign i to 99
 i 100 < {     // the boolean and opening the then-code fragment
   "i is less than 100" println
 } {           // closing the then fragment and opening the else-code fragment
@@ -201,7 +201,7 @@ f execute   // one form of the execute operator
 f()         // another, more familiar, form
 
 // You'll notice there's no space between the f and (). You can put in a space if you like,
-// but it's not neccessary becaue a name cannot contain a ( character, so shale
+// but it's not neccessarr because a name cannot contain a ( character, so shale
 // stops interpreting the name as soon as it hits the (.
 //
 // I add lots of spaces and newlines and indents for clarity, but they are not strictly necessary.
