@@ -201,7 +201,7 @@ f execute   // one form of the execute operator
 f()         // another, more familiar, form
 
 // You'll notice there's no space between the f and (). You can put in a space if you like,
-// but it's not neccessarr because a name cannot contain a ( character, so shale
+// but it's not necessary because a name cannot contain a ( character, so shale
 // stops interpreting the name as soon as it hits the (.
 //
 // I add lots of spaces and newlines and indents for clarity, but they are not strictly necessary.
