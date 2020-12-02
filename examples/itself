@@ -4,6 +4,6 @@
 // and ignore the println at the end of the script,
 // then this script prints itself out.
 
-s var s "s var s %c%s%c = 34 s 34 s printf" = 34 s 34 s printf
+i var i "i var i %c%s%c = 34 i 34 i printf" = 34 i 34 i printf
 
 "" println
