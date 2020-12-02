@@ -2,10 +2,10 @@
 
 // OL Stack not empty
 
-// This is a parsing problem. No code has been executed.
-// It means there are one or more code fragments that have not been closed.
+// If you see this error then it means there are one or more code fragments
+// that have not been closed. It is a parsing problem. No code has been executed.
 
-// Like this
+// For example
 
 { 1 2 + println
 
