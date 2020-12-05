@@ -17,7 +17,7 @@ file library
 maths library
 
 // Each library stores all their functions and variables under
-// a namespae of their name. So, for example, the maths
+// a namespace of their name. So, for example, the maths
 // library uses the maths:: namespace.
 //
 // Every library provides a help function, always accessible
