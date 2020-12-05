@@ -6,13 +6,13 @@
 
 
 
-// %d %x %f %s
+// %d %x %f %s %c
 //
 // These closely follow the stdio printf functionality, with one
 // notable exception. You can use them as above, and you can
 // also specify output widths, for example
 
-123 "abc123" 3.1415926 "%8.4f %-8s %10d\n" printf
+59 123 "abc123" 3.1415926 "%8.4f %-8s %10d %c\n" printf
 
 // What you can't do (the exception) is use * as a width specifier.
 // So although this would work fine in C or C++, it won't work in shale
