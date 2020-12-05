@@ -34,8 +34,10 @@ s initialised {
   "  5: irregular sudoku from Cracking The Cryptic" println
   "  6: irregular sudoku from Andrew Stuart" println
   "" println
+  "You can also enable colour output by adding colour=true or color=true to the command line." println
+  "" println
   "For example," println
-  file arg:: shale:: "  %s s=3\n" printf
+  file arg:: shale:: "  %s s=3 colour=true\n" printf
   "will solve the CTC sudoku with the Knight's move constraint" println
   "" println
   whichSudoku 1 =
@@ -52,18 +54,63 @@ printGrid var
 printGrid {
   r var
   c var
+  doColour var
+  irregular var
+  region var
+
+  colour initialised {
+    doColour colour =
+  } {
+    color initialised {
+      doColour color =
+    } {
+      doColour false =
+    } if
+  } if
+  irregular 0 0:: regions:: initialised =
 
   r 0 =
   { r 9 < } {
     c 0 =
     { c 9 < } {
+      doColour {
+        irregular {
+          region r.value c.value:: regions:: =
+          region.value colour:: 0x1b "%c[1;%dm" printf
+        } {
+          r 3 / c 3 / + 1 + 2 % 3 * 31 + 0x1b "%c[1;%dm" printf
+        } if
+      } ifthen
       r.value c.value:: grid:: dup 0 == { pop " ." } { " %d" } if printf
+      doColour {
+        0x1b "%c[0m" printf
+      } ifthen
       c increment()
     } while
     "" println
     r increment()
   } while
 } =
+
+// This sets up the colour map for irregular sudokus.
+1 colour:: var
+1 colour:: 30 =
+2 colour:: var
+2 colour:: 31 =
+3 colour:: var
+3 colour:: 32 =
+4 colour:: var
+4 colour:: 33 =
+5 colour:: var
+5 colour:: 34 =
+6 colour:: var
+6 colour:: 35 =
+7 colour:: var
+7 colour:: 36 =
+8 colour:: var
+8 colour:: 30 =   // skip 37 (too light) and reuse 30 and 31 (with luck they won't be close to regions 1 and 2).
+9 colour:: var
+9 colour:: 31 =
 
 // Assign the cell values to one row of the grid.
 setRow var
@@ -451,7 +498,7 @@ whichSudoku 4 == {
 
 // Another Cracking The Cryptic sudoku: https://www.youtube.com/watch?v=eJIu8w3ZXo8
 // This is an irregular (jigsaw) sudoku.
-// Ri3 Model A time to finish: 8m. Completed grid in about 4m.
+// Pi3 Modal A time to finish: 8m. Completed grid in about 4m.
 whichSudoku 5 == {
   found true =
   "From Cracking The Cryptic: https://www.youtube.com/watch?v=eJIu8w3ZXo8" println
@@ -514,6 +561,9 @@ whichSudoku 6 == {
 whichSudoku 7 == {
   found true =
   // add it here
+  // regionChecker standardRegions =          // Include a region checker
+  // regionChecker irregularRegions =
+  // constraint knightsMoveConstraint =       // Include any extra contraints, as appropriate
 } ifthen
 
 // Don't change anything from here to the end.
