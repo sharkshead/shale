@@ -148,7 +148,7 @@ setRow {
 } =
 
 // Standard 3x3 box region checker.
-// This only works when called from within possile().
+// This only works when called from within possible().
 standardRegions var
 standardRegions {
   r0 var
@@ -172,7 +172,7 @@ standardRegions {
 } =
 
 // Irregular region checker.
-// This only works when called from within possile().
+// This only works when called from within possible().
 irregularRegions var
 irregularRegions {
   region var
