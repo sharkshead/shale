@@ -49,18 +49,18 @@ debug
 // This is really useful for diagnosing stack and namespace leaks,
 // and shale memory leaks. The debug output looks like this
 //
-//  Number: free 0, new 0.  String: free 0, new 0.  Pointer: free 0, new 0.  Free bags: 0
-//  Stack: size 6, free 2
+//  Number: count 0, free 0.  String: count 0, free 0.  Pointer: count 0, free 0.  Free bags: 0
+//  Stack: depth 6, free 2
 //  BTree: depth 1, nodes 1, entries 6
 //
 // These numbers are interrelated to some degree.
 //
-// If your stack depth (size minus free) rises as your script runs then
+// If your stack depth rises as your script runs then
 // you are pushing objects on the stack without calling an operator
 // to deal with those objects. You'll need to work out where these
 // pushes are occuring and either remove them or work out why you're
 // not calling the intended operator. If your stack depth is rising you may
-// also find the "Number, String, Pointer" numbers (new minus free) also rise.
+// also find the "Number, String, Pointer" numbers (count minus free) also rise.
 // This is an artifact of pushing something on the stack and never processing it.
 // It wont always be the case that the "Number, ..." numbers will rise,
 // it's just more likely that they will.

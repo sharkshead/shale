@@ -32,9 +32,9 @@ SOFTWARE.
 #include <sys/stat.h>
 #include "shalelib.h"
 
-#define MAJOR ((INT) 1)
-#define MINOR ((INT) 0)
-#define MICRO ((INT) 9)
+#define MAJOR ((INT)  1)
+#define MINOR ((INT)  0)
+#define MICRO ((INT) 10)
 
 // Lexical analyser stuff.
 

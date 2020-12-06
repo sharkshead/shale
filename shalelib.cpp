@@ -64,7 +64,7 @@ CacheDebug::CacheDebug() : used(0), news(0) { }
 void CacheDebug::incUsed() { used++; }
 void CacheDebug::decUsed() { used--; }
 void CacheDebug::incNew() { news++; }
-void CacheDebug::debug() { printf("free %d, new %d", used, news); }
+void CacheDebug::debug() { printf("count %d, free %d", news, used); }
 
 Cache::Cache() : usedNumbers((ObjectBag *) 0), usedStrings((ObjectBag *) 0), usedPointers((ObjectBag *) 0), unusedBags((ObjectBag *) 0) { }
 
@@ -2425,5 +2425,5 @@ int Stack::getUsedSize() {
 }
 
 void Stack::debug() {
-  printf("Stack: size %d, free %d\n", stackSize, usedSize);
+  printf("Stack: depth %d, free %d\n", stackSize, usedSize);
 }
