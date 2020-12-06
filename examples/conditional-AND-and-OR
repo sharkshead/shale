@@ -31,4 +31,62 @@
 // Conditional AND and OR can have profound functionality and performance
 // impacts on your code,
 
-"Please read this file rather than executing it." println
+
+
+// Here's an example showing a conditional AND.
+
+// We'll start with two functions, one returning false and the other true.
+// I've used functions so you can see they've been executed by their println output.
+// Conditional AND and OR are not dependent on functions. They work with any boolean.
+
+cond1 var
+cond1 {
+  "cond1 returning false" println
+  false
+} =
+
+cond2 var
+cond2 {
+  "cond2 returning true" println
+  true
+} =
+
+// This is a standard AND where both operands are evaluated
+// before the final AND is evaluated. You can see that cond1() and
+// cond2() have been executed because of their println output.
+
+"Standard AND:" println
+cond1() cond2() and {
+  "cond1 and cond2 is true"
+} {
+  "cond1 and cond2 is false"
+} if
+println
+
+// Here's a conditional AND where the call to cond2()
+// is placed within a code fragment. In this case the cond2()
+// fragment is not executed because cond1(), returning false,
+// has decided the value of the overall AND clause.
+
+"" println
+"Conditional AND:" println
+cond1() { cond2() } and {
+  "cond1 and cond2 is true"
+} {
+  "cond1 and cond2 is false"
+} if
+println
+
+// And like other operators that accept a code fragment,
+// you can pass a variable that is assigned to a code fragment,
+// and since cond2 is a variable that is assigned to a code fragment,
+// we can drop the code fragment and refer directly to cond2.
+
+"" println
+"Conditional AND using a variable" println
+cond1() cond2 and {
+  "cond1 and cond2 is true"
+} {
+  "cond1 and cond2 is false"
+} if
+println
