@@ -171,9 +171,12 @@ i j != {
 
 // While loops.
 //
-// The while loop expects two code fragments on the stack. The first you
+// The while operator expects two code fragments on the stack. The first you
 // push on is a fragment which, when executed, leaves a boolean on the stack,
-// and the second you push on is the body of the while.
+// and the second you push on is the body of the while. The boolean fragment
+// will be executed, and if the resulting boolean it leaves on the stack is true,
+// then the body fragment will be executed. And so it goes on until the boolean
+// fragment leaves false on the stack.
 
 i 0 =                   // initialise the loop counter.
 { i 10 < } {            // boolean fragment and opening the body fragment
