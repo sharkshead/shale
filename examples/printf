@@ -50,7 +50,7 @@ i "%n\n" printf
 
 // \n
 //
-// Prints a newline chanacter.
+// Prints a newline character.
 
 
 
