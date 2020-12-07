@@ -1,6 +1,6 @@
 #!/usr/local/bin/shale
 
-// Everyting in the exampls/ directory is both readable and executable,
+// Everything in the examples/ directory is both readable and executable,
 // assuming you've installed the shale executable, that is. I'd suggest you
 // read each file first before executing the file.
 
