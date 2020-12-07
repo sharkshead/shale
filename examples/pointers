@@ -21,7 +21,7 @@ i println
 
 // will print 987.
 //
-// Pointers are not restricted to pointing at ohter variables, they can point to
+// Pointers are not restricted to pointing at other variables, they can point to
 // any object at all, like numbers, strings and code fragments.
 
 p 123 &=
