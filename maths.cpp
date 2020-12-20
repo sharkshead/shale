@@ -37,13 +37,13 @@ SOFTWARE.
 class MathsHelp : public Operation {
   public:
     MathsHelp(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class MathsFunction : public Operation {
   public:
     MathsFunction(int, LexInfo *);
-    bool action();
+    OperatorReturn action();
 
   private:
     int function;
@@ -52,7 +52,7 @@ class MathsFunction : public Operation {
 class MathsToThePower : public Operation {
   public:
     MathsToThePower(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 const char *mathsHelp[] = {
@@ -130,19 +130,19 @@ extern "C" void slmain() {
 
 MathsHelp::MathsHelp(LexInfo *li) : Operation(li) { }
 
-bool MathsHelp::action() {
+OperatorReturn MathsHelp::action() {
   const char **p;
 
   for(p = mathsHelp; *p != (const char *) 0; p++) {
     printf("%s\n", *p);
   }
 
-  return true;
+  return or_continue;
 }
 
 MathsFunction::MathsFunction(int f, LexInfo *li) : Operation(li), function(f) { }
 
-bool MathsFunction::action() {
+OperatorReturn MathsFunction::action() {
   Object *o;
   Number *n;
   Number *res;
@@ -170,12 +170,12 @@ bool MathsFunction::action() {
   n->release(getLexInfo());
   o->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
 
 MathsToThePower::MathsToThePower(LexInfo *li) : Operation(li) { }
 
-bool MathsToThePower::action() {
+OperatorReturn MathsToThePower::action() {
   Object *o1;
   Object *o2;
   Number *n1;
@@ -193,5 +193,5 @@ bool MathsToThePower::action() {
   o1->release(getLexInfo());
   o2->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }

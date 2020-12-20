@@ -1,101 +1,93 @@
 #!/usr/local/bin/shale
 
-// Functions. shale doesn't have functions, even though I mention
-// them constantly. shale doesn't have functions. What shale has is the
-// ability to assign a code fragment to a variable, and then execute
-// that code fragment. Executing a code fragment tucked away in
-// a variable is no different to the if, ifthen or while operators
-// executing code fragments in order to achieve their stated aims.
+// shale has two types of functions: simple and proper.
 //
-// The upshot of this is that there is no return statement like you
-// find in other languages.
-//
-// So how do you live without a return statement? That depends.
-//
-// If your "function" has a few initial conditions which, if not met,
-// cause your function to return, simply put their negation in
-// an ifthen:
-//
-//  void fn(int arg) {
-//    if(arg == 0) return;
-//    if(some-other-condition) return;
-//    ... rest of function
-//  }
-//
-// could become
-//
-//  fn var
-//  fn {
-//    arg 0 != some-other-condition not and {
-//      ... rest of function
-//    } ifthen
-//  } =
-//
-// shale does have a break operator that will break out of the
-// enclosing while loop, no matter how deep into other code fragments
-// you are:
-//
-//  { i 10 < } {
-//    some-condition {
-//      break
-//    } ifthen
-//    i i 1 + =
-//  } while
-//  ... execution will resume here after the break
-//
-// Even though the break is in a code fragment executed by ifthen,
-// the code execution will continue after the while. This is
-// what will happen no matter how deep you are into other code
-// fragments - the nearest enclosing while will terminate.
-//
-// If you have nested while loops and you want to return from an
-// inner loop, then you'll need a variable, which I often call "return".
-// Set this to false at the start and set it to true before you
-// do the break, and then include ifthen code to perform further
-// breaks when "return" is true until you are out of your nested loops.
-//
-//  return var
-//  return false =
-//  { i 10 < } {
-//    j 0 =
-//    { j 10 < }
-//      some-condition {
-//        return true =   // set our return variable to true
-//        break           // break from the "j" while
-//      } ifthen
-//      j j 1 + =
-//    } while
-//    return {            // should we return
-//      break             // yes, break from the "i" while
-//    } ifthen
-//    i i 1 + =
-//  } while
-//  ... execution continues here after the initial break
-//
-// In the code above, if some-condition is true then we set the
-// value of "return" to true and break. The code will then continue after
-// the inner while and hit the ifthen test on return, which
-// will execute another break, terminating the outer while.
-//
-// If, on the other hand, you don't have any while loops to break from
-// and your code consists of nested if/ifthen's, and you want to return
-// from deep inside the nesting, then the simplest thing to do is enclose
-// your code in a while. That way you can break from anywhere in your
-// nested if's and you'll immediately be outside the enclosing while.
-// Of course you need to ensure you don't go around the while loop
-// a second time, which is easy to avoid:
-//
-//  once var
-//  once true =
-//  { once } {
-//    ... lots of nested if and ifthen operators
-//      break           // a break anywhere will exit the enclosing while loop
-//    ...
-//    once false =      // last statement in the loop, ensure the loop terminates.
-//  } while
-//
-// There are millions of ways your function could return from
-// deep within the code, and I can't cover them all, but I hope I've
-// given you some thoughts on how to handle a return-less language.
+// A simple function is a code fragment assigned to a variable.
+// A proper function is also a code fragment assigned to a variable,
+// but the code fragment is tagged in a special way that allows a
+// "return" operator to exit the nearest enclosing tagged code fragment.
 
-"Please read this file rather than executing it." println
+
+
+// Simple functions
+
+// A simple function is a code fragment assigned to a variable, like
+
+sf var
+sf {
+  1 2 + 3 * println
+} =
+
+// And to execute the function you can use the "execute" or () operators
+
+sf execute
+sf()
+
+// You can create quite complex functions with this, but these is
+// a drawback - there is no return statement that will exit this code fragment.
+// This may complicate your code if you want to return from the
+// code fragment from deep within nested if/ifthen/while operators.
+// But, for many situations, a simple function is all that's needed.
+
+
+
+// Proper functions
+
+// A proper function is also a code fragment assigned to a variable,
+// except you add a "function" operator to the code fragment, usually at
+// the top of the fragment, but anywhere will do. Tagging a fragment this way
+// means a "return" operator knows when to stop unwinding nested fragments.
+
+i var     // define a couple of variables to make the example interesting.
+i 123 =
+j var
+j 987 =
+
+pf var
+pf { function
+  i 100 > {
+    j 1000 < {
+      n var       // Let's assume this situation is bad. Print
+      n 0 =       // some diagnostics and return from the function.
+      "This is bad" println
+      { n j < } {
+        n "n = %d\n" printf
+        n n 100 + =
+      } while
+      return      // we're out of here.
+    } {
+      // do something constructive
+    } if
+  } {
+    // do something constructive
+  } if
+  "this will not be output" println
+} =
+
+pf()
+
+// The "function" operator is a no-op in that is does not touch the
+// stack nor any variables. It's sole job is to tag its code fragment
+// as being the end point of a "return" operator.
+
+// And just to be clear, the function operator will tag any code fragment,
+// not just those assigned to a variable. It is perfecely fine to tag an
+// inline code fragment that is part of an if or ifthen.
+
+i 100 < {
+  "i is less than 100" println
+} {
+  function
+  "i is greater or equal to 100" println
+  return
+  "this will not be output" println
+} if
+"we're outside the if" println
+
+// Tagging the conditional code fragment of a while loop as a function and returning
+// from that fragment will work just fine, as long as you leave the expected boolean
+// on the stack, that is. However, taggng the body of the while loop and returning
+// from that body fragment will not terminate the loop, it will simply terminate
+// the body fragment after the return. To terminate any while loop requires a false
+// value on the stack from the conditional code fragment, of a break from within the
+// body fragment.

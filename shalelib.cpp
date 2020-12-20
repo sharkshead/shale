@@ -317,7 +317,7 @@ void Name::debug() { printf("Name: %s\n", name); }
 Code::Code(OperationList *ol) : Object(), operationList(ol) { }
 Code *Code::getCode(LexInfo *li) { this->hold(); return this; }
 OperationList *Code::getOperationList() { return operationList; }
-bool Code::action() { return operationList->action(); }
+OperatorReturn Code::action() { return operationList->action(); }
 void Code::debug() { printf("Code\n"); }
 
 // Pointer class
@@ -348,6 +348,10 @@ bool Operation::isVar() {
   return false;
 }
 
+bool Operation::isFunction() {
+  return false;
+}
+
 // OperationListItem class
 
 OperationListItem::OperationListItem(Operation *op) : operation(op), next((OperationListItem *) 0) { }
@@ -366,45 +370,48 @@ Operation *OperationListItem::getOperation() {
 
 // OperationList class
 
-OperationList::OperationList() : head((OperationListItem *) 0), tail((OperationListItem *) 0), newVariableStack(false) { }
+OperationList::OperationList() : head((OperationListItem *) 0), tail((OperationListItem *) 0), newVariableStack(false), isFn(false) { }
 
 void OperationList::addOperation(Operation *op) {
   OperationListItem *oli = new OperationListItem(op);
   if(head == (OperationListItem *) 0) { head = tail = oli; }
   else { tail->setNext(oli); tail = oli; }
   if(op->isVar()) newVariableStack = true;
+  if(op->isFunction()) isFn = true;
+}
+
+bool OperationList::isFunction() {
+  return isFn;
 }
 
 OperationListItem *OperationList::getOperationList() {
   return head;
 }
 
-bool OperationList::action() {
-  bool ret;
+OperatorReturn OperationList::action() {
+  OperatorReturn ret;
 
-  ret = true;
+  ret = or_continue;
   if(newVariableStack) variableStack.addVariableStack();
   for(OperationListItem *oli = head; oli != (OperationListItem *) 0; oli = oli->getNext()) {
-    if(! oli->getOperation()->action()) {
-      ret = false;
+    if((ret = oli->getOperation()->action()) != or_continue) {
       break;
     }
   }
   if(newVariableStack) variableStack.popVariableStack();
+  if((ret == or_return) && isFn) ret = or_continue;
   return ret;
 }
 
-bool OperationList::actionLatest() {
+OperatorReturn OperationList::actionLatest() {
   OperationListItem *oli;
-  bool ret;
+  OperatorReturn ret;
 
-  ret = true;
+  ret = or_continue;
   if(newVariableStack && variableStack.isEmpty()) variableStack.addVariableStack();
   oli = tail;
   if(oli != (OperationListItem *) 0) {
-    if(! oli->getOperation()->action()) {
-      ret = false;
-    }
+    ret = oli->getOperation()->action();
   }
   return ret;
 }
@@ -452,28 +459,28 @@ Object *ObjectList::getObject(int n) {
 
 Push::Push(Object *o, LexInfo *li) : Operation(li), object(o) { object->hold(); }
 
-bool Push::action() {
+OperatorReturn Push::action() {
   object->hold();
   stack.push(object);
-  return true;
+  return or_continue;
 }
 
 // Stack classes
 
 Pop::Pop(LexInfo *li) : Operation(li) { }
 
-bool Pop::action() {
+OperatorReturn Pop::action() {
   Object *o;
 
   o = stack.pop(getLexInfo());
   o->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
 
 Swap::Swap(LexInfo *li) : Operation(li) { }
 
-bool Swap::action() {
+OperatorReturn Swap::action() {
   Object *o1;
   Object *o2;
 
@@ -483,12 +490,12 @@ bool Swap::action() {
   stack.push(o1);
   stack.push(o2);
 
-  return true;
+  return or_continue;
 }
 
 Dup::Dup(LexInfo *li) : Operation(li) { }
 
-bool Dup::action() {
+OperatorReturn Dup::action() {
   Object *o;
 
   o = stack.pop(getLexInfo());
@@ -496,14 +503,14 @@ bool Dup::action() {
   stack.push(o);
   stack.push(o);
 
-  return true;
+  return or_continue;
 }
 
 // Arithmetic classes
 
 Int::Int(LexInfo *li) : Operation(li) { }
 
-bool Int::action() {
+OperatorReturn Int::action() {
   Object *o;
   Number *n;
 
@@ -513,12 +520,12 @@ bool Int::action() {
   n->release(getLexInfo());
   o->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
 
 Double::Double(LexInfo *li) : Operation(li) { }
 
-bool Double::action() {
+OperatorReturn Double::action() {
   Object *o;
   Number *n;
 
@@ -528,12 +535,12 @@ bool Double::action() {
   n->release(getLexInfo());
   o->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
 
 Plus::Plus(LexInfo *li) : Operation(li) { }
 
-bool Plus::action() {
+OperatorReturn Plus::action() {
   Object *o1;
   Object *o2;
   Number *n1;
@@ -595,12 +602,12 @@ bool Plus::action() {
   o1->release(getLexInfo());
   o2->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
 
 Minus::Minus(LexInfo *li) : Operation(li) { }
 
-bool Minus::action() {
+OperatorReturn Minus::action() {
   Object *o1;
   Object *o2;
   Number *n1;
@@ -626,12 +633,12 @@ bool Minus::action() {
   o1->release(getLexInfo());
   o2->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
 
 Times::Times(LexInfo *li) : Operation(li) { }
 
-bool Times::action() {
+OperatorReturn Times::action() {
   Object *o1;
   Object *o2;
   Number *n1;
@@ -657,12 +664,12 @@ bool Times::action() {
   o1->release(getLexInfo());
   o2->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
 
 Divide::Divide(LexInfo *li) : Operation(li) { }
 
-bool Divide::action() {
+OperatorReturn Divide::action() {
   Object *o1;
   Object *o2;
   Number *n1;
@@ -688,12 +695,12 @@ bool Divide::action() {
   o1->release(getLexInfo());
   o2->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
 
 Mod::Mod(LexInfo *li) : Operation(li) { }
 
-bool Mod::action() {
+OperatorReturn Mod::action() {
   Object *o1;
   Object *o2;
   Number *n1;
@@ -711,12 +718,12 @@ bool Mod::action() {
   o1->release(getLexInfo());
   o2->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
 
 BitwiseAnd::BitwiseAnd(LexInfo *li) : Operation(li) { }
 
-bool BitwiseAnd::action() {
+OperatorReturn BitwiseAnd::action() {
   Object *o1;
   Object *o2;
   Number *n1;
@@ -734,12 +741,12 @@ bool BitwiseAnd::action() {
   o1->release(getLexInfo());
   o2->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
 
 BitwiseOr::BitwiseOr(LexInfo *li) : Operation(li) { }
 
-bool BitwiseOr::action() {
+OperatorReturn BitwiseOr::action() {
   Object *o1;
   Object *o2;
   Number *n1;
@@ -757,12 +764,12 @@ bool BitwiseOr::action() {
   o1->release(getLexInfo());
   o2->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
 
 BitwiseXor::BitwiseXor(LexInfo *li) : Operation(li) { }
 
-bool BitwiseXor::action() {
+OperatorReturn BitwiseXor::action() {
   Object *o1;
   Object *o2;
   Number *n1;
@@ -780,12 +787,12 @@ bool BitwiseXor::action() {
   o1->release(getLexInfo());
   o2->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
 
 BitwiseNot::BitwiseNot(LexInfo *li) : Operation(li) { }
 
-bool BitwiseNot::action() {
+OperatorReturn BitwiseNot::action() {
   Object *o1;
   Number *n1;
 
@@ -797,21 +804,29 @@ bool BitwiseNot::action() {
   n1->release(getLexInfo());
   o1->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
+
+// The Function class
+
+Function::Function(LexInfo *li) : Operation(li) { }
+
+OperatorReturn Function::action() { return or_continue; }
+
+bool Function::isFunction() { return true; }
 
 // Var class
 
 Var::Var(LexInfo *li) : Operation(li) { }
 
-bool Var::action() {
+OperatorReturn Var::action() {
   Object *o;
 
   o = stack.pop(getLexInfo());
   variableStack.addVariable(o->getName(getLexInfo())->getValue(), getLexInfo());
   o->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
 
 bool Var::isVar() { return true; }
@@ -820,7 +835,7 @@ bool Var::isVar() { return true; }
 
 Assign::Assign(LexInfo *li) : Operation(li) { }
 
-bool Assign::action() {
+OperatorReturn Assign::action() {
   Object *var;
   Object *val;
   Number *number;
@@ -880,14 +895,14 @@ bool Assign::action() {
   val->release(getLexInfo());
   var->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
 
 // PointerAssign class
 
 PointerAssign::PointerAssign(LexInfo *li) : Operation(li) { }
 
-bool PointerAssign::action() {
+OperatorReturn PointerAssign::action() {
   Object *var;
   Object *val;
   Variable *v;
@@ -913,14 +928,14 @@ bool PointerAssign::action() {
   val->release(getLexInfo());
   var->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
 
 // PointerDereference class
 
 PointerDereference::PointerDereference(LexInfo *li) : Operation(li) { }
 
-bool PointerDereference::action() {
+OperatorReturn PointerDereference::action() {
   Object *var;
   Pointer *p;
   Object *o;
@@ -935,14 +950,14 @@ bool PointerDereference::action() {
 
   var->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
 
 // Logical operators
 
 LessThan::LessThan(LexInfo *li) : Operation(li) { }
 
-bool LessThan::action() {
+OperatorReturn LessThan::action() {
   Object *a;
   Object *b;
   Number *an;
@@ -968,12 +983,12 @@ bool LessThan::action() {
   a->release(getLexInfo());
   b->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
 
 LessThanOrEquals::LessThanOrEquals(LexInfo *li) : Operation(li) { }
 
-bool LessThanOrEquals::action() {
+OperatorReturn LessThanOrEquals::action() {
   Object *a;
   Object *b;
   Number *an;
@@ -999,12 +1014,12 @@ bool LessThanOrEquals::action() {
   a->release(getLexInfo());
   b->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
 
 Equals::Equals(LexInfo *li) : Operation(li) { }
 
-bool Equals::action() {
+OperatorReturn Equals::action() {
   Object *a;
   Object *b;
   Number *an;
@@ -1030,12 +1045,12 @@ bool Equals::action() {
   a->release(getLexInfo());
   b->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
 
 NotEquals::NotEquals(LexInfo *li) : Operation(li) { }
 
-bool NotEquals::action() {
+OperatorReturn NotEquals::action() {
   Object *a;
   Object *b;
   Number *an;
@@ -1061,12 +1076,12 @@ bool NotEquals::action() {
   a->release(getLexInfo());
   b->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
 
 GreaterThanOrEquals::GreaterThanOrEquals(LexInfo *li) : Operation(li) { }
 
-bool GreaterThanOrEquals::action() {
+OperatorReturn GreaterThanOrEquals::action() {
   Object *a;
   Object *b;
   Number *an;
@@ -1092,12 +1107,12 @@ bool GreaterThanOrEquals::action() {
   a->release(getLexInfo());
   b->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
 
 GreaterThan::GreaterThan(LexInfo *li) : Operation(li) { }
 
-bool GreaterThan::action() {
+OperatorReturn GreaterThan::action() {
   Object *a;
   Object *b;
   Number *an;
@@ -1123,12 +1138,12 @@ bool GreaterThan::action() {
   a->release(getLexInfo());
   b->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
 
 LogicalAnd::LogicalAnd(LexInfo *li) : Operation(li) { }
 
-bool LogicalAnd::action() {
+OperatorReturn LogicalAnd::action() {
   Object *a;
   Object *b;
   Object *co;
@@ -1137,17 +1152,19 @@ bool LogicalAnd::action() {
   Code *c;
   bool found;
   bool r;
+  OperatorReturn ret;
 
   b = stack.pop(getLexInfo());
   a = stack.pop(getLexInfo());
   an = a->getNumber(getLexInfo());
 
+  ret = or_continue;
   r = (an->getInt() != 0);
   if(r) {
     try {
       found = false;
       c = b->getCode(getLexInfo());
-      c->action();
+      ret = c->action();
       co = stack.pop(getLexInfo());
       bn = co->getNumber(getLexInfo());
       co->release(getLexInfo());
@@ -1168,12 +1185,12 @@ bool LogicalAnd::action() {
   a->release(getLexInfo());
   b->release(getLexInfo());
 
-  return true;
+  return ret;
 }
 
 LogicalOr::LogicalOr(LexInfo *li) : Operation(li) { }
 
-bool LogicalOr::action() {
+OperatorReturn LogicalOr::action() {
   Object *a;
   Object *b;
   Object *co;
@@ -1213,12 +1230,12 @@ bool LogicalOr::action() {
   a->release(getLexInfo());
   b->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
 
 LogicalNot::LogicalNot(LexInfo *li) : Operation(li) { }
 
-bool LogicalNot::action() {
+OperatorReturn LogicalNot::action() {
   Object *a;
   Number *an;
   bool r;
@@ -1233,38 +1250,46 @@ bool LogicalNot::action() {
   an->release(getLexInfo());
   a->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
 
 True::True(LexInfo *li) : Operation(li) { }
 
-bool True::action() {
+OperatorReturn True::action() {
   stack.push(cache.newNumber((INT) 1));
 
-  return true;
+  return or_continue;
 }
 
 False::False(LexInfo *li) : Operation(li) { }
 
-bool False::action() {
+OperatorReturn False::action() {
   stack.push(cache.newNumber((INT) 0));
 
-  return true;
+  return or_continue;
 }
 
 // Break class
 
 Break::Break(LexInfo *li) : Operation(li) { }
 
-bool Break::action() {
-  return false;
+OperatorReturn Break::action() {
+  return or_break;
+}
+
+// Return class
+
+Return::Return(LexInfo *li) : Operation(li) { }
+
+OperatorReturn Return::action() {
+  return or_return;
 }
 
 // Exit class
 
 Exit::Exit(LexInfo *li) : Operation(li) { }
 
-bool Exit::action() {
+OperatorReturn Exit::action() {
   Object *o;
   Number *n;
 
@@ -1272,14 +1297,14 @@ bool Exit::action() {
   n = o->getNumber(getLexInfo());
   exit(n->getInt());
 
-  return true;
+  return or_continue;
 }
 
 // While class
 
 While::While(LexInfo *li) : Operation(li) { }
 
-bool While::action() {
+OperatorReturn While::action() {
   Object *cond;
   Object *body;
   Code *condCode;
@@ -1287,12 +1312,14 @@ bool While::action() {
   Object *c;
   Number *n;
   INT num;
+  OperatorReturn ret;
 
   body = stack.pop(getLexInfo());
   cond = stack.pop(getLexInfo());
   condCode = cond->getCode(getLexInfo());
   bodyCode = body->getCode(getLexInfo());
 
+  ret = or_continue;
   while(true) {
     condCode->action();
     c = stack.pop(getLexInfo());
@@ -1301,7 +1328,10 @@ bool While::action() {
     n->release(getLexInfo());
     c->release(getLexInfo());
     if(num == 0) break;
-    if(! bodyCode->action()) break;
+    if((ret = bodyCode->action()) != or_continue) {
+      if(ret == or_break) ret = or_continue;
+      break;
+    }
   }
 
   condCode->release(getLexInfo());
@@ -1309,21 +1339,21 @@ bool While::action() {
   cond->release(getLexInfo());
   body->release(getLexInfo());
 
-  return true;
+  return ret;
 }
 
 // If class
 
 If::If(LexInfo *li) : Operation(li) { }
 
-bool If::action() {
+OperatorReturn If::action() {
   Object *cond;
   Object *thenPart;
   Object *elsePart;
   Code *thenCode;
   Code *elseCode;
   Number *n;
-  bool ret;
+  OperatorReturn ret;
 
   elsePart = stack.pop(getLexInfo());
   thenPart = stack.pop(getLexInfo());
@@ -1354,18 +1384,18 @@ bool If::action() {
 
 IfThen::IfThen(LexInfo *li) : Operation(li) { }
 
-bool IfThen::action() {
+OperatorReturn IfThen::action() {
   Object *cond;
   Object *thenPart;
   Code *thenCode;
   Number *n;
-  bool ret;
+  OperatorReturn ret;
 
   thenPart = stack.pop(getLexInfo());
   cond = stack.pop(getLexInfo());
   thenCode = thenPart->getCode(getLexInfo());
   n = cond->getNumber(getLexInfo());
-  ret = true;
+  ret = or_continue;
 
   if(n->isInt()) {
     if(n->getInt() != 0) ret = thenCode->action();
@@ -1385,7 +1415,7 @@ bool IfThen::action() {
 
 Value::Value(LexInfo *li) : Operation(li) { }
 
-bool Value::action() {
+OperatorReturn Value::action() {
   Object *o;
 
   o = stack.pop(getLexInfo());
@@ -1393,31 +1423,31 @@ bool Value::action() {
   try {
     stack.push(o->getNumber(getLexInfo()));
     o->release(getLexInfo());
-    return true;
+    return or_continue;
   } catch (Exception *e) { }
 
   try {
     stack.push(o->getString(getLexInfo()));
     o->release(getLexInfo());
-    return true;
+    return or_continue;
   } catch (Exception *e) { }
 
   try {
     stack.push(o->getCode(getLexInfo()));
     o->release(getLexInfo());
-    return true;
+    return or_continue;
   } catch (Exception *e) { }
 
   slexception.chuck("value error", getLexInfo());
 
-  return false;
+  return or_continue;
 }
 
 // ToName class
 
 ToName::ToName(LexInfo *li) : Operation(li) { }
 
-bool ToName::action() {
+OperatorReturn ToName::action() {
   Object *o;
   Number *n;
   String *s;
@@ -1432,7 +1462,7 @@ bool ToName::action() {
     stack.push(new Name(buf));
     n->release(getLexInfo());
     o->release(getLexInfo());
-    return true;
+    return or_continue;
   } catch (Exception *e) { }
 
   try {
@@ -1440,19 +1470,19 @@ bool ToName::action() {
     stack.push(new Name(s->getValue()));
     s->release(getLexInfo());
     o->release(getLexInfo());
-    return true;
+    return or_continue;
   } catch(Exception *e) { }
 
   slexception.chuck("to name error", getLexInfo());
 
-  return false;
+  return or_continue;
 }
 
 // Namespace class
 
 Namespace::Namespace(LexInfo *li) : Operation(li) { }
 
-bool Namespace::action() {
+OperatorReturn Namespace::action() {
   Object *nsobject;
   Object *inobject;
   Name *nsname;
@@ -1558,14 +1588,14 @@ bool Namespace::action() {
   inobject->release(getLexInfo());
   nsobject->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
 
 // The Library class
 
 Library::Library(LexInfo *li) : Operation(li) { }
 
-bool Library::action() {
+OperatorReturn Library::action() {
   Object *o;
   Name *n;
   char pluginName[256];
@@ -1589,17 +1619,17 @@ bool Library::action() {
 
   o->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
 
 // Execute class
 
 Execute::Execute(LexInfo *li) : Operation(li) { }
 
-bool Execute::action() {
+OperatorReturn Execute::action() {
   Object *o;
   Code *code;
-  bool ret;
+  OperatorReturn ret;
 
   o = stack.pop(getLexInfo());
   code = o->getCode(getLexInfo());
@@ -1616,7 +1646,7 @@ bool Execute::action() {
 
 Print::Print(bool nl, LexInfo *li) : Operation(li), newline(nl) { }
 
-bool Print::action() {
+OperatorReturn Print::action() {
   Object *o;
   Number *n;
   String *s;
@@ -1653,12 +1683,12 @@ bool Print::action() {
 
   o->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
 
 Printf::Printf(bool o, LexInfo *li) : Operation(li), output(o) { }
 
-bool Printf::action() {
+OperatorReturn Printf::action() {
   Object *formatObject;
   Object *o;
   String *format;
@@ -1777,14 +1807,14 @@ bool Printf::action() {
   format->release(getLexInfo());
   formatObject->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
 
 // Defined and Initialised classes
 
 Defined::Defined(LexInfo *li) : Operation(li) { }
 
-bool Defined::action() {
+OperatorReturn Defined::action() {
   Object *o;
   Variable *v;
   INT n;
@@ -1802,12 +1832,12 @@ bool Defined::action() {
 
   o->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
 
 Initialised::Initialised(LexInfo *li) : Operation(li) { }
 
-bool Initialised::action() {
+OperatorReturn Initialised::action() {
   Object *o;
   Variable *v;
   INT n;
@@ -1823,14 +1853,14 @@ bool Initialised::action() {
 
   o->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
 
 // PrintStack class
 
 PrintStack::PrintStack(LexInfo *li) : Operation(li) { }
 
-bool PrintStack::action() {
+OperatorReturn PrintStack::action() {
   StackItem *si;
   Object *o;
   Name *na;
@@ -1883,29 +1913,29 @@ bool PrintStack::action() {
     if(! found) slexception.chuck("unknown stack entry", getLexInfo());
   }
 
-  return true;
+  return or_continue;
 }
 
 // Debug class
 
 Debug::Debug(LexInfo *li) : Operation(li) { }
 
-bool Debug::action() {
+OperatorReturn Debug::action() {
   cache.debug();
   stack.debug();
   btree.debug();
 
-  return true;
+  return or_continue;
 }
 
 // BTree debug class
 
 BTreeDebug::BTreeDebug(LexInfo *li) : Operation(li) { }
 
-bool BTreeDebug::action() {
+OperatorReturn BTreeDebug::action() {
   btree.print();
 
-  return true;
+  return or_continue;
 }
 
 // Variable class

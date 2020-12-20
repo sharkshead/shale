@@ -86,6 +86,12 @@ class Name;
 class Code;
 class Pointer;
 
+enum OperatorReturn {
+  or_continue,
+  or_break,
+  or_return
+};
+
 class Object {
   public:
     Object();
@@ -162,7 +168,7 @@ class Code : public Object {
     Code(OperationList *);
     Code *getCode(LexInfo *);
     OperationList *getOperationList();
-    bool action();
+    OperatorReturn action();
     void debug();
 
   private:
@@ -238,8 +244,9 @@ class Cache {
 class Operation {
   public:
     Operation(LexInfo *);
-    virtual bool action() = 0;
+    virtual OperatorReturn action() = 0;
     virtual bool isVar();
+    virtual bool isFunction();
     LexInfo *getLexInfo();
 
   private:
@@ -249,25 +256,25 @@ class Operation {
 class PrintStack : public Operation {
   public:
     PrintStack(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class Debug : public Operation {
   public:
     Debug(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class BTreeDebug : public Operation {
   public:
     BTreeDebug(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class Push : public Operation {
   public:
     Push(Object *, LexInfo *);
-    bool action();
+    OperatorReturn action();
 
   private:
     Object *object;
@@ -276,236 +283,249 @@ class Push : public Operation {
 class Pop : public Operation {
   public:
     Pop(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class Swap : public Operation {
   public:
     Swap(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class Dup : public Operation {
   public:
     Dup(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class Int : public Operation {
   public:
     Int(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class Double : public Operation {
   public:
     Double(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class Plus : public Operation {
   public:
     Plus(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class Minus : public Operation {
   public:
     Minus(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class Times : public Operation {
   public:
     Times(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class Divide : public Operation {
   public:
     Divide(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class Mod : public Operation {
   public:
     Mod(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class BitwiseAnd : public Operation {
   public:
     BitwiseAnd(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class BitwiseOr : public Operation {
   public:
     BitwiseOr(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class BitwiseXor : public Operation {
   public:
     BitwiseXor(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class BitwiseNot : public Operation {
   public:
     BitwiseNot(LexInfo *);
-    bool action();
+    OperatorReturn action();
+};
+
+class Function : public Operation {
+  public:
+    Function(LexInfo *);
+    OperatorReturn action();
+    bool isFunction();
+};
+
+class Return : public Operation {
+  public:
+    Return(LexInfo *);
+    OperatorReturn action();
 };
 
 class Var : public Operation {
   public:
     Var(LexInfo *);
-    bool action();
+    OperatorReturn action();
     bool isVar();
 };
 
 class Defined : public Operation {
   public:
     Defined(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class Initialised : public Operation {
   public:
     Initialised(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class Assign : public Operation {
   public:
     Assign(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class PointerAssign : public Operation {
   public:
     PointerAssign(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class PointerDereference : public Operation {
   public:
     PointerDereference(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class LessThan : public Operation {
   public:
     LessThan(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class LessThanOrEquals : public Operation {
   public:
     LessThanOrEquals(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class Equals : public Operation {
   public:
     Equals(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class NotEquals : public Operation {
   public:
     NotEquals(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class GreaterThanOrEquals : public Operation {
   public:
     GreaterThanOrEquals(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class GreaterThan : public Operation {
   public:
     GreaterThan(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class LogicalAnd : public Operation {
   public:
     LogicalAnd(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class LogicalOr : public Operation {
   public:
     LogicalOr(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class LogicalNot : public Operation {
   public:
     LogicalNot(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class True : public Operation {
   public:
     True(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class False : public Operation {
   public:
     False(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class Stop : public Operation {
   public:
     Stop(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class Start : public Operation {
   public:
     Start(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class Break : public Operation {
   public:
     Break(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class Exit : public Operation {
   public:
     Exit(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class While : public Operation {
   public:
     While(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class If : public Operation {
   public:
     If(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class IfThen : public Operation {
   public:
     IfThen(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class Repeat : public Operation {
   public:
     Repeat(LexInfo *);
-    bool action();
+    OperatorReturn action();
 
   private:
     bool checkTimers(int *);
@@ -514,31 +534,31 @@ class Repeat : public Operation {
 class Value : public Operation {
   public:
     Value(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class ToName : public Operation {
   public:
     ToName(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class Namespace : public Operation {
   public:
     Namespace(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class Library : public Operation {
   public:
     Library(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class Print : public Operation {
   public:
     Print(bool, LexInfo *);
-    bool action();
+    OperatorReturn action();
 
   private:
     bool newline;
@@ -547,7 +567,7 @@ class Print : public Operation {
 class Printf : public Operation {
   public:
     Printf(bool, LexInfo *);
-    bool action();
+    OperatorReturn action();
 
   private:
     bool output;
@@ -556,7 +576,7 @@ class Printf : public Operation {
 class Execute : public Operation {
   public:
     Execute(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class OperationListItem {
@@ -576,13 +596,15 @@ class OperationList {
     OperationList();
     void addOperation(Operation *);
     OperationListItem *getOperationList();
-    bool action();
-    bool actionLatest();
+    OperatorReturn action();
+    OperatorReturn actionLatest();
+    bool isFunction();
 
   private:
     OperationListItem *head;
     OperationListItem *tail;
     bool newVariableStack;
+    bool isFn;
 };
 
 class ObjectListItem {

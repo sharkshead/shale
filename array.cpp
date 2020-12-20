@@ -51,31 +51,31 @@ const char *arrayHelp[] = {
 class ArrayHelp : public Operation {
   public:
     ArrayHelp(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class ArrayCreate : public Operation {
   public:
     ArrayCreate(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class ArrayScooch : public Operation {
   public:
     ArrayScooch(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class ArrayGet : public Operation {
   public:
     ArrayGet(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class ArraySet : public Operation {
   public:
     ArraySet(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 extern "C" void slmain() {
@@ -136,19 +136,19 @@ extern "C" void slmain() {
 
 ArrayHelp::ArrayHelp(LexInfo *li) : Operation(li) { }
 
-bool ArrayHelp::action() {
+OperatorReturn ArrayHelp::action() {
   const char **p;
 
   for(p = arrayHelp; *p != (const char *) 0; p++) {
     printf("%s\n", *p);
   }
 
-  return true;
+  return or_continue;
 }
 
 ArrayCreate::ArrayCreate(LexInfo *li) : Operation(li) { }
 
-bool ArrayCreate::action() {
+OperatorReturn ArrayCreate::action() {
   Object *oname;
   Object *size;
   Object *value;
@@ -218,12 +218,12 @@ bool ArrayCreate::action() {
   size->release(getLexInfo());
   value->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
 
 ArrayScooch::ArrayScooch(LexInfo *li) : Operation(li) { }
 
-bool ArrayScooch::action() {
+OperatorReturn ArrayScooch::action() {
   Object *name;
   Object *value;
   Name *arrayName;
@@ -266,12 +266,12 @@ bool ArrayScooch::action() {
   name->release(getLexInfo());
   value->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
 
 ArrayGet::ArrayGet(LexInfo *li) : Operation(li) { }
 
-bool ArrayGet::action() {
+OperatorReturn ArrayGet::action() {
   Object *array;
   Object *index;
   Name *arrayName;
@@ -329,12 +329,12 @@ bool ArrayGet::action() {
   array->release(getLexInfo());
   index->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
 
 ArraySet::ArraySet(LexInfo *li) : Operation(li) { }
 
-bool ArraySet::action() {
+OperatorReturn ArraySet::action() {
   Object *value;
   Object *array;
   Object *index;
@@ -388,5 +388,5 @@ bool ArraySet::action() {
   array->release(getLexInfo());
   index->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }

@@ -33,37 +33,37 @@ SOFTWARE.
 class FileHelp : public Operation {
   public:
     FileHelp(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class FileOpen : public Operation {
   public:
     FileOpen(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class FileClose : public Operation {
   public:
     FileClose(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class FileFgets : public Operation {
   public:
     FileFgets(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class FileFprintf : public Operation {
   public:
     FileFprintf(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 class FileFlush : public Operation {
   public:
     FileFlush(LexInfo *);
-    bool action();
+    OperatorReturn action();
 };
 
 const char *fileHelp[] = {
@@ -165,19 +165,19 @@ extern "C" void slmain() {
 
 FileHelp::FileHelp(LexInfo *li) : Operation(li) { }
 
-bool FileHelp::action() {
+OperatorReturn FileHelp::action() {
   const char **p;
 
   for(p = fileHelp; *p != (const char *) 0; p++) {
     printf("%s\n", *p);
   }
 
-  return true;
+  return or_continue;
 }
 
 FileOpen::FileOpen(LexInfo *li) : Operation(li) { }
 
-bool FileOpen::action() {
+OperatorReturn FileOpen::action() {
   Object *of;
   Object *om;
   String *filename;
@@ -210,12 +210,12 @@ bool FileOpen::action() {
   om->release(getLexInfo());
   of->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
 
 FileClose::FileClose(LexInfo *li) : Operation(li) { }
 
-bool FileClose::action() {
+OperatorReturn FileClose::action() {
   Object *oh;
   Number *h;
   int i;
@@ -234,12 +234,12 @@ bool FileClose::action() {
   h->release(getLexInfo());
   oh->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
 
 FileFgets::FileFgets(LexInfo *li) : Operation(li) { }
 
-bool FileFgets::action() {
+OperatorReturn FileFgets::action() {
   Object *oh;
   Number *h;
   int i;
@@ -276,12 +276,12 @@ bool FileFgets::action() {
   h->release(getLexInfo());
   oh->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
 
 FileFprintf::FileFprintf(LexInfo *li) : Operation(li) { }
 
-bool FileFprintf::action() {
+OperatorReturn FileFprintf::action() {
   Object *handleObject;
   Object *formatObject;
   Object *o;
@@ -406,12 +406,12 @@ bool FileFprintf::action() {
   h->release(getLexInfo());
   handleObject->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }
 
 FileFlush::FileFlush(LexInfo *li) : Operation(li) { }
 
-bool FileFlush::action() {
+OperatorReturn FileFlush::action() {
   Object *oh;
   Number *h;
   int i;
@@ -429,5 +429,5 @@ bool FileFlush::action() {
   h->release(getLexInfo());
   oh->release(getLexInfo());
 
-  return true;
+  return or_continue;
 }

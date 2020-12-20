@@ -33,8 +33,8 @@ SOFTWARE.
 #include "shalelib.h"
 
 #define MAJOR ((INT)  1)
-#define MINOR ((INT)  0)
-#define MICRO ((INT) 10)
+#define MINOR ((INT)  1)
+#define MICRO ((INT)  0)
 
 // Lexical analyser stuff.
 
@@ -98,9 +98,11 @@ SOFTWARE.
 #define LEX_TOKEN_KEYWORD_TONAME           21
 #define LEX_TOKEN_KEYWORD_NAMESPACE        22
 #define LEX_TOKEN_KEYWORD_LIBRARY          23
-#define LEX_TOKEN_KEYWORD_DEBUG            24
-#define LEX_TOKEN_KEYWORD_STACK            25
-#define LEX_TOKEN_KEYWORD_BTREE            26
+#define LEX_TOKEN_KEYWORD_FUNCTION         24
+#define LEX_TOKEN_KEYWORD_RETURN           25
+#define LEX_TOKEN_KEYWORD_DEBUG            26
+#define LEX_TOKEN_KEYWORD_STACK            27
+#define LEX_TOKEN_KEYWORD_BTREE            28
 
 // How the lexical analyser stores things.
 

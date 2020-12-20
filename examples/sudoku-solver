@@ -161,12 +161,10 @@ standardRegions {
     j 0 =
     { j 3 < } {
       r0 i + c0 j +:: grid:: n == {
-        ok false =
-        break
+        false return
       } ifthen
       j increment()
     } while
-    ok not { break } ifthen
     i increment()
   } while
 } =
@@ -183,8 +181,7 @@ irregularRegions {
   i 0 =
   { i 9 < } {
     i.value r:: region.value:: region:: value i.value c:: region.value:: region:: value:: grid:: n == {
-      ok false =
-      break
+      false return
     } ifthen
     i increment()
   } while
@@ -229,62 +226,50 @@ optimiseRegions {
 
 // Is it possible to place a digit in a given cell?
 possible var
-possible {
+possible { function
   n var n swap =
   c var c swap =
   r var r swap =
   i var
   j var
-  ok var
-
-  ok true =
 
   // Check the column doesn't already contain this value.
   i 0 =
   { i 9 < } {
     r.value i.value:: grid:: n == {
-      ok false =
-      break
+      false return
     } ifthen
     i increment()
   } while
 
   // Check the row doesn't already contain this value.
-  ok {
-    i 0 =
-    { i 9 < } {
-      i.value c.value:: grid:: n == {
-        ok false =
-        break
-      } ifthen
-      i increment()
-    } while
-
-    // Check that the region doesn't already contain this value.
-    ok {
-      regionChecker()
-
-      // Check for any other constraint.
-      ok { constraint initialised { r c n constraint() not } and } and {
-        ok false =
-      } ifthen
+  i 0 =
+  { i 9 < } {
+    i.value c.value:: grid:: n == {
+      false return
     } ifthen
+    i increment()
+  } while
+
+  // Check that the region doesn't already contain this value.
+  regionChecker()
+
+  // Check for any other constraint.
+  constraint initialised { r c n constraint() not } and {
+    false return
   } ifthen
 
-  ok.value
+  true
 } =
 
 // This is a Knight's move constraint.
 knightsMoveConstraint var
-knightsMoveConstraint {
+knightsMoveConstraint { function
   0$ var 0$ swap =  // n
   1$ var 1$ swap =  // column
   2$ var 2$ swap =  // row
   nr var
   nc var
-  ok var
-
-  ok true =
 
   // Check Knight's move 2 left and 1 up and down.
   nc 1$ 2 - =
@@ -292,83 +277,69 @@ knightsMoveConstraint {
     nr 2$ 1 - =
     nr 0 >= {
       nr.value nc.value:: grid:: 0$ == {
-        ok false =
+        false return
       } ifthen
     } ifthen
-    ok {
-      nr 2$ 1 + =
-      nr 9 < {
-        nr.value nc.value:: grid:: 0$ == {
-          ok false =
-        } ifthen
+    nr 2$ 1 + =
+    nr 9 < {
+      nr.value nc.value:: grid:: 0$ == {
+        false return
       } ifthen
     } ifthen
   } ifthen
 
   // Check Knight's move 1 left and 2 up and down.
-  ok {
-    nc 1$ 1 - =
-    nc 0 >= {
-      nr 2$ 2 - =
-      nr 0 >= {
-        nr.value nc.value:: grid:: 0$ == {
-          ok false =
-        } ifthen
+  nc 1$ 1 - =
+  nc 0 >= {
+    nr 2$ 2 - =
+    nr 0 >= {
+      nr.value nc.value:: grid:: 0$ == {
+        false return
       } ifthen
-      ok {
-        nr 2$ 2 + =
-        nr 9 < {
-          nr.value nc.value:: grid:: 0$ == {
-            ok false =
-          } ifthen
-        } ifthen
+    } ifthen
+    nr 2$ 2 + =
+    nr 9 < {
+      nr.value nc.value:: grid:: 0$ == {
+        false return
       } ifthen
     } ifthen
   } ifthen
 
   // Check Knight's move 1 right and 2 up and down.
-  ok {
-    nc 1$ 1 + =
-    nc 9 < {
-      nr 2$ 2 - =
-      nr 0 >= {
-        nr.value nc.value:: grid:: 0$ == {
-          ok false =
-        } ifthen
+  nc 1$ 1 + =
+  nc 9 < {
+    nr 2$ 2 - =
+    nr 0 >= {
+      nr.value nc.value:: grid:: 0$ == {
+        false return
       } ifthen
-      ok {
-        nr 2$ 2 + =
-        nr 9 < {
-          nr.value nc.value:: grid:: 0$ == {
-            ok false =
-          } ifthen
-        } ifthen
+    } ifthen
+    nr 2$ 2 + =
+    nr 9 < {
+      nr.value nc.value:: grid:: 0$ == {
+        false return
       } ifthen
     } ifthen
   } ifthen
 
   // Check Knight's move 2 right and 1 up and down.
-  ok {
-    nc 1$ 2 + =
-    nc 9 < {
-      nr 2$ 1 - =
-      nr 0 >= {
-        nr.value nc.value:: grid:: 0$ == {
-          ok false =
-        } ifthen
+  nc 1$ 2 + =
+  nc 9 < {
+    nr 2$ 1 - =
+    nr 0 >= {
+      nr.value nc.value:: grid:: 0$ == {
+        false return
       } ifthen
-      ok {
-        nr 2$ 1 + =
-        nr 9 < {
-          nr.value nc.value:: grid:: 0$ == {
-            ok false =
-          } ifthen
-        } ifthen
+    } ifthen
+    nr 2$ 1 + =
+    nr 9 < {
+      nr.value nc.value:: grid:: 0$ == {
+        false return
       } ifthen
     } ifthen
   } ifthen
 
-  ok.value
+  true
 } =
 
 // Set this to standardRegions for the usual 3x3 boxes,
@@ -380,13 +351,11 @@ regionChecker var
 constraint var
 
 solve var
-solve {
+solve { function
   r var
   c var
   n var
-  prt var
 
-  prt true =
   r 0 =
   { r 9 < } {
     c 0 =
@@ -401,19 +370,15 @@ solve {
           } ifthen
           n increment()
         } while
-        prt false =
-        break
+        return
       } ifthen
       c increment()
     } while
-    prt not { break } ifthen
     r increment()
   } while
 
-  prt {
-    "" println
-    printGrid()
-  } ifthen
+  "" println
+  printGrid()
 } =
 
 found var
@@ -459,7 +424,7 @@ whichSudoku 2 == {
 
 // From https://www.youtube.com/watch?v=rQHV-gIAG_0
 // Another Cracking The Cryptic video, this one with a Knight's move constraint.
-// Raspberry Pi3 Model A time: 54 seconds to the solution, and almost 7 minutes
+// Raspberry Pi3 Model A time: 50 seconds to the solution, and 6 1/2 minutes
 // to complete.
 whichSudoku 3 == {
   found true =

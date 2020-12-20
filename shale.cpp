@@ -67,6 +67,8 @@ Keyword keyword[] = {
   { "initialised",    LEX_TOKEN_KEYWORD_INITIALISED     },
   { "initialized",    LEX_TOKEN_KEYWORD_INITIALISED     },
   { "library",        LEX_TOKEN_KEYWORD_LIBRARY         },
+  { "function",       LEX_TOKEN_KEYWORD_FUNCTION        },
+  { "return",         LEX_TOKEN_KEYWORD_RETURN          },
   { "stack",          LEX_TOKEN_KEYWORD_STACK           },
   { "debug",          LEX_TOKEN_KEYWORD_DEBUG           },
   { "btree",          LEX_TOKEN_KEYWORD_BTREE           },
@@ -637,6 +639,8 @@ void olBuild(Lex &lex) {
         case LEX_TOKEN_KEYWORD_TONAME: op = new ToName(li); break;
         case LEX_TOKEN_KEYWORD_NAMESPACE: op = new Namespace(li); break;
         case LEX_TOKEN_KEYWORD_LIBRARY: op = new Library(li); break;
+        case LEX_TOKEN_KEYWORD_FUNCTION: op = new Function(li); break;
+        case LEX_TOKEN_KEYWORD_RETURN: op = new Return(li); break;
         case LEX_TOKEN_KEYWORD_DEBUG: op = new Debug(li); break;
         case LEX_TOKEN_KEYWORD_BTREE: op = new BTreeDebug(li); break;
         default: shaleException.chuck("unexpected token", li); // throw unexpectedTokenException;
@@ -743,6 +747,9 @@ void syntax() {
   printf("  double          {n} double                  - convert to floating point\n");
   printf("  float                                       - same as double\n");
   printf("  break                                       - exit a while loop\n");
+  printf("  function                                    - tags this code fragment as being a function which allows\n");
+  printf("                                              - a return in this or subsequent fragments to exit this fragment\n");
+  printf("  return                                      - exits the nearest code fragment tagged as a function\n");
   printf("  exit            {n} exit                    - terminte the process with the given exit code\n");
   printf("  value           {name} value                - replace a name with its value\n");
   printf("  .value                                      - same as value\n");

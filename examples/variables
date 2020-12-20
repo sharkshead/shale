@@ -60,8 +60,7 @@
 //
 // A variable's scope is defined by the code fragment's execution,
 // and not the lexical scope of the fragment as it is in C.
-// This really impacts "functions". shale doesn't have functions. It has
-// the ability to assign a code fragment to a variable.
+// This really impacts functions.
 //
 // A variable defined in a code fragment will hide a
 // variable of the same name created in an enclosing fragment.
@@ -90,11 +89,8 @@ i 100 > {
 i println         // 123, because all the code fragments have exited,
                   // and so all their i's have been removed.
 
-// When it comes to "functions" it is important to remember
-// that shale doesn't have functions but rather you assign
-// a code fragment to a variable and execute that code fragment.
-//
-// Here's how this plays out.
+// Here's now scoping plays out with some simple functions.
+// This will work exactly the same with proper functions.
 
 printi var
 printi {
@@ -114,16 +110,13 @@ cf()          // 987
 
 // It is important to recognise that executing printi() from within cf()
 // is simply executing another code fragment ("i println").
-// There is no such thing as a function in shale, although I make it look
-// like there is. There's more on this in the functions file.
 
 
 
 // The problems and their solutions.
 
 // Pushing a variable's name on the stack rather than its value can lead
-// to some problems when calling functions. I know shale doesn't have functions,
-// but I'll still refer to them like this. Everything I say here also
+// to some problems when calling functions. Everything I say here also
 // applies to any code fragment, but it is most likely to show up
 // when calling functions. And it all relates to passing values in to,
 // or out from, functions.
@@ -134,11 +127,11 @@ cf()          // 987
 //
 //  i var
 //  i 123 =
-//  i function()
+//  i fn()
 //
-// where function() is meant to perform some calculation based on the
-// top of the stack. Problem is, function() is not getting a value, it is
-// getting a variable name. function() might create its own variable called i,
+// where fn() is meant to perform some calculation based on the
+// top of the stack. Problem is, fn() is not getting a value, it is
+// getting a variable name. fn() might create its own variable called i,
 // hiding the calling code's i.
 //
 // There're a couple of ways of dealing with this.
@@ -146,12 +139,12 @@ cf()          // 987
 // The first way is to push the variable's value rather than its name.
 // You do with the value or .value operator. So you could do:
 //
-//  i value function()      or
-//  i.value function()      I prefer this from a purely visual point of view
+//  i value fn()      or
+//  i.value fn()      I prefer this from a purely visual point of view
 //
-// The second way is for function() to call the value or .value operator before
+// The second way is for fn() to call the value or .value operator before
 // creating any of its own variables, thereby turning any name into its value.
-// Unfortunately, this only works when the function()
+// Unfortunately, this only works when the fn()
 // has one or two arguments on the stack. For three or more arguments this cannot
 // be relied upon. So I call this deprecated.
 //

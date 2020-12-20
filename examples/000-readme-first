@@ -197,30 +197,51 @@ f {
   1 2 + 3 * println
 } =
 
-// That's it, function created. To execute the function use the execute operator,
-// which is the "execute" keyword or, alternatively, ().
+// To execute a function use the execute operator, which is the "execute" keyword or,
+// alternatively, ().
 
 f execute   // one form of the execute operator
 f()         // another, more familiar, form
 
-// You'll notice there's no space between the f and (). You can put in a space if you like,
-// but it's not necessary because a name cannot contain a ( character, so shale
-// stops interpreting the name as soon as it hits the (.
+// This isn't really a function in the C sense of the word, but rather a code fragment
+// assigned to a variable. For many applications this kind of "function" will do fine.
 //
-// I add lots of spaces and newlines and indents for clarity, but they are not strictly necessary.
-// For example, here's the function definition above with all unnecessary spacing removed
+// However, there is a shortcoming to this kind of "function" - there is no
+// return statement. This limitation may be fine for smaller functions, but in the
+// end you'll need, or want, a return statement.
 //
-//  f{1 2+3*println}=
+// However, if you use the "function" operator inside the code fragment, like
+
+pf var
+pf { function       // tag this code fragment as a function
+  i 100 < {
+    "i is less than 100, and returning" println
+    -1
+    return          // exit the enclosing tagged fragment
+  } {
+    i > 200 {
+      "i is greater than 200, and returning" println
+      -2
+      return        // exit the enclosing tagged fragment
+    } {
+      "i is within bounds" println
+    } if
+  } if
+
+  0
+} =
+
+pf() "pf() returned %d\n" printf
+
+// then you'll get something approaching a C function.
+// A code fragment can be tagged as being a "function", and any return operator
+// within this code fragment or any fragments in this code's execution path,
+// will exit the function. Kind of like a break exits a while loop, a return
+// will exit the immediately enclosing "function" code fragment. Functions
+// can be nested.
 //
-// You can see, I hope, why I space things out.
-//
-// There is a side effect to this type of "function" - there is no return statement.
-// A shale "function" is just a code fragment assigned to a variable. In effect, the variable
-// becomes a place holder for the code fragment. The lack of a return statement may
-// complicate some code and it may force you to arrange your code differently to how
-// you would in a language with proper functions. See the "functions" example for
-// ideas on dealing with a return-less function.
-//
+// There's more info on this in the "functions" example file.
+
 // And to complete the circle, the if, ifthen, while and = operators can also take a
 // variable which has been assigned to a code fragment.
 // For example, this is also fine
