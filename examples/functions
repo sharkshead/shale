@@ -88,6 +88,4 @@ i 100 < {
 // from that fragment will work just fine, as long as you leave the expected boolean
 // on the stack, that is. However, taggng the body of the while loop and returning
 // from that body fragment will not terminate the loop, it will simply terminate
-// the body fragment after the return. To terminate any while loop requires a false
-// value on the stack from the conditional code fragment, of a break from within the
-// body fragment.
+// the body fragment after the return.
