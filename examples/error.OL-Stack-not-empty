@@ -2,8 +2,8 @@
 
 // OL Stack not empty
 
-// If you see this error then it means there are one or more code fragments
-// that have not been closed. It is a parsing problem. No code has been executed.
+// If you see this error then it means one or more code fragments
+// have not been closed. It is a parsing problem. No code has been executed.
 
 // For example
 
