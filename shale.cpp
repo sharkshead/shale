@@ -849,7 +849,15 @@ void syntax() {
 }
 
 void version() {
-  printf("%ld.%ld.%ld\n", MAJOR, MINOR, MICRO);
+  char fmt[32];
+
+  sprintf(fmt, "%%%sd", PCTD);
+  printf(fmt, MAJOR);
+  printf(".");
+  printf(fmt, MINOR);
+  printf(".");
+  printf(fmt, MICRO);
+  printf("\n");
   exit(0);
 }
 

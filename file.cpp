@@ -297,6 +297,7 @@ OperatorReturn FileFprintf::action() {
   char res[10240];
   char *op;
   bool found;
+  char fmt[32];
 
   handleObject = stack.pop(getLexInfo());
   h = handleObject->getNumber(getLexInfo());
@@ -333,7 +334,8 @@ OperatorReturn FileFprintf::action() {
           case 'x':
           case 'X':
             q--;
-            *q++ = 'l';
+            strcpy(q, PCTD);
+            while(*q != 0) q++;
             *q++ = *p;
             *q = 0;
             n = o->getNumber(getLexInfo());
@@ -357,8 +359,10 @@ OperatorReturn FileFprintf::action() {
             found = false;
             try {
               n = o->getNumber(getLexInfo());
-              if(n->isInt()) sprintf(op, "%ld", n->getInt());
-              else sprintf(op, "%0.3f", n->getDouble());
+              if(n->isInt()) {
+                sprintf(fmt, "%%%sd", PCTD);
+                sprintf(op, fmt, n->getInt());
+              } else sprintf(op, "%0.3f", n->getDouble());
               n->release(getLexInfo());
               found = true;
             } catch(Exception *e) { }

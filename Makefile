@@ -14,6 +14,12 @@ shale.o: shale.h shale.cpp shalelib.h
 shalelib.o: shalelib.h shalelib.cpp
 	g++ -c -o shalelib.o shalelib.cpp
 
+shalelib.h: config.h
+
+config.h: config.cpp
+	g++ -o config config.cpp
+	./config
+
 maths.o: maths.cpp shalelib.h
 	g++ -fPIC -c -o maths.o maths.cpp
 

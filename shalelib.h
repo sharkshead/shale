@@ -43,10 +43,9 @@ SOFTWARE.
 #include <sys/select.h>
 #include <netdb.h>
 #include <dlfcn.h>
+#include "config.h"
 
 using namespace std;
-
-#define INT long int
 
 #define MAX_NAME_LENGTH    64
 

@@ -18,6 +18,9 @@
 // So although this would work fine in C or C++, it won't work in shale
 //
 //  123 10 "%*d\n" printf
+//
+// And you don't need to worry about adding size qualifiers, like %ld
+// or %lld based on how your platform defines 64-bit ints. shale sort it out.
 
 
 

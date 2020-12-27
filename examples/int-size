@@ -2,19 +2,8 @@
 
 // shale can compile on most Linux systems, AFAIK, but not all Linux
 // systems are the same, specifically around the size of an int.
-// Internally shale uses a long int to represent integers. The size
-// of this varies between different cpu's.
-//
-// For example, on the Raspberry Pi (Pi Zero Wifi and the Pi3 Model A)
-// that I develop shale on, a long int is 4 bytes. However, on other Linux
-// systems that I test shale on, using an Intel chip, a long int is 8 bytes.
-//
-// One day I'll "fix" shale so that an integer is a consistent size,
-// probably 8 bytes, but for now I'm leaving things as they are.
-//
-// So, this being the case, here's a shale script that will tell you
-// if you're on a 4-byte (32-bit) or 8-byte (64-bit) int cpu. It's based on
-// a number that overflows a 4-byte int, and doesn't on 8-bytes.
+// As long as the platform you're compiling on has support for 64-bit ints,
+// that's what shale will use, otherwise it falls back to a plain int.
 
 6227020800 1932053504 == {
   32

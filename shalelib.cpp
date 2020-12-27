@@ -240,7 +240,7 @@ void Number::setInt(INT i) { intRep = true; valueInt = i; }
 double Number::getDouble() { return (intRep ? valueInt : valueDouble); }
 void Number::setDouble(double d) { intRep = false; valueDouble = d; }
 void Number::release(LexInfo *li) { if(referenceCount < 0) slexception.chuck("reference error", li); if(referenceCount == 0) cache.deleteNumber(this); else referenceCount--; }
-void Number::debug() { printf("Number: "); if(intRep) printf("%ld\n", valueInt); else printf("%0.3f\n", valueDouble); }
+void Number::debug() { char fmt[32]; printf("Number: "); if(intRep) { sprintf(fmt, "%%%sd\n", PCTD); printf(fmt, valueInt); } else printf("%0.3f\n", valueDouble); }
 
 // String class
 
@@ -1452,13 +1452,16 @@ OperatorReturn ToName::action() {
   Number *n;
   String *s;
   char buf[64];
+  char fmt[32];
 
   o = stack.pop(getLexInfo());
 
   try {
     n = o->getNumber(getLexInfo());
-    if(n->isInt()) sprintf(buf, "%ld", n->getInt());
-    else sprintf(buf, "%0.3f", n->getDouble());
+    if(n->isInt()) {
+      sprintf(fmt, "%%%sd", PCTD);
+      sprintf(buf, fmt, n->getInt());
+    } else sprintf(buf, "%0.3f", n->getDouble());
     stack.push(new Name(buf));
     n->release(getLexInfo());
     o->release(getLexInfo());
@@ -1502,6 +1505,7 @@ OperatorReturn Namespace::action() {
   const char *p;
   int i;
   int j;
+  char fmt[32];
 
   nsobject = stack.pop(getLexInfo());
   inobject = stack.pop(getLexInfo());
@@ -1518,8 +1522,10 @@ OperatorReturn Namespace::action() {
   if(! found) {
     try {
       nsnumber = nsobject->getNumber(getLexInfo());
-      if(nsnumber->isInt()) sprintf(nselement, "%ld", nsnumber->getInt());
-      else sprintf(nselement, "%0.3f", nsnumber->getDouble());
+      if(nsnumber->isInt()) {
+        sprintf(fmt, "%%%sd", PCTD);
+        sprintf(nselement, fmt, nsnumber->getInt());
+      } else sprintf(nselement, "%0.3f", nsnumber->getDouble());
       nselementp = nselement;
       nsnumber->release(getLexInfo());
       found = true;
@@ -1549,8 +1555,10 @@ OperatorReturn Namespace::action() {
   if(! found) {
     try {
       innumber = inobject->getNumber(getLexInfo());
-      if(innumber->isInt()) sprintf(inelement, "%ld", innumber->getInt());
-      else sprintf(inelement, "%0.3f", innumber->getDouble());
+      if(innumber->isInt()) {
+        sprintf(fmt, "%%%sd", PCTD);
+        sprintf(inelement, fmt, innumber->getInt());
+      } else sprintf(inelement, "%0.3f", innumber->getDouble());
       inelementp = inelement;
       innumber->release(getLexInfo());
       found = true;
@@ -1651,6 +1659,7 @@ OperatorReturn Print::action() {
   Number *n;
   String *s;
   bool found;
+  char fmt[32];
 
   o = stack.pop(getLexInfo());
   found = false;
@@ -1658,8 +1667,10 @@ OperatorReturn Print::action() {
   if(! found) {
     try {
       n = o->getNumber(getLexInfo());
-      if(n->isInt()) printf("%ld", n->getInt());
-      else printf("%0.3f", n->getDouble());
+      if(n->isInt()) {
+        sprintf(fmt, "%%%sd", PCTD);
+        printf(fmt, n->getInt());
+      } else printf("%0.3f", n->getDouble());
       n->release(getLexInfo());
       found = true;
     } catch(Exception *e) {
@@ -1701,6 +1712,7 @@ OperatorReturn Printf::action() {
   char res[10240];
   char *op;
   bool found;
+  char fmt[32];
 
   formatObject = stack.pop(getLexInfo());
   format = formatObject->getString(getLexInfo());
@@ -1732,7 +1744,8 @@ OperatorReturn Printf::action() {
           case 'x':
           case 'X':
             q--;
-            *q++ = 'l';
+            strcpy(q, PCTD);
+            while(*q != 0) q++;
             *q++ = *p;
             *q = 0;
             n = o->getNumber(getLexInfo());
@@ -1756,8 +1769,10 @@ OperatorReturn Printf::action() {
             found = false;
             try {
               n = o->getNumber(getLexInfo());
-              if(n->isInt()) sprintf(op, "%ld", n->getInt());
-              else sprintf(op, "%0.3f", n->getDouble());
+              if(n->isInt()) {
+                sprintf(fmt, "%%%sd", PCTD);
+                sprintf(op, fmt, n->getInt());
+              } else sprintf(op, "%0.3f", n->getDouble());
               n->release(getLexInfo());
               found = true;
             } catch(Exception *e) { }
@@ -1869,6 +1884,7 @@ OperatorReturn PrintStack::action() {
   Number *no;
   int i;
   bool found;
+  char fmt[32];
 
   for(i = 0, si = stack.getStack(); si != (StackItem *) 0; si = si->getDown(), i++) {
     printf("%d: ", i);
@@ -1903,8 +1919,10 @@ OperatorReturn PrintStack::action() {
     if(! found) {
       try {
         no = o->getNumber(getLexInfo());
-        if(no->isInt()) printf("%ld\n", no->getInt());
-        else printf("%0.3f\n", no->getDouble());
+        if(no->isInt()) {
+          sprintf(fmt, "%%%sd\n", PCTD);
+          printf(fmt, no->getInt());
+        } else printf("%0.3f\n", no->getDouble());
         no->release(getLexInfo());
         found = true;
       } catch(Exception *e) { }
@@ -2337,6 +2355,7 @@ void BTree::printDetail(BTreeNode *t, int i) {
   Pointer *p;
   Code *c;
   bool found;
+  char fmt[32];
 
   v = t->getData(i);
 
@@ -2350,8 +2369,10 @@ void BTree::printDetail(BTreeNode *t, int i) {
   found = false;
   try {
     n = o->getNumber((LexInfo *) 0);
-    if(n->isInt()) printf("%ld", n->getInt());
-    else printf("%0.3f", n->getDouble());
+    if(n->isInt()) {
+      sprintf(fmt, "%%%sd", PCTD);
+      printf(fmt, n->getInt());
+    } else printf("%0.3f", n->getDouble());
     n->release((LexInfo *) 0);
     found = true;
   } catch(Exception *e) { }

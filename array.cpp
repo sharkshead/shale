@@ -162,6 +162,7 @@ OperatorReturn ArrayCreate::action() {
   INT j;
   static char element[1024];
   bool found;
+  char fmt[32];
 
   oname = stack.pop(getLexInfo());
   size = stack.pop(getLexInfo());
@@ -178,8 +179,10 @@ OperatorReturn ArrayCreate::action() {
   if(! found) {
     try {
       number = oname->getNumber(getLexInfo());
-      if(number->isInt()) sprintf(buf, "%ld", number->getInt());
-      else sprintf(buf, "%0.3f", number->getDouble());
+      if(number->isInt()) {
+        sprintf(fmt, "%%%sd",PCTD);
+        sprintf(buf, fmt, number->getInt());
+      } else sprintf(buf, "%0.3f", number->getDouble());
       number->release(getLexInfo());
       found = true;
     } catch(Exception *e) { }
@@ -236,6 +239,7 @@ OperatorReturn ArrayScooch::action() {
   INT i;
   INT j;
   char element[1024];
+  char fmt[32];
 
   name = stack.pop(getLexInfo());
   value = stack.pop(getLexInfo());
@@ -250,11 +254,12 @@ OperatorReturn ArrayScooch::action() {
 
   if(count > 0) {
     j = count - 1;
-    sprintf(element, "/%ld/%s", j, n);
+    sprintf(fmt, "/%%%sd/%%s", PCTD);
+    sprintf(element, fmt, j, n);
     if((dst = btree.findVariable(element)) == (Variable *) 0) slexception.chuck(element, getLexInfo());
     if(j > 0) {
       for(i = j; i > 0; i--) {
-        sprintf(element, "/%ld/%s", i - 1, n);
+        sprintf(element, fmt, i - 1, n);
         if((src = btree.findVariable(element)) == (Variable *) 0) slexception.chuck(element, getLexInfo());
         dst->setObject(src->getObject());
         dst = src;
@@ -282,6 +287,7 @@ OperatorReturn ArrayGet::action() {
   char buf[1024];
   char element[1024];
   bool found;
+  char fmt[32];
 
   array = stack.pop(getLexInfo());
   index = stack.pop(getLexInfo());
@@ -293,7 +299,8 @@ OperatorReturn ArrayGet::action() {
   try {
     indexNumber = index->getNumber(getLexInfo());
     if(indexNumber->isInt()) {
-      sprintf(buf, "%ld", indexNumber->getInt());
+      sprintf(fmt, "%%%sd", PCTD);
+      sprintf(buf, fmt, indexNumber->getInt());
     } else {
       sprintf(buf, "%0.3f", indexNumber->getDouble());
     }
@@ -345,6 +352,7 @@ OperatorReturn ArraySet::action() {
   char buf[1024];
   char element[1024];
   bool found;
+  char fmt[32];
 
   value = stack.pop(getLexInfo());
   array = stack.pop(getLexInfo());
@@ -357,7 +365,8 @@ OperatorReturn ArraySet::action() {
   try {
     indexNumber = index->getNumber(getLexInfo());
     if(indexNumber->isInt()) {
-      sprintf(buf, "%ld", indexNumber->getInt());
+      sprintf(fmt, "%%%sd", PCTD);
+      sprintf(buf, fmt, indexNumber->getInt());
     } else {
       sprintf(buf, "%0.3f", indexNumber->getDouble());
     }
