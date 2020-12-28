@@ -4,6 +4,17 @@
 // assuming you've installed the shale executable, that is. I'd suggest you
 // read each file first before executing the file.
 
+// In this file I'll be discussing, very broadly
+//  - how a reverse polish notation language is used
+//  - variables
+//  - assignments
+//  - pointers
+//  - if statements
+//  - while loops
+//  - functions
+// Each of these, from variables down, have their own example file where
+// I give more detail.
+
 // shale is a reverse-polish notation language, meaning you don't write
 // things like:
 //
