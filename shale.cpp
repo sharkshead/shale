@@ -149,8 +149,8 @@ void lexShutdown() {
   fclose(lexInput);
 }
 
-int hextoi(char *p) {
-  int ret;
+INT hextoi(char *p) {
+  INT ret;
   int n;
 
   ret = 0;
