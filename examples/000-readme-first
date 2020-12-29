@@ -134,7 +134,7 @@ i println
 // the pointers example file. To create a pointer you use the pointer assignment
 // operator, and to access the thing pointed to you use the dereference operator.
 
-i j &=        // the pointer assinment operator. i is a pointer to j
+i j &=        // the pointer assignment operator. i is a pointer to j
 i-> println   // the pointer dereference operator. 987 will be output
 i-> 3.141 =   // another pointer dereference. this will assign 3.141 to j
 j println     // 3.141 will be output
@@ -195,6 +195,19 @@ i 0 =                   // initialise the loop counter.
   i i 1 + =             // increment the loop counter
 } while
 
+// You can also use the "break" operator within the body fragment to terminate
+// the while loop just like you can in C-like languages.
+
+"break example" println
+i 0 =
+{ i 10 < } {
+  i 5 == {
+    break               // terminates the enclosing while loop.
+  } ifthen
+  i "i = %d\n" printf
+  i i 1 + =
+} while
+
 
 
 // Functions.
@@ -219,9 +232,11 @@ f()         // another, more familiar, form
 //
 // However, there is a shortcoming to this kind of "function" - there is no
 // return statement. This limitation may be fine for smaller functions, but in the
-// end you'll need, or want, a return statement.
+// end you'll need, or want, a return statement, so here it is:
 //
-// However, if you use the "function" operator inside the code fragment, like
+// The "function" operator. This is a no-op in that is does nothing to any variable
+// or the stack. What it does do is tag the code fragment in such a way so that the
+// "return" operator will exit the "function" code fragment.
 
 pf var
 pf { function       // tag this code fragment as a function
@@ -244,18 +259,15 @@ pf { function       // tag this code fragment as a function
 
 pf() "pf() returned %d\n" printf
 
-// then you'll get something approaching a C function.
 // A code fragment can be tagged as being a "function", and any return operator
-// within this code fragment or any fragments in this code's execution path,
-// will exit the function. Kind of like a break exits a while loop, a return
-// will exit the immediately enclosing "function" code fragment. Functions
-// can be nested.
+// within this code fragment or any fragments executed by this code fragment
+// will exit the function. Kind of like a break exits an enclosing while loop,
+// a return will exit an enclosing "function" code fragment.
 //
 // There's more info on this in the "functions" example file.
 
-// And to complete the circle, the if, ifthen, while and = operators can also take a
-// variable which has been assigned to a code fragment.
-// For example, this is also fine
+// And as a final note to the if, ifthen, while and = operators, they can also take a
+// variable which has been assigned to a code fragment. For example:
 
 then var
 then { "i is less than 100" } =

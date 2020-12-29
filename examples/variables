@@ -54,9 +54,9 @@
 
 // The scope of a simple variable.
 
-// A simple variable created in a code fragment is accessible to all code fragments
-// that this and subsequent fragments executes. When the code fragment exits
-// the variable is removed.
+// A simple variable created in a code fragment is accessible to this code fragment
+// and any fragments that are subsequently executed by this fragment - the fragment's
+// execution path, as it were. When the code fragment exits the variable is removed.
 //
 // A variable's scope is defined by the code fragment's execution,
 // and not the lexical scope of the fragment as it is in C.
