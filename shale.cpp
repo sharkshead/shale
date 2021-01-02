@@ -684,7 +684,7 @@ void olBuild(Lex &lex) {
         olStackIndex--;
         olStack[olStackIndex]->addOperation(new Push(new Code(olStack[olStackIndex + 1]), li));
       } else {
-        shaleException.chuck("code stack undderrun", li); // throw codeStackUnderrunException;
+        shaleException.chuck("code stack underrun", li); // throw codeStackUnderrunException;
       }
       break;
   }
