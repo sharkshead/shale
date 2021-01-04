@@ -237,7 +237,7 @@ Number *Number::getNumber(LexInfo *li) { this->hold(); return this; }
 bool Number::isInt() { return intRep; }
 INT Number::getInt() { if(intRep) return valueInt; return valueDouble; }
 void Number::setInt(INT i) { intRep = true; valueInt = i; }
-double Number::getDouble() { return (intRep ? valueInt : valueDouble); }
+double Number::getDouble() { if(intRep) return valueInt; return valueDouble; }
 void Number::setDouble(double d) { intRep = false; valueDouble = d; }
 void Number::release(LexInfo *li) { if(referenceCount < 0) slexception.chuck("reference error", li); if(referenceCount == 0) cache.deleteNumber(this); else referenceCount--; }
 void Number::debug() { char fmt[32]; printf("Number: "); if(intRep) { sprintf(fmt, "%%%sd\n", PCTD); printf(fmt, valueInt); } else printf("%0.3f\n", valueDouble); }
