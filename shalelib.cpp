@@ -235,7 +235,7 @@ Number::Number(INT i) : Object(), intRep(true), valueInt(i) { }
 Number::Number(double d) : Object(), intRep(false), valueDouble(d) { }
 Number *Number::getNumber(LexInfo *li) { this->hold(); return this; }
 bool Number::isInt() { return intRep; }
-INT Number::getInt() { return (intRep ? valueInt : valueDouble); }
+INT Number::getInt() { if(intRep) return valueInt; return valueDouble; }
 void Number::setInt(INT i) { intRep = true; valueInt = i; }
 double Number::getDouble() { return (intRep ? valueInt : valueDouble); }
 void Number::setDouble(double d) { intRep = false; valueDouble = d; }
