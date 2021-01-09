@@ -44,11 +44,11 @@ j var
 j 987 =
 
 pf var
-pf { function
+pf { function     // Tag this fragment as a function so a return operator knows where to exit.
   i 100 > {
     j 1000 < {
-      n var       // Let's assume this situation is bad. Print
-      n 0 =       // some diagnostics and return from the function.
+      n var       // Let's assume this situation is bad. Print some
+      n 0 =       // diagnostics and return from the function.
       "This is bad" println
       { n j < } {
         n "n = %d\n" printf
