@@ -1,9 +1,3 @@
-array.o
-array.so
-file.o
-file.so
-maths.o
-maths.so
+*.o
+*.so
 shale
-shale.o
-shalelib.o
