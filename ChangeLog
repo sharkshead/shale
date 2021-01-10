@@ -1,4 +1,11 @@
 shale:
 
-1.2.3:
+1.2.3 - 10 Jan 2021
   - addition of left shift (<<) and right shift (>>) operators.
+
+
+primes library:
+
+1.0.0 = 10 Jan 2021
+  - initial release.
+  - shale version 1.2.2
