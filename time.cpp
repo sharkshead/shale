@@ -29,7 +29,7 @@ SOFTWARE.
 
 #define MAJOR   (INT) 1
 #define MINOR   (INT) 0
-#define MICRO   (INT) 0
+#define MICRO   (INT) 1
 
 class TimeHelp : public Operation {
   public:
@@ -145,11 +145,17 @@ OperatorReturn TimeNow::action() {
 TimeDate::TimeDate(LexInfo *li) : Operation(li) { }
 
 OperatorReturn TimeDate::action() {
-  static const char *month[12] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+  static const char *en_month[12] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+  static const char *de_month[12] = { "Jan", "Feb", "Mar", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez" };
+  static const char *fr_month[12] = { "Janv","Févr","Mars","Avr", "Mai", "Juin","Juil","Août","Sept","Oct", "Nov", "Déc" };
+  const char **month;
   struct timespec tp;
   tm *tm;
   Object *o;
   Number *n;
+  Variable *v;
+  String *s;
+  const char *str;
   INT epoch;
   time_t t;
   char *output;
@@ -171,6 +177,17 @@ OperatorReturn TimeDate::action() {
   if((output = (char *) malloc(64)) == (char *) 0) {
     printf("Out of memory in date time::()\n");
     exit(1);
+  }
+  v = btree.findVariable("/language/option/shale");
+  if(v != (Variable *) 0) {
+    s = v->getObject()->getString(getLexInfo());
+    str = s->getValue();
+    if(strcmp(str, "de") == 0) month = de_month;
+    else if(strcmp(str, "fr") == 0) month = fr_month;
+    else month = en_month;
+    s->release(getLexInfo());
+  } else {
+    month = en_month;
   }
   sprintf(output, "%2d %s %4d", tm->tm_mday, month[tm->tm_mon], tm->tm_year + 1900);
   stack.push(cache.newString(output, true));

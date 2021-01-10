@@ -817,8 +817,8 @@ void syntax() {
   printf("\n");
   printf("Special shale:: namespace\n");
   printf("  The shale:: namespace is used by shale to provide interaction between the script and shale.\n");
-  printf("  The namespace currently contains the shale script name and version numbers:\n");
   printf("    file arg:: shale::\n");
+  printf("    language option:: shale::       defaults to \"en\". Other options are \"de\" and \"fr\"\n");
   printf("    major version:: shale::\n");
   printf("    minor version:: shale::\n");
   printf("    micro version:: shale::\n");
@@ -892,6 +892,10 @@ void setupShaleNamespace(const char *arg0) {
 
   v = new Variable("/micro/version/shale");
   v->setObject(new Number(MICRO));
+  btree.addVariable(v);
+
+  v = new Variable("/language/option/shale");
+  v->setObject(new String("en", false));
   btree.addVariable(v);
 }
 
