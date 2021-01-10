@@ -807,6 +807,52 @@ OperatorReturn BitwiseNot::action() {
   return or_continue;
 }
 
+LeftShift::LeftShift(LexInfo *li) : Operation(li) { }
+
+OperatorReturn LeftShift::action() {
+  Object *o1;
+  Object *o2;
+  Number *n1;
+  Number *n2;
+
+  o2 = stack.pop(getLexInfo());
+  o1 = stack.pop(getLexInfo());
+  n1 = o1->getNumber(getLexInfo());
+  n2 = o2->getNumber(getLexInfo());
+
+  stack.push(cache.newNumber(n1->getInt() << n2->getInt()));
+
+  n1->release(getLexInfo());
+  n2->release(getLexInfo());
+  o1->release(getLexInfo());
+  o2->release(getLexInfo());
+
+  return or_continue;
+}
+
+RightShift::RightShift(LexInfo *li) : Operation(li) { }
+
+OperatorReturn RightShift::action() {
+  Object *o1;
+  Object *o2;
+  Number *n1;
+  Number *n2;
+
+  o2 = stack.pop(getLexInfo());
+  o1 = stack.pop(getLexInfo());
+  n1 = o1->getNumber(getLexInfo());
+  n2 = o2->getNumber(getLexInfo());
+
+  stack.push(cache.newNumber(n1->getInt() >> n2->getInt()));
+
+  n1->release(getLexInfo());
+  n2->release(getLexInfo());
+  o1->release(getLexInfo());
+  o2->release(getLexInfo());
+
+  return or_continue;
+}
+
 // The Function class
 
 Function::Function(LexInfo *li) : Operation(li) { }

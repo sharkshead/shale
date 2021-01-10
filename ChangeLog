@@ -1,0 +1,4 @@
+shale:
+
+1.2.3:
+  - addition of left shift (<<) and right shift (>>) operators.

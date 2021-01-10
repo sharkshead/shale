@@ -297,23 +297,33 @@ void lexNextToken(Lex &lex) {
         break;
 
       case '<':
-        lex.token = LEX_TOKEN_LOGICAL_OP;
         lexGetChar();
         if(lexChar == '=') {
+          lex.token = LEX_TOKEN_LOGICAL_OP;
           lex.logicalOp = LEX_TOKEN_LOGICAL_OP_LE;
           lexGetChar();
+        } else if(lexChar == '<') {
+          lex.token = LEX_TOKEN_MATHS_OP;
+          lex.mathsOp = LEX_TOKEN_MATHS_OP_LEFT_SHIFT;
+          lexGetChar();
         } else {
+          lex.token = LEX_TOKEN_LOGICAL_OP;
           lex.logicalOp = LEX_TOKEN_LOGICAL_OP_LT;
         }
         break;
 
       case '>':
-        lex.token = LEX_TOKEN_LOGICAL_OP;
         lexGetChar();
         if(lexChar == '=') {
+          lex.token = LEX_TOKEN_LOGICAL_OP;
           lex.logicalOp = LEX_TOKEN_LOGICAL_OP_GE;
           lexGetChar();
+        } else if(lexChar == '>') {
+          lex.token = LEX_TOKEN_MATHS_OP;
+          lex.mathsOp = LEX_TOKEN_MATHS_OP_RIGHT_SHIFT;
+          lexGetChar();
         } else {
+          lex.token = LEX_TOKEN_LOGICAL_OP;
           lex.logicalOp = LEX_TOKEN_LOGICAL_OP_GT;
         }
         break;
@@ -588,6 +598,8 @@ void olBuild(Lex &lex) {
         case LEX_TOKEN_MATHS_OP_OR: op = new BitwiseOr(li); break;
         case LEX_TOKEN_MATHS_OP_XOR: op = new BitwiseXor(li); break;
         case LEX_TOKEN_MATHS_OP_NOT: op = new BitwiseNot(li); break;
+        case LEX_TOKEN_MATHS_OP_LEFT_SHIFT: op = new LeftShift(li); break;
+        case LEX_TOKEN_MATHS_OP_RIGHT_SHIFT: op = new RightShift(li); break;
         case LEX_TOKEN_MATHS_OP_ASSIGN: op = new Assign(li); break;
         case LEX_TOKEN_MATHS_OP_POINTER_ASSIGN: op = new PointerAssign(li); break;
         case LEX_TOKEN_MATHS_OP_POINTER_DEREF: op = new PointerDereference(li); break;
@@ -713,7 +725,7 @@ void usage() {
 
 void syntax() {
   printf("Maths operators\n");
-  printf("  + - * / %% & | ^ ~                           - plus, minus, times, divide, modulus, bit-wise and, or, xor, not\n");
+  printf("  + - * / %% & | ^ ~ << >>                     - plus, minus, times, divide, modulus, bit-wise and, or, xor, not, left shift, right shift\n");
   printf("Logical operators\n");
   printf("  < <= == != >= > && || !                     - see below for 'conditional and' and 'conditional or'\n");
   printf("Keywords\n");

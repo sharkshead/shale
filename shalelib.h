@@ -363,6 +363,18 @@ class BitwiseNot : public Operation {
     OperatorReturn action();
 };
 
+class LeftShift : public Operation {
+  public:
+    LeftShift(LexInfo *);
+    OperatorReturn action();
+};
+
+class RightShift : public Operation {
+  public:
+    RightShift(LexInfo *);
+    OperatorReturn action();
+};
+
 class Function : public Operation {
   public:
     Function(LexInfo *);
