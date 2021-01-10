@@ -4,17 +4,19 @@
 // Each library will add functions you may call,
 // or variables you may reference.
 //
-// At the time of writing, there are three libraries avilable
+// At the time of writing, there are four libraries avilable
 //
 //  array
 //  file
 //  maths
+//  primes
 //
 // To load a library, use the library operator
 
 array library
 file library
 maths library
+primes library
 
 // Each library stores all their functions and variables under
 // a namespace of their name. So, for example, the maths

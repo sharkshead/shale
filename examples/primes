@@ -1,0 +1,124 @@
+#!/usr/local/bin/shale
+
+// The primes library is used to generate prime numbers.
+//
+// First, load it with the library operator
+
+primes library
+
+
+
+// The primes library provides two functions:
+//
+//  generate primes::()   generates primes
+//  map primes::()        creates an inverse map of primes
+//
+
+
+
+// Generating primes
+//
+// To generate primes use the generate primes::() function.
+// This takes three arguments on the stack
+//    highest prime to generate
+//    number of primes to generate
+//    namespace to place the primes
+//
+// The highest prime or the number of primes may be given as zero,
+// meaning there is no limit. When both are non-zero the first
+// limit to be reached, either the highest prime or the number,
+// will terminate the generation.
+//
+// For example,
+
+1000 0 prime generate primes::()
+
+// has generate all primes that are less than 1000.
+//
+// If, on the other hand, this
+
+0 1000 prime generate primes::()
+
+// will generate the first 1000 primes.
+
+// The third argument you push on the stack, "prime" in this example,
+// is a namespace where the primes and two variables are stored.
+//
+// The variables are the last prime generated (the highest value)
+// and the number of primes generated.
+
+last prime:: "Last prime generated is %d\n" printf
+count prime:: "%d primes generated\n" printf
+
+// The primes are accessed by indexing the namespace with
+// an integer, starting from 0 and going up to one less
+// that the count.
+//
+// Here's the first 10 primes printed out
+
+"First 10 primes:" printf
+i var
+i 0 =
+{ i 10 < } {
+  i.value prime:: " %d" printf
+  i i 1 + =
+} while
+"" println
+
+// To go through all the primes, do something like:
+
+sum var
+sum 0 =
+i 0 =
+{ i count prime:: < } {
+  sum sum i.value prime:: + =
+  i i 1 + =
+} while
+sum last prime:: "Sum of all the primes up to %d is %d\n" printf
+
+
+
+
+// Primality check
+//
+// To check if a number is prime the map primes::() funciton may be of help.
+// This function takes one argument being the namespace where the generated
+// primes are stored, and produces an inverse map that can be used to check if
+// a number (less than or equal to the current highest generated prime) is prime.
+//
+// For example:
+
+prime map primes::()
+
+i 801 =
+i.value map:: prime:: initialised {
+  i "%d is prime\n" printf
+} {
+  i "%d is not prime\n" printf
+} if
+
+// When the number is prime the value of the map is the
+// index of this prime in the {ns} namespace
+
+i 811 =
+i.value map:: prime:: initialised {
+  i.value map:: prime:: i "%d is prime and is index %d in the prime:: namespace\n" printf
+} {
+  i "%d is not prime\n" printf
+} if
+
+// If the value you'd like to check is greater than the current highest prime,
+// you could generate more primes, regenerate the map, then do the test:
+
+i 8009 =
+i last prime:: > {
+  "Generating more primes" println
+  i.value 0 prime generate primes::()
+  "Rebuilding the reverse map" println
+  prime map primes::()
+} ifthen
+i.value map:: prime:: initialised {
+  i.value map:: prime:: i "%d is prime and is index %d in the prime:: namespace\n" printf
+} {
+  i "%d is not prime\n" printf
+} if

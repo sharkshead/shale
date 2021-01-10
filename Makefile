@@ -1,6 +1,6 @@
-all: shale maths.so array.so file.so
+all: shale maths.so array.so primes.o file.so
 
-install: /usr/local/bin/shale /usr/local/lib/shale/maths.so /usr/local/lib/shale/array.so /usr/local/lib/shale/file.so
+install: /usr/local/bin/shale /usr/local/lib/shale/maths.so /usr/local/lib/shale/array.so /usr/local/lib/shale/primes.so /usr/local/lib/shale/file.so
 
 clean:
 	rm -f shale *.o *.so
@@ -38,6 +38,12 @@ file.o: file.cpp shalelib.h
 file.so: file.o
 	g++ -shared -o file.so file.o
 
+primes.o: primes.cpp shalelib.h
+	g++ -fPIC -c -o primes.o primes.cpp
+
+primes.so: primes.o
+	g++ -shared -o primes.so primes.o
+
 /usr/local/bin/shale: shale
 	sudo rm -f /usr/local/bin/shale
 	sudo cp shale /usr/local/bin/shale
@@ -56,3 +62,8 @@ file.so: file.o
 	[ -d /usr/local/lib/shale ] || sudo mkdir /usr/local/lib/shale
 	sudo rm -f /usr/local/lib/shale/file.so
 	sudo cp file.so /usr/local/lib/shale/file.so
+
+/usr/local/lib/shale/primes.so: primes.so
+	[ -d /usr/local/lib/shale ] || sudo mkdir /usr/local/lib/shale
+	sudo rm -f /usr/local/lib/shale/primes.so
+	sudo cp primes.so /usr/local/lib/shale/primes.so
