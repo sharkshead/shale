@@ -29,7 +29,7 @@ SOFTWARE.
 
 #define MAJOR   (INT) 1
 #define MINOR   (INT) 0
-#define MICRO   (INT) 2
+#define MICRO   (INT) 3
 
 class TimeHelp : public Operation {
   public:
@@ -278,6 +278,7 @@ OperatorReturn TimeLocaltime::action() {
   time_t t;
   char *output;
   int ms;
+  Variable *v;
 
   o = stack.pop(getLexInfo());
   n = o->getNumber(getLexInfo());
@@ -295,15 +296,95 @@ OperatorReturn TimeLocaltime::action() {
   ms = epoch % 1000;
   tm = localtime(&t);
 
-  stack.push(cache.newNumber((INT) tm->tm_isdst));
-  stack.push(cache.newNumber((INT) tm->tm_yday));
-  stack.push(cache.newNumber((INT) tm->tm_wday));
-  stack.push(cache.newNumber((INT) tm->tm_year));
-  stack.push(cache.newNumber((INT) tm->tm_mon));
-  stack.push(cache.newNumber((INT) tm->tm_mday));
-  stack.push(cache.newNumber((INT) tm->tm_hour));
-  stack.push(cache.newNumber((INT) tm->tm_min));
-  stack.push(cache.newNumber((INT) tm->tm_sec));
+  v = btree.findVariable("/sec/tm/time");
+  if(v == (Variable *) 0) {
+    v = new Variable("/sec/tm/time");
+    v->setObject(cache.newNumber((INT) tm->tm_sec));
+    btree.addVariable(v);
+    
+  } else {
+    v->setObject(cache.newNumber((INT) tm->tm_sec));
+  }
+
+  v = btree.findVariable("/min/tm/time");
+  if(v == (Variable *) 0) {
+    v = new Variable("/min/tm/time");
+    v->setObject(cache.newNumber((INT) tm->tm_min));
+    btree.addVariable(v);
+    
+  } else {
+    v->setObject(cache.newNumber((INT) tm->tm_hour));
+  }
+
+  v = btree.findVariable("/hour/tm/time");
+  if(v == (Variable *) 0) {
+    v = new Variable("/hour/tm/time");
+    v->setObject(cache.newNumber((INT) tm->tm_hour));
+    btree.addVariable(v);
+    
+  } else {
+    v->setObject(cache.newNumber((INT) tm->tm_hour));
+  }
+
+  v = btree.findVariable("/mday/tm/time");
+  if(v == (Variable *) 0) {
+    v = new Variable("/mday/tm/time");
+    v->setObject(cache.newNumber((INT) tm->tm_mday));
+    btree.addVariable(v);
+    
+  } else {
+    v->setObject(cache.newNumber((INT) tm->tm_mday));
+  }
+
+  v = btree.findVariable("/mon/tm/time");
+  if(v == (Variable *) 0) {
+    v = new Variable("/mon/tm/time");
+    v->setObject(cache.newNumber((INT) tm->tm_mon));
+    btree.addVariable(v);
+    
+  } else {
+    v->setObject(cache.newNumber((INT) tm->tm_mon));
+  }
+
+  v = btree.findVariable("/year/tm/time");
+  if(v == (Variable *) 0) {
+    v = new Variable("/year/tm/time");
+    v->setObject(cache.newNumber((INT) tm->tm_year));
+    btree.addVariable(v);
+    
+  } else {
+    v->setObject(cache.newNumber((INT) tm->tm_year));
+  }
+
+  v = btree.findVariable("/wday/tm/time");
+  if(v == (Variable *) 0) {
+    v = new Variable("/wday/tm/time");
+    v->setObject(cache.newNumber((INT) tm->tm_wday));
+    btree.addVariable(v);
+    
+  } else {
+    v->setObject(cache.newNumber((INT) tm->tm_wday));
+  }
+
+  v = btree.findVariable("/yday/tm/time");
+  if(v == (Variable *) 0) {
+    v = new Variable("/yday/tm/time");
+    v->setObject(cache.newNumber((INT) tm->tm_yday));
+    btree.addVariable(v);
+    
+  } else {
+    v->setObject(cache.newNumber((INT) tm->tm_yday));
+  }
+
+  v = btree.findVariable("/isdst/tm/time");
+  if(v == (Variable *) 0) {
+    v = new Variable("/isdst/tm/time");
+    v->setObject(cache.newNumber((INT) tm->tm_isdst));
+    btree.addVariable(v);
+    
+  } else {
+    v->setObject(cache.newNumber((INT) tm->tm_isdst));
+  }
 
   n->release(getLexInfo());
   o->release(getLexInfo());

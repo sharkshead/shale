@@ -18,6 +18,11 @@ primes library:
 
 time library:
 
+1.0.3 - 11 Jan 2021
+  - change localtime time::() to store entries in tm:: time::,
+    for example sec tm:: time::
+  - shale version 1.2.4
+
 1.0.2 - 11 Jan 2021
   - added timems time::() to include milliseconds
   - added localtime time::() to return contents of struct tm
