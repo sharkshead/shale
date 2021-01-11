@@ -29,7 +29,7 @@ SOFTWARE.
 
 #define MAJOR   (INT) 1
 #define MINOR   (INT) 0
-#define MICRO   (INT) 1
+#define MICRO   (INT) 2
 
 class TimeHelp : public Operation {
   public:
@@ -51,19 +51,33 @@ class TimeDate : public Operation {
 
 class TimeTime : public Operation {
   public:
-    TimeTime(LexInfo *);
+    TimeTime(LexInfo *, bool);
+    OperatorReturn action();
+
+  private:
+    bool includeMs;
+};
+
+class TimeLocaltime : public Operation {
+  public:
+    TimeLocaltime(LexInfo *);
     OperatorReturn action();
 };
 
 const char *timeHelp[] = {
   "Time library:",
-  "  now time::()                          - Returns the time library's epoch (time-epoch) time",
+  "  now time::()                          - Returns the time library's epoch (time-epoch) time.",
+  "                                          This is the Unix epoch times 1000 plus milliseconds",
   "  {time-epoch} date time::()            - Returns a string on the stack containing the",
   "                                          day month year of the {time-epoch}. If {time-epoch}",
   "                                          is zero then the current date is returned",
   "  {time-epoch} time time::()            - Returns a string on the stack containing the",
   "                                          hours, minutes and seconds (24h, not 12h) of the {time-epoch}.",
   "                                          If {time-epoch} is zero then the current time is returned",
+  "  {time-epoch{ timems time::()          - same as time time:() but includes milliseconds",
+  "  {time-epoch} localtime time::()       - returns the 9 elements of struct tm: tm_sec is top of stack",
+  "                                          through to tm_isdst on the bottom. If {time-epoch} is zero",
+  "                                          then the current time is used",
   "  major version:: time::                - major version number",
   "  minor version:: time::                - minor version number",
   "  micro version:: time::                - micro version number",
@@ -109,8 +123,20 @@ extern "C" void slmain() {
   btree.addVariable(v);
 
   ol = new OperationList;
-  ol->addOperation(new TimeTime((LexInfo *) 0));
+  ol->addOperation(new TimeTime((LexInfo *) 0, false));
   v = new Variable("/time/time");
+  v->setObject(new Code(ol));
+  btree.addVariable(v);
+
+  ol = new OperationList;
+  ol->addOperation(new TimeTime((LexInfo *) 0, true));
+  v = new Variable("/timems/time");
+  v->setObject(new Code(ol));
+  btree.addVariable(v);
+
+  ol = new OperationList;
+  ol->addOperation(new TimeLocaltime((LexInfo *) 0));
+  v = new Variable("/localtime/time");
   v->setObject(new Code(ol));
   btree.addVariable(v);
 }
@@ -198,7 +224,7 @@ OperatorReturn TimeDate::action() {
   return or_continue;
 }
 
-TimeTime::TimeTime(LexInfo *li) : Operation(li) { }
+TimeTime::TimeTime(LexInfo *li, bool ms) : Operation(li), includeMs(ms) { }
 
 OperatorReturn TimeTime::action() {
   struct timespec tp;
@@ -208,6 +234,7 @@ OperatorReturn TimeTime::action() {
   INT epoch;
   time_t t;
   char *output;
+  int ms;
 
   o = stack.pop(getLexInfo());
   n = o->getNumber(getLexInfo());
@@ -222,13 +249,61 @@ OperatorReturn TimeTime::action() {
     }
   }
   t = epoch / 1000;
+  ms = epoch % 1000;
   tm = localtime(&t);
   if((output = (char *) malloc(64)) == (char *) 0) {
     printf("Out of memory in date time::()\n");
     exit(1);
   }
-  sprintf(output, "%2d:%02d:%02d", tm->tm_hour, tm->tm_min, tm->tm_sec);
+  if(includeMs)
+    sprintf(output, "%2d:%02d:%02d.%03d", tm->tm_hour, tm->tm_min, tm->tm_sec, ms);
+  else
+    sprintf(output, "%2d:%02d:%02d", tm->tm_hour, tm->tm_min, tm->tm_sec);
   stack.push(cache.newString(output, true));
+
+  n->release(getLexInfo());
+  o->release(getLexInfo());
+
+  return or_continue;
+}
+
+TimeLocaltime::TimeLocaltime(LexInfo *li) : Operation(li) { }
+
+OperatorReturn TimeLocaltime::action() {
+  struct timespec tp;
+  tm *tm;
+  Object *o;
+  Number *n;
+  INT epoch;
+  time_t t;
+  char *output;
+  int ms;
+
+  o = stack.pop(getLexInfo());
+  n = o->getNumber(getLexInfo());
+
+  epoch = n->getInt();
+  if(epoch == (INT) 0) {
+    if(clock_gettime(CLOCK_REALTIME, &tp) == 0) {
+      epoch = (((INT) tp.tv_sec) * 1000) + (((INT) tp.tv_nsec) / 1000000);
+    } else {
+      printf("Can't get the realtime clock. Bailing.\n");
+      exit(1);
+    }
+  }
+  t = epoch / 1000;
+  ms = epoch % 1000;
+  tm = localtime(&t);
+
+  stack.push(cache.newNumber((INT) tm->tm_isdst));
+  stack.push(cache.newNumber((INT) tm->tm_yday));
+  stack.push(cache.newNumber((INT) tm->tm_wday));
+  stack.push(cache.newNumber((INT) tm->tm_year));
+  stack.push(cache.newNumber((INT) tm->tm_mon));
+  stack.push(cache.newNumber((INT) tm->tm_mday));
+  stack.push(cache.newNumber((INT) tm->tm_hour));
+  stack.push(cache.newNumber((INT) tm->tm_min));
+  stack.push(cache.newNumber((INT) tm->tm_sec));
 
   n->release(getLexInfo());
   o->release(getLexInfo());
