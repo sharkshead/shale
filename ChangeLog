@@ -1,37 +1,37 @@
 shale:
 
-1.2.4 - 11 Jan 2021
-  - addition of language option:: shale::
+  1.2.4 - 11 Jan 2021
+    - addition of language option:: shale::
 
-1.2.3 - 10 Jan 2021
-  - addition of left shift (<<) and right shift (>>) operators.
+  1.2.3 - 10 Jan 2021
+    - addition of left shift (<<) and right shift (>>) operators.
 
 
 
 primes library:
 
-1.0.0 = 10 Jan 2021
-  - initial release.
-  - shale version 1.2.2
+  1.0.0 = 10 Jan 2021
+    - initial release.
+    - shale version 1.2.2
 
  
 
 time library:
 
-1.0.3 - 11 Jan 2021
-  - change localtime time::() to store entries in tm:: time::,
-    for example sec tm:: time::
-  - shale version 1.2.4
+  1.0.3 - 11 Jan 2021
+    - change localtime time::() to store entries in tm:: time::,
+      for example sec tm:: time::
+    - shale version 1.2.4
 
-1.0.2 - 11 Jan 2021
-  - added timems time::() to include milliseconds
-  - added localtime time::() to return contents of struct tm
-  - shale version 1.2.4
+  1.0.2 - 11 Jan 2021
+    - added timems time::() to include milliseconds
+    - added localtime time::() to return contents of struct tm
+    - shale version 1.2.4
 
-1.0.1 - 11 Jan 2021
-  - language support (en, de, fr) in date time::()
-  - shale version 1.2.4
+  1.0.1 - 11 Jan 2021
+    - language support (en, de, fr) in date time::()
+    - shale version 1.2.4
 
-1.0.0 - 10 Jan 2021
-  - initial release
-  - shale version 1.2.3
+  1.0.0 - 10 Jan 2021
+    - initial release
+    - shale version 1.2.3
