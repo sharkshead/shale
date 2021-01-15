@@ -1,0 +1,3 @@
+#!/bin/sh -
+
+uname -a | grep -q Darwin && ln -s Makefile.macosx Makefile || ln -s Makefile.linux Makefile

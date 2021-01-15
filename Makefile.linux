@@ -3,7 +3,7 @@ all: shale maths.so array.so primes.o time.o file.so
 install: /usr/local/bin/shale /usr/local/lib/shale/maths.so /usr/local/lib/shale/array.so /usr/local/lib/shale/primes.so /usr/local/lib/shale/time.so /usr/local/lib/shale/file.so
 
 clean:
-	rm -f shale *.o *.so
+	rm -f shale *.o *.so config config.h config.o
 
 shale: shale.h shale.o shalelib.h shalelib.o
 	g++ -o shale -rdynamic shale.o shalelib.o -ldl

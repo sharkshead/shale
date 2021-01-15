@@ -1,0 +1,81 @@
+all: shale maths.so array.so primes.o time.o file.so
+
+install: /usr/local/bin/shale /usr/local/lib/shale/maths.so /usr/local/lib/shale/array.so /usr/local/lib/shale/primes.so /usr/local/lib/shale/time.so /usr/local/lib/shale/file.so
+
+clean:
+	rm -f shale *.o *.so
+
+shale: shale.h shale.o shalelib.h shalelib.o
+	g++ -o shale -rdynamic shale.o shalelib.o -ldl
+
+shale.o: shale.h shale.cpp shalelib.h
+	g++ -c -o shale.o shale.cpp
+
+shalelib.o: shalelib.h shalelib.cpp
+	g++ -c -o shalelib.o shalelib.cpp
+
+shalelib.h: config.h
+
+config.h: config.cpp
+	g++ -o config config.cpp
+	./config
+
+maths.o: maths.cpp shalelib.h
+	g++ -c -o maths.o maths.cpp
+
+maths.so: maths.o
+	g++ -flat_namespace -bundle -undefined suppress -o maths.so maths.o
+
+array.o: array.cpp shalelib.h
+	g++ -c -o array.o array.cpp
+
+array.so: array.o
+	g++ -flat_namespace -bundle -undefined suppress -o array.so array.o
+
+file.o: file.cpp shalelib.h
+	g++ -c -o file.o file.cpp
+
+file.so: file.o
+	g++ -flat_namespace -bundle -undefined suppress -o file.so file.o
+
+primes.o: primes.cpp shalelib.h
+	g++ -c -o primes.o primes.cpp
+
+primes.so: primes.o
+	g++ -flat_namespace -bundle -undefined suppress -o primes.so primes.o
+
+time.o: time.cpp shalelib.h
+	g++ -c -o time.o time.cpp
+
+time.so: time.o
+	g++ -flat_namespace -bundle -undefined suppress -o time.so time.o
+
+/usr/local/bin/shale: shale
+	[ -d /usr/local/bin ] || sudo mkdir -p /usr/local/bin
+	sudo rm -f /usr/local/bin/shale
+	sudo cp shale /usr/local/bin/shale
+
+/usr/local/lib/shale/maths.so: maths.so
+	[ -d /usr/local/lib/shale ] || sudo mkdir -p /usr/local/lib/shale
+	sudo rm -f /usr/local/lib/shale/maths.so
+	sudo cp maths.so /usr/local/lib/shale/maths.so
+
+/usr/local/lib/shale/array.so: array.so
+	[ -d /usr/local/lib/shale ] || sudo mkdir -p /usr/local/lib/shale
+	sudo rm -f /usr/local/lib/shale/array.so
+	sudo cp array.so /usr/local/lib/shale/array.so
+
+/usr/local/lib/shale/file.so: file.so
+	[ -d /usr/local/lib/shale ] || sudo mkdir -p /usr/local/lib/shale
+	sudo rm -f /usr/local/lib/shale/file.so
+	sudo cp file.so /usr/local/lib/shale/file.so
+
+/usr/local/lib/shale/primes.so: primes.so
+	[ -d /usr/local/lib/shale ] || sudo mkdir -p /usr/local/lib/shale
+	sudo rm -f /usr/local/lib/shale/primes.so
+	sudo cp primes.so /usr/local/lib/shale/primes.so
+
+/usr/local/lib/shale/time.so: time.so
+	[ -d /usr/local/lib/shale ] || sudo mkdir -p /usr/local/lib/shale
+	sudo rm -f /usr/local/lib/shale/time.so
+	sudo cp time.so /usr/local/lib/shale/time.so
