@@ -55,7 +55,7 @@ const char *primesHelp[] = {
   "                                            up to and including this value. When {count} is",
   "                                            non-zero, this many primes will be generated.",
   "                                            When both are non-zero, whichever of the two",
-  "                                            is reached first will terminate the generation.",
+  "                                            produces more primes will terminate the generation.",
   "                                            last {ns}:: is the highest prime generated, and",
   "                                            count {ns}:: is the number generated.",
   "                                            Primes are indexed by an integer in {ns}::,",
@@ -196,7 +196,7 @@ OperatorReturn PrimesGenerate::action() {
     if(count < (INT) 1) count = (INT) 1;
 
     candidate = (last == (INT) 2 ? (INT) 3 : last + 2);
-    while(((lastReq == (INT) 0) || (lastReq >= candidate)) && ((numberReq == (INT) 0) || (numberReq > count))) {
+    while(((lastReq == (INT) 0) || (lastReq >= candidate)) || ((numberReq == (INT) 0) || (numberReq > count))) {
       squareRoot = ((INT) sqrt(candidate)) + 1;
       index = (INT) 0;
       found = true;
