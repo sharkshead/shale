@@ -28,7 +28,7 @@ SOFTWARE.
 
 #define MAJOR   (INT) 1
 #define MINOR   (INT) 0
-#define MICRO   (INT) 0
+#define MICRO   (INT) 1
 
 class PrimesHelp : public Operation {
   public:
