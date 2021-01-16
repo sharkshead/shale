@@ -76,7 +76,7 @@ const char *timeHelp[] = {
   "  {tepoch} time time::()            - Returns a string on the stack containing the",
   "                                      hours, minutes and seconds (24h, not 12h) of the {tepoch}.",
   "                                      If {tepoch} is zero then the current time is returned",
-  "  {tepoch{ timems time::()          - same as time time::() but includes milliseconds",
+  "  {tepoch} timems time::()          - same as time time::() but includes milliseconds",
   "  {tepoch} localtime time::()       - stores the 9 elements of struct tm in the tm:: time:: namespace,",
   "                                      each entry without the tm_ prefix, eg, sec tm:: time::",
   "                                      If {tepoch} is zero then the current time is used",
