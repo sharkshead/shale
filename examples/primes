@@ -113,7 +113,7 @@ i.value map:: prime:: initialised {
 i 8009 =
 i last prime:: > {
   "Generating more primes" println
-  i.value 0 prime generate primes::()
+  i 0 prime generate primes::()
   "Rebuilding the reverse map" println
   prime map primes::()
 } ifthen
