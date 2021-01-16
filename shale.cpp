@@ -741,7 +741,8 @@ void usage() {
 
 void syntax() {
   printf("Maths operators\n");
-  printf("  + - * / %% & | ^ ~ << >>                     - plus, minus, times, divide, modulus, bit-wise and, or, xor, not, left shift, right shift\n");
+  printf("  + - * / %% & | ^ ~ << >> ++ --               - plus, minus, times, divide, modulus, bit-wise and, or, xor, not, left shift, right shift,\n");
+  printf("                                                increment, decrement\n");
   printf("Logical operators\n");
   printf("  < <= == != >= > && || !                     - see below for 'conditional and' and 'conditional or'\n");
   printf("Keywords\n");
@@ -759,6 +760,8 @@ void syntax() {
   printf("  var             {name} var                  - defines a variable\n");
   printf("  $                                           - turns a number or string into a name\n");
   printf("  ::              {index} {name} ::           - create the variable {index} in namespace {name}\n");
+  printf("  ++              {variable} ++               - increment the variable by 1. does not leave a value on the stack\n");
+  printf("  --              {variable} --               - decrement the variable by 1. does not leave a value on the stack\n");
   printf("  if              bool { then-code } { else-code } if\n");
   printf("  ifthen          bool { then-code } ifthen\n");
   printf("  while           { bool } { code } while\n");
