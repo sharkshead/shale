@@ -1,0 +1,101 @@
+#!/usr/local/bin/shale
+
+// The time library give you access to these functions
+//
+//  now time::()
+//  {tepoch} time time::()
+//  {tepoch} timems time::()
+//  {tepoch} date time::()
+//  {tepoch} localtime time::()
+//  help time::()
+//
+// and it uses the
+//
+//  language option:: shale::
+//
+// option to effect the output of the date time::() function.
+
+
+
+// To access the time library you must load it:
+
+time library
+
+
+
+// now time::()
+//
+// This returns a tepoch, which is the standard Unix epoch time
+// multiplied by 1000 and with milli seconds added.
+//
+// You can pass a tepoch to the time time::(), date time::()
+// and localtime time::() functions, or you can time the duration
+// of some code by surrounding it with call to now time::() and
+// subtracting the two and you'll have the time in ms.
+
+"Counting ..." println
+now time::()
+i var
+i 0 =
+{ i 1000000 < } {
+  i i 1 + =
+} while
+now time::() swap - 1000.0 / "Time taken to count to 1 million is %0.3f seconds\n" printf
+
+
+
+// {tepoch} time time::()
+//
+// This returns a string containing the hours, minues and seconds (in a 24 hour format)
+// from the {tepoch}. If {tepoch} is zero then the current tepoch time is used.
+
+0 time time::() "The current time is %s\n" printf
+
+
+
+// {tepoch} timems time::()
+//
+// Same as time time::() except is includes the milli seconds
+
+0 timems time::() "The current time is %s\n" printf
+
+
+
+// {tepoch} date time::()
+//
+// This returns a string containing the day of the month, month and the year.
+// Setting the language option:: shale:: option to one of these strings:
+//
+//  "en"  "de"  "fr"
+//
+// (default is "en") will produce the month in the specified language.
+
+language option:: shale:: "de" =
+0 date time::() "Das Datum ist der %s\n" printf
+
+
+
+// {tepoch} localtime time::()
+//
+// This give you access to the attributes of struct tm as you would
+// in C or C++. The struct tm attribues and theie shale placement are:
+//
+//  tm_sec    sec tm:: time::     /* seconds (0 - 60) */
+//  tm_min    min tm:: time::     /* minutes (0 - 59) */
+//  tm_hour   hour tm:: time::    /* hours (0 - 23) */
+//  tm_mday   mday tm:: time::    /* day of month (1 - 31) */
+//  tm_mon    mon tm:: time::     /* month of year (0 - 11) */
+//  tm_year   year tm:: time::    /* year - 1900 */
+//  tm_wday   wday tm:: time::    /* day of week (Sunday = 0) */
+//  tm_yday   yday tm:: time::    /* day of year (0 - 365) */
+//  tm_isdst  isdst tm:: time::   /* is summer time in effect? */
+
+0 localtime time::()
+yday tm:: time:: "The current day of the year is %d\n" printf
+
+
+
+// help time::()
+
+"" println
+help time::()
