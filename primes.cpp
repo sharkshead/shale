@@ -196,7 +196,7 @@ OperatorReturn PrimesGenerate::action() {
     if(count < (INT) 1) count = (INT) 1;
 
     candidate = (last == (INT) 2 ? (INT) 3 : last + 2);
-    while(((lastReq == (INT) 0) || (lastReq >= candidate)) || ((numberReq == (INT) 0) || (numberReq > count))) {
+    while(((lastReq == (INT) 0) || (lastReq >= candidate)) && ((numberReq == (INT) 0) || (numberReq > count))) {
       squareRoot = ((INT) sqrt(candidate)) + 1;
       index = (INT) 0;
       found = true;
