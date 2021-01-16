@@ -999,6 +999,60 @@ OperatorReturn PointerDereference::action() {
   return or_continue;
 }
 
+// PlusPlus class
+
+PlusPlus::PlusPlus(LexInfo *li) : Operation(li) { }
+
+OperatorReturn PlusPlus::action() {
+  Object *o;
+  Variable *v;
+  Number *n;
+  Number *newn;
+
+  o = stack.pop(getLexInfo());
+
+  v = variableStack.findVariable(o->getName(getLexInfo())->getValue());
+  if(v == (Variable *) 0) slexception.chuck("variable error", getLexInfo());
+  n = v->getObject()->getNumber(getLexInfo());
+
+  if(n->isInt()) v->setObject(newn = cache.newNumber(n->getInt() + (INT) 1));
+  else v->setObject(newn = cache.newNumber(n->getDouble() + 1.0));
+
+  newn->release(getLexInfo());
+  n->release(getLexInfo());
+
+  o->release(getLexInfo());
+
+  return or_continue;
+}
+
+// MinusMinus class
+
+MinusMinus::MinusMinus(LexInfo *li) : Operation(li) { }
+
+OperatorReturn MinusMinus::action() {
+  Object *o;
+  Variable *v;
+  Number *n;
+  Number *newn;
+
+  o = stack.pop(getLexInfo());
+
+  v = variableStack.findVariable(o->getName(getLexInfo())->getValue());
+  if(v == (Variable *) 0) slexception.chuck("variable error", getLexInfo());
+  n = v->getObject()->getNumber(getLexInfo());
+
+  if(n->isInt()) v->setObject(newn = cache.newNumber(n->getInt() - (INT) 1));
+  else v->setObject(newn = cache.newNumber(n->getDouble() - 1.0));
+
+  newn->release(getLexInfo());
+  n->release(getLexInfo());
+
+  o->release(getLexInfo());
+
+  return or_continue;
+}
+
 // Logical operators
 
 LessThan::LessThan(LexInfo *li) : Operation(li) { }

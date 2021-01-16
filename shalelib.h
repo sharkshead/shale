@@ -425,6 +425,18 @@ class PointerDereference : public Operation {
     OperatorReturn action();
 };
 
+class PlusPlus : public Operation {
+  public:
+    PlusPlus(LexInfo *);
+    OperatorReturn action();
+};
+
+class MinusMinus : public Operation {
+  public:
+    MinusMinus(LexInfo *);
+    OperatorReturn action();
+};
+
 class LessThan : public Operation {
   public:
     LessThan(LexInfo *);

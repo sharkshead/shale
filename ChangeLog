@@ -1,5 +1,8 @@
 shale:
 
+  1.2.5 - 17 Jan 2021
+    - addition of the ++ and -- operators
+
   1.2.4 - 11 Jan 2021
     - addition of language option:: shale::
 

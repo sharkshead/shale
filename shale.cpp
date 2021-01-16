@@ -239,9 +239,19 @@ void lexNextToken(Lex &lex) {
         break;
 
       case '+':
+        lex.token = LEX_TOKEN_MATHS_OP;
+        lexGetChar();
+        if(lexChar == '+') {
+          lexGetChar();
+          lex.mathsOp = LEX_TOKEN_MATHS_OP_PLUSPLUS;
+        } else {
+          lex.mathsOp = LEX_TOKEN_MATHS_OP_PLUS;
+        }
+        break;
+
       case '*':
         lex.token = LEX_TOKEN_MATHS_OP;
-        lex.mathsOp = (lexChar == '+' ? LEX_TOKEN_MATHS_OP_PLUS : LEX_TOKEN_MATHS_OP_TIMES);
+        lex.mathsOp = LEX_TOKEN_MATHS_OP_TIMES;
         lexGetChar();
         break;
 
@@ -278,6 +288,10 @@ void lexNextToken(Lex &lex) {
           lexGetChar();
           lex.token = LEX_TOKEN_MATHS_OP;
           lex.mathsOp = LEX_TOKEN_MATHS_OP_POINTER_DEREF;
+        } else if(lexChar == '-') {
+          lexGetChar();
+          lex.token = LEX_TOKEN_MATHS_OP;
+          lex.mathsOp = LEX_TOKEN_MATHS_OP_MINUSMINUS;
         } else {
           lex.token = LEX_TOKEN_MATHS_OP;
           lex.mathsOp = LEX_TOKEN_MATHS_OP_MINUS;
@@ -603,6 +617,8 @@ void olBuild(Lex &lex) {
         case LEX_TOKEN_MATHS_OP_ASSIGN: op = new Assign(li); break;
         case LEX_TOKEN_MATHS_OP_POINTER_ASSIGN: op = new PointerAssign(li); break;
         case LEX_TOKEN_MATHS_OP_POINTER_DEREF: op = new PointerDereference(li); break;
+        case LEX_TOKEN_MATHS_OP_PLUSPLUS: op = new PlusPlus(li); break;
+        case LEX_TOKEN_MATHS_OP_MINUSMINUS: op = new MinusMinus(li); break;
         default: shaleException.chuck("parse error", li); // throw parseException;
       }
       olStack[olStackIndex]->addOperation(op);
