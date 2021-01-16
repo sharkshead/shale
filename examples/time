@@ -95,6 +95,15 @@ yday tm:: time:: "The current day of the year is %d\n" printf
 
 
 
+// Timestamping.
+//
+// Timestamping output is something done frequently.
+// Here's how I generally do it, where "123" is the data output I want to timestamp.
+
+123 now time::() dup time time::() swap date time::() "%s %s Here's the important data: %d\n" printf
+
+
+
 // help time::()
 
 "" println
