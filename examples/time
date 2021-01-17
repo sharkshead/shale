@@ -9,11 +9,12 @@
 //  {tepoch} localtime time::()
 //  help time::()
 //
-// and it uses the
+// and it uses the variables
 //
+//  dateformat time::
 //  language option:: shale::
 //
-// option to affect the output of the date time::() function.
+// to affect the output of the date time::() function.
 
 
 
@@ -64,6 +65,17 @@ now time::() swap - 1000.0 / "Time taken to count to 1 million is %0.3f seconds\
 // {tepoch} date time::()
 //
 // This returns a string containing the day of the month, month and the year.
+//
+// You can alter the format of the output from date time::() by setting
+// dateformat time:: to one of the strings:
+//
+//  MDY     eg Jan 17 2021
+//  YMD        2021 Jan 17
+//  Y-M-D      2021-01-17
+
+dateformat time:: "MDY" =
+0 date time::() "US-style date: %s\n" printf
+
 // Setting the language option:: shale:: option to one of these strings:
 //
 //  "en"  "de"  "fr"
@@ -72,6 +84,7 @@ now time::() swap - 1000.0 / "Time taken to count to 1 million is %0.3f seconds\
 
 language option:: shale:: "de" =
 0 date time::() "Das Datum ist der %s\n" printf
+
 
 
 

@@ -21,6 +21,11 @@ primes library:
 
 time library:
 
+  1.1.0 - 17 Jan 2021
+    - add dateformat time:: variable to control output format
+      of date time::()
+    - shale version 1.2.5
+
   1.0.3 - 11 Jan 2021
     - change localtime time::() to store entries in tm:: time::,
       for example sec tm:: time::

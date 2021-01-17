@@ -28,8 +28,8 @@ SOFTWARE.
 #include <time.h>
 
 #define MAJOR   (INT) 1
-#define MINOR   (INT) 0
-#define MICRO   (INT) 3
+#define MINOR   (INT) 1
+#define MICRO   (INT) 0
 
 class TimeHelp : public Operation {
   public:
@@ -80,6 +80,10 @@ const char *timeHelp[] = {
   "  {tepoch} localtime time::()       - stores the 9 elements of struct tm in the tm:: time:: namespace,",
   "                                      each entry without the tm_ prefix, eg, sec tm:: time::",
   "                                      If {tepoch} is zero then the current time is used",
+  "  dateformat time:: {fmt} =         - Format of the output of date time::(). Default is \"DMY\"",
+  "                                      with options \"MDY\", \"YMD\" or \"Y-M-D\"",
+  "  language option:: shale:: {l} =   - Change the language output by date time::",
+  "                                      where {l} can be \"en\" (the default), \"de\" or \"fr\"",
   "  major version:: time::            - major version number",
   "  minor version:: time::            - minor version number",
   "  micro version:: time::            - micro version number",
@@ -110,6 +114,10 @@ extern "C" void slmain() {
 
   v = new Variable("/micro/version/time");
   v->setObject(cache.newNumber(MICRO));
+  btree.addVariable(v);
+
+  v = new Variable("/dateformat/time");
+  v->setObject(cache.newString("DMY", false));
   btree.addVariable(v);
 
   ol = new OperationList;
@@ -187,6 +195,7 @@ OperatorReturn TimeDate::action() {
   INT epoch;
   time_t t;
   char *output;
+  const char *fmt;
 
   o = stack.pop(getLexInfo());
   n = o->getNumber(getLexInfo());
@@ -217,7 +226,25 @@ OperatorReturn TimeDate::action() {
   } else {
     month = en_month;
   }
-  sprintf(output, "%2d %s %4d", tm->tm_mday, month[tm->tm_mon], tm->tm_year + 1900);
+
+  v = btree.findVariable("/dateformat/time");
+  if(v != (Variable *) 0) {
+    s = v->getObject()->getString(getLexInfo());
+    fmt = s->getValue();
+    s->release(getLexInfo());
+  } else {
+    fmt = "DMY";
+  }
+
+  if((strcmp(fmt, "MDY") == 0) || (strcmp(fmt, "mdy") == 0)) {
+    sprintf(output, "%s %2d %4d", month[tm->tm_mon], tm->tm_mday, tm->tm_year + 1900);
+  } else if((strcmp(fmt, "YMD") == 0) || (strcmp(fmt, "ymd") == 0)) {
+    sprintf(output, "%4d %s %2d", tm->tm_year + 1900, month[tm->tm_mon], tm->tm_mday);
+  } else if((strcmp(fmt, "Y-M-D") == 0) || (strcmp(fmt, "y-m-d") == 0)) {
+    sprintf(output, "%4d-%02d-%02d", tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday);
+  } else {
+    sprintf(output, "%2d %s %4d", tm->tm_mday, month[tm->tm_mon], tm->tm_year + 1900);
+  }
   stack.push(cache.newString(output, true));
 
   n->release(getLexInfo());
