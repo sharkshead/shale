@@ -82,7 +82,7 @@ const char *timeHelp[] = {
   "                                      If {tepoch} is zero then the current time is used",
   "  dateformat time:: {fmt} =         - Format of the output of date time::(). Default is \"DMY\"",
   "                                      with options \"MDY\", \"YMD\" or \"Y-M-D\"",
-  "  language option:: shale:: {l} =   - Change the language output by date time::",
+  "  language option:: shale:: {l} =   - Change the language output by date time::()",
   "                                      where {l} can be \"en\" (the default), \"de\" or \"fr\"",
   "  major version:: time::            - major version number",
   "  minor version:: time::            - minor version number",

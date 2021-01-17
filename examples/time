@@ -31,7 +31,7 @@ time library
 //
 // You can pass a tepoch to the time time::(), date time::()
 // and localtime time::() functions, or you can time the duration
-// of some code by surrounding it with call to now time::() and
+// of some code by surrounding it with calls to now time::() and
 // subtracting the two and you'll have the time in ms.
 
 "Counting ..." println
@@ -56,7 +56,7 @@ now time::() swap - 1000.0 / "Time taken to count to 1 million is %0.3f seconds\
 
 // {tepoch} timems time::()
 //
-// Same as time time::() except is includes the milli seconds
+// Same as time time::() except it includes the milli seconds
 
 0 timems time::() "The current time is %s\n" printf
 
@@ -76,11 +76,11 @@ now time::() swap - 1000.0 / "Time taken to count to 1 million is %0.3f seconds\
 dateformat time:: "MDY" =
 0 date time::() "US-style date: %s\n" printf
 
-// Setting the language option:: shale:: option to one of these strings:
+// Setting the language option:: shale:: variable to one of these strings:
 //
 //  "en"  "de"  "fr"
 //
-// (default is "en") will produce the month in the specified language.
+// (default is "en") will output the month in the specified language.
 
 language option:: shale:: "de" =
 0 date time::() "Das Datum ist der %s\n" printf
