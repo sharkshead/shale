@@ -285,6 +285,11 @@ i 100 < then else if println
 // For the full list of operators, do
 //
 //  shale -s
+//
+// I'd suggest that the next examples you check out are
+//  variables     and
+//  namespaces
+// After that just follow your nose.
 
 
 
