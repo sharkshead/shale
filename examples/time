@@ -73,8 +73,10 @@ now time::() swap - 1000.0 / "Time taken to count to 1 million is %0.3f seconds\
 //  YMD        2021 Jan 17
 //  Y-M-D      2021-01-17
 
+0 date time::() "Default date format: %s\n" printf
 dateformat time:: "MDY" =
 0 date time::() "US-style date: %s\n" printf
+dateformat time:: "DMY" =
 
 // Setting the language option:: shale:: variable to one of these strings:
 //
@@ -84,6 +86,7 @@ dateformat time:: "MDY" =
 
 language option:: shale:: "de" =
 0 date time::() "Das Datum ist der %s\n" printf
+language option:: shale:: "en" =
 
 
 
