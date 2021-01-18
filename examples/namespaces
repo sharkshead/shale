@@ -19,8 +19,8 @@
 // squint your eyes. shale doesn't have structs or classes, but you can
 // use namespaces to achieve something resembling them.
 //
-// The namespace operator is :: and it takes an index and a name from
-// the stack
+// The namespace operator is :: and it takes two names from the stack.
+// For example
 //
 //  i ns::
 //
@@ -53,7 +53,10 @@ j-> 3.141 =
 i ns:: println        // 3.141
 
 // Anything you can do with a simple variable you can do with a namespace variable.
-//
+
+
+
+
 // Namespaces can be nested
 
 i a:: b:: var
@@ -61,7 +64,10 @@ i a:: b:: var
 // is i in namespace a, which in turn is in namespace b. Effectively b::a::i.
 // You can nest them as deep as you want, subject to variable name length limitations,
 // and again you can use this like a simple variable.
-//
+
+
+
+
 // The index and namespace name don't have to be names, they can be numbers
 // or strings.
 
@@ -89,9 +95,12 @@ i.value j.value:: a:: println
 // will print the value of a[j][i], 987.
 //
 // There is an example of using multi-dimensional arrays in the sudoku-solver.
-//
+
+
+
+
 // Taking it further, the index and namespace name can be strings
-// or floating point numbers, as well. Floating point numbers may
+// or floating point numbers. Floating point numbers may
 // not be that useful, but strings are ueful when your index or name
 // is not an integer, like a code composed of alphanumeric charaters.
 //
