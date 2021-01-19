@@ -54,7 +54,7 @@
 
 // The scope of a simple variable.
 
-// A simple variable created in a code fragment is accessible to this code fragment
+// A simple variable created in a code fragment is accessible to the code fragment
 // and any fragments that are subsequently executed by this fragment - the fragment's
 // execution path, as it were. When the code fragment exits the variable is removed.
 //
@@ -67,7 +67,7 @@
 //
 // Here's how this plays out.
 //
-// The easiest thing to see is some nested fragments.
+// The easiest thing tis o see some nested fragments.
 
 i var
 i 123 =

@@ -107,6 +107,7 @@ i.value j.value:: a:: println
 // shale also uses the shale:: namespace to store a couple of things you may find useful
 
 file arg:: shale:: "script name '%s'\n" printf
+language option:: shale:: "The language is currently set to \"%s\"\n" printf
 micro version:: shale:: minor version:: shale:: major version:: shale:: "shale version %d.%d.%d\n" printf
 
 // And finally, when you're developing a script that uses namespaces, it is handy to

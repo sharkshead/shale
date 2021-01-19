@@ -1,6 +1,6 @@
 #!/usr/local/bin/shale
 
-// shale can compile on most Linux systems, AFAIK, but not all Linux
+// shale can compile on Linux and Mac OS X systems, but not all
 // systems are the same, specifically around the size of an int.
 // As long as the platform you're compiling on has support for 64-bit ints,
 // that's what shale will use, otherwise it falls back to a plain int.
