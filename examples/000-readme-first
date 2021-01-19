@@ -192,7 +192,7 @@ i j != {
 i 0 =                   // initialise the loop counter.
 { i 10 < } {            // boolean fragment and opening the body fragment
   i "i = %d\n" printf   // do something interesting
-  i i 1 + =             // increment the loop counter
+  i++
 } while
 
 // You can also use the "break" operator within the body fragment to terminate
@@ -205,7 +205,7 @@ i 0 =
     break               // terminates the enclosing while loop.
   } ifthen
   i "i = %d\n" printf
-  i i 1 + =
+  i++
 } while
 
 

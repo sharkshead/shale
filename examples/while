@@ -30,7 +30,7 @@ n 0 <= {
 //  res = 0;
 //  while(i <= n) {
 //    res = res + i;
-//    i = i + 1;
+//    i++;
 //  }
 //  printf("%d\n", res);
 
@@ -50,8 +50,8 @@ res 0 =
 // The loop condition, and ...
 { i n <= } {
   // .. the body of the loop.
-  res res i + =     // res = res + i;
-  i i 1 + =         // i = i + 1;
+  res res i + =     // res = res + 1;
+  i++               // i++;
 } while
 
 res "%d\n" printf
@@ -59,7 +59,7 @@ res "%d\n" printf
 // One or both of the condition and body can also be variables
 // whose value is a code fragment.
 
-i 0 =
+i 1 =
 res 0 =
 condition var
 condition {
@@ -68,7 +68,7 @@ condition {
 body var
 body {
   res res i + =
-  i i 1 + =
+  i++
 } =
 condition body while
 res "%d\n" printf

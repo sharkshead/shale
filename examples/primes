@@ -61,7 +61,7 @@ i var
 i 0 =
 { i 10 < } {
   i.value prime:: " %d" printf
-  i i 1 + =
+  i++
 } while
 "" println
 
@@ -72,7 +72,7 @@ sum 0 =
 i 0 =
 { i count prime:: < } {
   sum sum i.value prime:: + =
-  i i 1 + =
+  i++
 } while
 sum last prime:: "Sum of all the primes up to %d is %d\n" printf
 

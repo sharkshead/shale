@@ -43,12 +43,6 @@ s initialised {
   whichSudoku 1 =
 } if
 
-// Increment a variable. Expects a variable name on the stack.
-increment var
-increment {
-  dup 1 + =
-} =
-
 // Prints the sudoku grid.
 printGrid var
 printGrid {
@@ -85,10 +79,10 @@ printGrid {
       doColour {
         0x1b "%c[0m" printf
       } ifthen
-      c increment()
+      c++
     } while
     "" println
-    r increment()
+    r++
   } while
 } =
 
@@ -143,7 +137,7 @@ setRow {
       r.value i.value:: ns->:: var
     } ifthen
     r.value i.value:: ns->:: i.value$ =       // assign the value to the grid cell
-    i increment()
+    i++
   } while
 } =
 
@@ -163,9 +157,9 @@ standardRegions {
       r0 i + c0 j +:: grid:: n == {
         false return
       } ifthen
-      j increment()
+      j++
     } while
-    i increment()
+    i++
   } while
 } =
 
@@ -183,7 +177,7 @@ irregularRegions {
     i.value r:: region.value:: region:: value i.value c:: region.value:: region:: value:: grid:: n == {
       false return
     } ifthen
-    i increment()
+    i++
   } while
 } =
 
@@ -209,17 +203,17 @@ optimiseRegions {
             i.value c:: region.value:: region:: var
             i.value r:: region.value:: region:: r =
             i.value c:: region.value:: region:: c =
-            i increment()
+            i++
           } ifthen
-          c increment()
+          c++
         } while
-        r increment()
+        r++
       } while
       i 9 != {
         i region "Region %d contains the wrong number of cells (%d)\n" printf
         1 exit
       } ifthen
-      region increment()
+      region++
     } while
   } ifthen
 } =
@@ -239,7 +233,7 @@ possible { function
     r.value i.value:: grid:: n == {
       false return
     } ifthen
-    i increment()
+    i++
   } while
 
   // Check the row doesn't already contain this value.
@@ -248,7 +242,7 @@ possible { function
     i.value c.value:: grid:: n == {
       false return
     } ifthen
-    i increment()
+    i++
   } while
 
   // Check that the region doesn't already contain this value.
@@ -368,13 +362,13 @@ solve { function
             solve()
             r.value c.value:: grid:: 0 =
           } ifthen
-          n increment()
+          n++
         } while
         return
       } ifthen
-      c increment()
+      c++
     } while
-    r increment()
+    r++
   } while
 
   "" println
