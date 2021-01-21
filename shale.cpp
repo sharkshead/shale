@@ -898,23 +898,23 @@ void setupShaleNamespace(const char *arg0) {
   Variable *v;
 
   v = new Variable("/file/arg/shale");
-  v->setObject(new String(arg0));
+  v->setObject(cache.newString(arg0, false));
   btree.addVariable(v);
 
   v = new Variable("/major/version/shale");
-  v->setObject(new Number(MAJOR));
+  v->setObject(cache.newNumber(MAJOR));
   btree.addVariable(v);
 
   v = new Variable("/minor/version/shale");
-  v->setObject(new Number(MINOR));
+  v->setObject(cache.newNumber(MINOR));
   btree.addVariable(v);
 
   v = new Variable("/micro/version/shale");
-  v->setObject(new Number(MICRO));
+  v->setObject(cache.newNumber(MICRO));
   btree.addVariable(v);
 
   v = new Variable("/language/option/shale");
-  v->setObject(new String("en", false));
+  v->setObject(cache.newString("en", false));
   btree.addVariable(v);
 }
 

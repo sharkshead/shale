@@ -109,27 +109,27 @@ extern "C" void slmain() {
   btree.addVariable(v);
 
   v = new Variable("/major/version/file");
-  v->setObject(new Number(MAJOR));
+  v->setObject(cache.newNumber(MAJOR));
   btree.addVariable(v);
 
   v = new Variable("/minor/version/file");
-  v->setObject(new Number(MINOR));
+  v->setObject(cache.newNumber(MINOR));
   btree.addVariable(v);
 
   v = new Variable("/micro/version/file");
-  v->setObject(new Number(MICRO));
+  v->setObject(cache.newNumber(MICRO));
   btree.addVariable(v);
 
   v = new Variable("/stdin/file");
-  v->setObject(new Number((INT) 0));
+  v->setObject(cache.newNumber((INT) 0));
   btree.addVariable(v);
 
   v = new Variable("/stdout/file");
-  v->setObject(new Number((INT) 1));
+  v->setObject(cache.newNumber((INT) 1));
   btree.addVariable(v);
 
   v = new Variable("/stderr/file");
-  v->setObject(new Number((INT) 2));
+  v->setObject(cache.newNumber((INT) 2));
   btree.addVariable(v);
 
   ol = new OperationList;

@@ -84,23 +84,23 @@ extern "C" void slmain() {
   btree.addVariable(v);
 
   v = new Variable("/major/version/maths");
-  v->setObject(new Number(MAJOR));
+  v->setObject(cache.newNumber(MAJOR));
   btree.addVariable(v);
 
   v = new Variable("/minor/version/maths");
-  v->setObject(new Number(MINOR));
+  v->setObject(cache.newNumber(MINOR));
   btree.addVariable(v);
 
   v = new Variable("/micro/version/maths");
-  v->setObject(new Number(MICRO));
+  v->setObject(cache.newNumber(MICRO));
   btree.addVariable(v);
 
   v = new Variable("/e/maths");
-  v->setObject(new Number(2.718281828459045));
+  v->setObject(cache.newNumber(2.718281828459045));
   btree.addVariable(v);
 
   v = new Variable("/pi/maths");
-  v->setObject(new Number(3.141592653589793));
+  v->setObject(cache.newNumber(3.141592653589793));
   btree.addVariable(v);
 
   ol = new OperationList;

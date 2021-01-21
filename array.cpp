@@ -94,15 +94,15 @@ extern "C" void slmain() {
   btree.addVariable(v);
 
   v = new Variable("/major/version/array");
-  v->setObject(new Number(MAJOR));
+  v->setObject(cache.newNumber(MAJOR));
   btree.addVariable(v);
 
   v = new Variable("/minor/version/array");
-  v->setObject(new Number(MINOR));
+  v->setObject(cache.newNumber(MINOR));
   btree.addVariable(v);
 
   v = new Variable("/micro/version/array");
-  v->setObject(new Number(MICRO));
+  v->setObject(cache.newNumber(MICRO));
   btree.addVariable(v);
 
   // create array::
