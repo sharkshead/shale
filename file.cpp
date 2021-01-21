@@ -28,7 +28,7 @@ SOFTWARE.
 
 #define MAJOR   (INT) 1
 #define MINOR   (INT) 0
-#define MICRO   (INT) 1
+#define MICRO   (INT) 2
 
 class FileHelp : public Operation {
   public:
