@@ -25,6 +25,8 @@ stack
 i ns:: var
 i ns:: 123 =
 j ns:: var
+5 8:: a:: var
+5 8:: a:: 987 =
 btree
 
 // All namespace variables are stored in a BTree (as opposed
