@@ -65,9 +65,7 @@
 // A variable defined in a code fragment will hide a
 // variable of the same name created in an enclosing fragment.
 //
-// Here's how this plays out.
-//
-// The easiest thing tis o see some nested fragments.
+// Here's how this plays out with some nested fragments.
 
 i var
 i 123 =
@@ -89,8 +87,7 @@ i 100 > {
 i println         // 123, because all the code fragments have exited,
                   // and so all their i's have been removed.
 
-// Here's now scoping plays out with some simple functions.
-// This will work exactly the same with proper functions.
+// Here's now scoping plays out with functions.
 
 printi var
 printi {
