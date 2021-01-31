@@ -130,3 +130,6 @@ a printArray()
 // Access to array elements is pretty quick because all the entries are stored
 // in namespaces, which shale stores in a BTree. Creating a 1,000,000 entry
 // fully populated array might take a few seconds, but accessing entries is lightning fast.
+
+"" println
+micro version:: array:: minor version:: array:: major version:: array:: "Array library version %d.%d.%d\n" printf

@@ -252,8 +252,13 @@ i 0 =
 } while
 now time::() swap - 1000.9 / "Array primality check of 10,000 numbers took %0.3f seconds\n" printf
 
+// And to round things out, the primes version number.
+
+"" println
+micro version:: primes:: minor version:: primes:: major version:: primes:: "Primes library version %d.%d.%d\n" printf
 
 
-// Final comment.
+
+// Closing comment.
 //
 // Always use the sieve layout unless you are making heavy use of non-sequential access.
