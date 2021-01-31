@@ -1,5 +1,9 @@
 shale:
 
+  1.2.7 - not yet released
+    - Use "Error" rather than "Internal error" for exceptions raised
+      where no lexical information is available.
+
   1.2.6 - 21 Jan 2021
     - use the cache to allocate some static numbers (version nubmers)
       and strings at startup.
@@ -17,7 +21,11 @@ shale:
 
 primes library:
 
-  1.0.0 = 10 Jan 2021
+  1.1.0 - 31 Jan 2021
+    - Initial release of a sieve layout type.
+    - shale version 1.2.6
+
+  1.0.0 - 10 Jan 2021
     - initial release.
     - shale version 1.2.2
 

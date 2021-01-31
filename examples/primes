@@ -8,11 +8,37 @@ primes library
 
 
 
-// The primes library provides two functions:
+// The primes library provides these functions:
 //
+//  type primes::()       set the memory layout for storing primes
 //  generate primes::()   generates primes
-//  map primes::()        creates an inverse map of primes
+//  get primes::()        fetch a prime at a given index
+//  isprime primes::()    primality check
+//  map primes::()        deprecated - use isprime primes::() instead
 //
+
+
+
+// Setting the layout (type)
+//
+// There are two possible layouts for storing the primes
+// you generate - array and sieve. The array layout stores each
+// prime in a separate namespace variable and the sieve layout
+// stores the primality of each odd prime as a bit, 1 for prime
+// and 0 for not prime, with 64 bits being stored in each namespace
+// variable. The pros and cons of each layout is discussed below.
+//
+// To use the sieve layout you must call type primes::()
+// before calling generate primes::().
+//
+// type primes::() takes two arguments on the stack
+//    sieve   or   array
+//    namespace where you will generate the primes
+
+primesInASieve sieve type primes::()
+
+// The default if you do not set the type before calling generate primes::()
+// is array. This is purely for backwards compatibility.
 
 
 
@@ -22,7 +48,7 @@ primes library
 // This takes three arguments on the stack
 //    highest prime to generate
 //    number of primes to generate
-//    namespace to place the primes
+//    namespace to store the primes
 //
 // The highest prime or the number of primes may be given as zero,
 // meaning there is no limit. When both are non-zero the first
@@ -31,36 +57,47 @@ primes library
 //
 // For example,
 
-1000 0 prime generate primes::()
+1000 0 primesInAnArray generate primes::()
 
-// has generate all primes that are less than 1000.
+// has generated all primes that are less than 1000.
 //
-// If, on the other hand, this
+// For an array memory layout you can also use the count
+// argument to generate an exact number of primes, eg
 
-0 1000 prime generate primes::()
+0 1000 primesInAnArray generate primes::()
 
 // will generate the first 1000 primes.
 
-// The third argument you push on the stack, "prime" in this example,
-// is a namespace where the primes and two variables are stored.
-//
-// The variables are the last prime generated (the highest value)
-// and the number of primes generated.
+// You cannot use the count argument with a sieve layout.
 
-last prime:: "Last prime generated is %d\n" printf
-count prime:: "%d primes generated\n" printf
-
-// The primes are accessed by indexing the namespace with
-// an integer, starting from 0 and going up to one less
-// that the count.
+// The third argument you push on the stack, "primesInAnArray"
+// in this example, is a namespace where the primes and three variables
+// are stored.
 //
+// The variables are the last prime generated (the highest value),
+// the number of primes generated and the memory layout.
+
+last primesInAnArray:: "Last prime generated is %d\n" printf
+count primesInAnArray:: "%d primes generated\n" printf
+type primesInAnArray:: "primesInAnArray memory layout: %s\n" printf
+type primesInASieve:: "primesInASieve memory layout: %s\n" printf
+
+
+
+// Accessing the primes.
+//
+// You use
+//
+//    {index} {ns} get primes::()
+//
+// to access the index-th prime in the ns namespace.
 // Here's the first 10 primes printed out
 
 "First 10 primes:" printf
 i var
 i 0 =
 { i 10 < } {
-  i.value prime:: " %d" printf
+  i primesInAnArray get primes::() " %d" printf
   i++
 } while
 "" println
@@ -70,55 +107,153 @@ i 0 =
 sum var
 sum 0 =
 i 0 =
-{ i count prime:: < } {
-  sum sum i.value prime:: + =
+{ i count primesInAnArray:: < } {
+  sum sum i primesInAnArray get primes::() + =
   i++
 } while
-sum last prime:: "Sum of all the primes up to %d is %d\n" printf
+sum last primesInAnArray:: "Sum of all the primes up to %d is %d\n" printf
 
 
 
 
 // Primality check
 //
-// To check if a number is prime the map primes::() funciton may be of help.
-// This function takes one argument being the namespace where the generated
-// primes are stored, and produces an inverse map that can be used to check if
-// a number (less than or equal to the current highest generated prime) is prime.
+// To check the primality of a number use
 //
-// For example:
-
-prime map primes::()
+//    {n} {ns} isprime primes::()
+//
 
 i 801 =
-i.value map:: prime:: initialised {
+i primesInAnArray isprime primes::() {
   i "%d is prime\n" printf
 } {
   i "%d is not prime\n" printf
 } if
 
-// When the number is prime the value of the map is the
-// index of this prime in the {ns} namespace
-
-i 811 =
-i.value map:: prime:: initialised {
-  i.value map:: prime:: i "%d is prime and is index %d in the prime:: namespace\n" printf
-} {
-  i "%d is not prime\n" printf
-} if
-
 // If the value you'd like to check is greater than the current highest prime,
-// you could generate more primes, regenerate the map, then do the test:
+// generate more primes.
 
 i 8009 =
-i last prime:: > {
+i last primesInAnArray:: > {
   "Generating more primes" println
-  i 0 prime generate primes::()
-  "Rebuilding the reverse map" println
-  prime map primes::()
+  i 0 primesInAnArray generate primes::()
 } ifthen
-i.value map:: prime:: initialised {
-  i.value map:: prime:: i "%d is prime and is index %d in the prime:: namespace\n" printf
+i primesInAnArray isprime primes::() {
+  i "%d is prime\n" printf
 } {
   i "%d is not prime\n" printf
 } if
+
+
+
+// The good and the bad of each layout type.
+//
+// First, the bad:
+//
+//  array
+//    - slow to generate primes
+//    - uses large amounts of memory
+//  sieve
+//    - slow for anything other than sequential, non-decreasing
+//      access via get primes::()
+//
+// We'll use the time library to measure the time it takes
+// to perform some operations.
+
+time library
+
+// Here is a snapshot of the memory usage before web begin. The numbers to watch
+// are the BTree numbers.
+
+"" println
+"Snapshot before generation tests." println
+debug
+
+// Generating primes. We'll time the generation of all primes below 1,000,000
+// in both layout types. Please bear in mind that primesInAnArray already
+// has 1,000 primes generated.
+
+"" println
+now time::()
+1000000 0 primesInASieve generate primes::()
+now time::() swap - 1000.0 / "Generating primes below 1m in a sieve layout took %0.3f seconds\n" printf
+debug
+
+"" println
+now time::()
+1000000 0 primesInAnArray generate primes::()
+now time::() swap - 1000.0 / "Generating primes below 1m in an array layout took %0.3f seconds\n" printf
+debug
+
+// Sequential access of both types is pretty fast. Here's a loop that compares each prime
+// from both lists
+
+"" println
+now time::()
+i 0 =
+{ i count primesInAnArray:: < } {
+  i primesInAnArray get primes::() i primesInASieve get primes::() != {
+    i "Prime at %d failed - this is not good\n" printf
+    break
+  } ifthen
+  i++
+} while
+now time::() swap - 1000.0 / "Sequential check of each prime in both lists took %0.3f seconds\n" printf
+
+// Here's what happens when you don't access a sieve sequentially. Here we calculate the sum
+// of the last 1000 primes, but do it backwards. Both lists.
+
+"" println
+now time::()
+sum 0 =
+i count primesInASieve:: =
+end var
+end i 1000 - =
+{ i end > } {
+  i--
+  sum sum i primesInASieve get primes::() + =
+} while
+now time::() swap - 1000.0 / sum "Backwards sieve sum of the last 1,000 primes is %d and took %0.3f seconds\n" printf
+
+now time::()
+sum 0 =
+i count primesInAnArray:: =
+end i 1000 - =
+{ i end > } {
+  i--
+  sum sum i primesInAnArray get primes::() + =
+} while
+now time::() swap - 1000.0 / sum "Backwards array sum of the last 1,000 primes is %d and took %0.3f seconds\n" printf
+
+// And finally we time the primality function. We'll check 10000 "random" numbers using both layouts. Won't do
+// anything with the result other than pop it from the stack. The sieve layout is super fast as it is
+// a direct lookup of a single namespace variable, whereas the array layout can suffer some time penalty as it uses
+// a binary chop algorithm and so may access many namespace variables.
+
+"" println
+now time::()
+j var
+j 1233 =
+i 0 =
+{ i 10000 < } {
+  i primesInASieve isprime primes::() pop
+  j j 6 + =
+  i++
+} while
+now time::() swap - 1000.9 / "Sieve primality check of 10,000 numbers took %0.3f seconds\n" printf
+
+now time::()
+j 1233 =
+i 0 =
+{ i 10000 < } {
+  i primesInAnArray isprime primes::() pop
+  j j 6 + =
+  i++
+} while
+now time::() swap - 1000.9 / "Array primality check of 10,000 numbers took %0.3f seconds\n" printf
+
+
+
+// Final comment.
+//
+// Always use the sieve layout unless you are making heavy use of non-sequential access.
