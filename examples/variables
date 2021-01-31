@@ -87,7 +87,7 @@ i 100 > {
 i println         // 123, because all the code fragments have exited,
                   // and so all their i's have been removed.
 
-// Here's now scoping plays out with functions.
+// Here's how scoping plays out with functions.
 
 printi var
 printi {
