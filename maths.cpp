@@ -28,11 +28,12 @@ SOFTWARE.
 
 #define MAJOR   (INT) 1
 #define MINOR   (INT) 0
-#define MICRO   (INT) 1
+#define MICRO   (INT) 2
 
 #define FUNCTION_LN      0
 #define FUNCTION_LOG     1
 #define FUNCTION_SQRT    3
+#define FUNCTION_GCD     4
 
 class MathsHelp : public Operation {
   public:
@@ -63,6 +64,7 @@ const char *mathsHelp[] = {
   "  {n} log maths::()        - log base 10",
   "  {n} sqrt maths::()       - square root",
   "  {a} {b} power maths::()  - a to the power b",
+  "  {a} {b} gcd maths::()    - greatest common divisor of a and b",
   "  major version:: maths::  - major version number",
   "  minor version:: maths::  - minor version number",
   "  micro version:: maths::  - micro version number",
@@ -122,6 +124,12 @@ extern "C" void slmain() {
   btree.addVariable(v);
 
   ol = new OperationList;
+  ol->addOperation(new MathsFunction(FUNCTION_GCD, (LexInfo *) 0));
+  v = new Variable("/gcd/maths");
+  v->setObject(new Code(ol));
+  btree.addVariable(v);
+
+  ol = new OperationList;
   ol->addOperation(new MathsToThePower((LexInfo *) 0));
   v = new Variable("/power/maths");
   v->setObject(new Code(ol));
@@ -144,28 +152,53 @@ MathsFunction::MathsFunction(int f, LexInfo *li) : Operation(li), function(f) { 
 
 OperatorReturn MathsFunction::action() {
   Object *o;
+  Object *o2;
   Number *n;
+  Number *n2;
   Number *res;
-  double val;
+  INT a;
+  INT b;
+  INT t;
 
   o = stack.pop(getLexInfo());
   n = o->getNumber(getLexInfo());
 
   switch(function) {
     case FUNCTION_LN:
-      val = log(n->getDouble());
+      stack.push(cache.newNumber(log(n->getDouble())));
       break;
 
     case FUNCTION_LOG:
-      val = log10(n->getDouble());
+      stack.push(cache.newNumber(log10(n->getDouble())));
       break;
 
     case FUNCTION_SQRT:
-      val = sqrt(n->getDouble());
+      stack.push(cache.newNumber(sqrt(n->getDouble())));
+      break;
+
+    case FUNCTION_GCD:
+      o2 = stack.pop(getLexInfo());
+      n2 = o2->getNumber(getLexInfo());
+      a = n->getInt();
+      b = n2->getInt();
+
+      if(a < b) {
+        t = a;
+        a = b;
+        b = t;
+      }
+      while(b != 0) {
+        t = b;
+        b = a % b;
+        a = t;
+      }
+      stack.push(cache.newNumber(a));
+
+      n2->release(getLexInfo());
+      o2->release(getLexInfo());
       break;
 
   }
-  stack.push(cache.newNumber(val));
 
   n->release(getLexInfo());
   o->release(getLexInfo());
