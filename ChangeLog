@@ -21,6 +21,10 @@ shale:
 
 primes library:
 
+  1.1.1 - 17 Feb 2021
+    - fix loop termination condition on sieve type generate
+    - shale version 1.2.6
+
   1.1.0 - 31 Jan 2021
     - Initial release of a sieve layout type.
     - shale version 1.2.6

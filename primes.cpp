@@ -28,7 +28,7 @@ SOFTWARE.
 
 #define MAJOR   (INT) 1
 #define MINOR   (INT) 1
-#define MICRO   (INT) 0
+#define MICRO   (INT) 1
 
 class PrimesHelp : public Operation {
   public:
@@ -353,10 +353,11 @@ OperatorReturn PrimesGenerate::action() {
       // the sieve process from scratch, if does not try to pick up from where it was last time.
 
       if(numberReq > (INT) 0) slexception.chuck("Can't specify a count on a sieve primes type", getLexInfo());
+      count = (INT) 1;
       if(lastReq > (INT) 2) {
         sprintf(fmt, "/%%%sd/%s", PCTD, name);
         candidate = 3;
-        while(candidate < (lastReq / 2)) {
+        while(candidate <= (lastReq / 2)) {
           index = (candidate - 3) / 128;
           bit = (INT) 1 << (((candidate - 3) / 2) % 64);
           sprintf(buf, fmt, index);
@@ -395,9 +396,8 @@ OperatorReturn PrimesGenerate::action() {
 
         // Now count the number of primes generated.
         // fixme - this is hopeleessly inefficient. Should be counting bits using a loop around x & (x - 1).
-        count = (INT) 1;
         lastIndex = (INT) -1;
-        for(candidate = 3; candidate < lastReq; candidate += 2) {
+        for(candidate = 3; candidate <= lastReq; candidate += 2) {
           index = (candidate - 3) / 128;
           bit = (INT) 1 << (((candidate - 3) / 2) % 64);
           if(index != lastIndex) {
