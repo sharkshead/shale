@@ -214,7 +214,7 @@ i 0 =
 //
 // This is the last feature I'll be discussing here. To create a
 // function, first create a variable, then assign a code fragment
-// to it.
+// to it. Function are discussed in more detail in the "functions" example.
 
 f var
 f {
@@ -227,44 +227,7 @@ f {
 f execute   // one form of the execute operator
 f()         // another, more familiar, form
 
-// This isn't really a function in the C sense of the word, but rather a code fragment
-// assigned to a variable. For many applications this kind of "function" will do fine.
-//
-// However, there is a shortcoming to this kind of "function" - there is no
-// return statement. This limitation may be fine for smaller functions, but in the
-// end you'll need, or want, a return statement, so here it is:
-//
-// The "function" operator. This is a no-op in that is does nothing to any variable
-// or the stack. What it does do is tag the code fragment in such a way so that the
-// "return" operator will exit the "function" code fragment.
 
-pf var
-pf { function       // tag this code fragment as a function
-  i 100 < {
-    "i is less than 100, and returning" println
-    -1
-    return          // exit the enclosing tagged fragment
-  } {
-    i > 200 {
-      "i is greater than 200, and returning" println
-      -2
-      return        // exit the enclosing tagged fragment
-    } {
-      "i is within bounds" println
-    } if
-  } if
-
-  0
-} =
-
-pf() "pf() returned %d\n" printf
-
-// A code fragment can be tagged as being a "function", and any return operator
-// within this code fragment or any fragments executed by this code fragment
-// will exit the function. Kind of like a break exits an enclosing while loop,
-// a return will exit an enclosing "function" code fragment.
-//
-// There's more info on this in the "functions" example file.
 
 // And as a final note to the if, ifthen, while and = operators, they can also take a
 // variable which has been assigned to a code fragment. For example:
