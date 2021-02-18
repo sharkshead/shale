@@ -763,7 +763,7 @@ OperatorReturn PrimesPhi::action() {
       while(true) {
         if(i == 63) {
           sieveIndex++;
-          sprintf(buf, fmt, (INT) 0);
+          sprintf(buf, fmt, sieveIndex);
           v = btree.findVariable(buf);
           if(v == (Variable *) 0) slexception.chuck("Can't find next prime.", getLexInfo());
           n = v->getObject()->getNumber(getLexInfo());
@@ -776,7 +776,7 @@ OperatorReturn PrimesPhi::action() {
           i++;
         }
         if(word & bit) {
-          p = ((sieveIndex * 64) + i) * 2 + 3;
+          p = (sieveIndex * 64 + i) * 2 + 3;
           break;
         }
       }
