@@ -21,6 +21,10 @@ shale:
 
 primes library:
 
+  1.2.0 - 18 Feb 2021
+    - add Euler's totient functon: phi primes()
+    - shale version 1.2.6
+
   1.1.1 - 17 Feb 2021
     - fix loop termination condition on sieve type generate
     - shale version 1.2.6

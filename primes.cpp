@@ -27,8 +27,8 @@ SOFTWARE.
 #include "shalelib.h"
 
 #define MAJOR   (INT) 1
-#define MINOR   (INT) 1
-#define MICRO   (INT) 1
+#define MINOR   (INT) 2
+#define MICRO   (INT) 0
 
 class PrimesHelp : public Operation {
   public:
@@ -60,6 +60,12 @@ class PrimesIsPrime : public Operation {
     OperatorReturn action();
 };
 
+class PrimesPhi : public Operation {
+  public:
+    PrimesPhi(LexInfo *);
+    OperatorReturn action();
+};
+
 class PrimesMap : public Operation {
   public:
     PrimesMap(LexInfo *);
@@ -86,6 +92,8 @@ const char *primesHelp[] = {
   "                                            is optimised for sequential (non-decreasing) access.",
   "  {n} {ns} isprime primes::()             - Returns true on the stack if the given number n is",
   "                                            a prime as listed in the {ns}:: namespace, false otherwise.",
+  "  {n} {ns} phi primes::()                 - Returns phi(n), where phi is Euler's totient function.",
+  "                                            Uses the primes stored in {ns} to determine the result.",
   "  {ns} map primes::()                     - Generate a reverse map of the currently generated",
   "                                            primes in the map:: {ns}:: namespace. Indexed by",
   "                                            an integer, eg i.value map:: {ns}:: is initialised",
@@ -146,6 +154,12 @@ extern "C" void slmain() {
   ol = new OperationList;
   ol->addOperation(new PrimesIsPrime((LexInfo *) 0));
   v = new Variable("/isprime/primes");
+  v->setObject(new Code(ol));
+  btree.addVariable(v);
+
+  ol = new OperationList;
+  ol->addOperation(new PrimesPhi((LexInfo *) 0));
+  v = new Variable("/phi/primes");
   v->setObject(new Code(ol));
   btree.addVariable(v);
 
@@ -616,7 +630,7 @@ OperatorReturn PrimesIsPrime::action() {
     isPrime = false;
     sprintf(buf, "/count/%s", name);
     v = btree.findVariable(buf);
-    if(v == (Variable *) 0) slexception.chuck("This doesn't look like a primes array", getLexInfo());
+    if(v == (Variable *) 0) slexception.chuck("This doesn't look like a primes:: array", getLexInfo());
     num = v->getObject()->getNumber(getLexInfo());
     count = num->getInt();
     num->release(getLexInfo());
@@ -660,6 +674,124 @@ OperatorReturn PrimesIsPrime::action() {
   return or_continue;
 }
 
+PrimesPhi::PrimesPhi(LexInfo *li) : Operation(li) { }
+
+OperatorReturn PrimesPhi::action() {
+  Object *nso;
+  Object *no;
+  Name *ns;
+  Number *n;
+  Variable *v;
+  char *name;
+  char buf[1024];
+  char fmt[64];
+  bool isArrayType;
+  String *layout;
+  INT num;
+  INT m;
+  INT lastPrime;
+  INT sr;
+  INT p;
+  INT count;
+  INT index;
+  INT sieveIndex;
+  INT word;
+  INT bit;
+  INT i;
+  INT ret;
+
+  nso = stack.pop(getLexInfo());
+  no = stack.pop(getLexInfo());
+  ns = nso->getName(getLexInfo());
+
+  name = ns->getValue();
+  n = no->getNumber(getLexInfo());
+  num = n->getInt();
+  n->release(getLexInfo());
+
+  sprintf(fmt, "/%%%sd/%s", PCTD, name);
+
+  sprintf(buf, "/type/%s", name);
+  v = btree.findVariable(buf);
+  if(v == (Variable *) 0) {
+    isArrayType = true;
+  } else {
+    layout = v->getObject()->getString(getLexInfo());
+    isArrayType = (strcmp(layout->getValue(), "array") == 0);
+    layout->release(getLexInfo());
+  }
+
+  sprintf(buf, "/last/%s", name);
+  v = btree.findVariable(buf);
+  if(v == (Variable *) 0) slexception.chuck("This does not appear to be a primes:: array", getLexInfo());
+  n = v->getObject()->getNumber(getLexInfo());
+  lastPrime = n->getInt();
+  n->release(getLexInfo());
+
+  sr = sqrt(num);
+  if(sr > lastPrime) slexception.chuck("Not enough primes generated.", getLexInfo());
+
+  ret = 1;
+  p = 2;
+  m = num;
+
+  if(isArrayType) {
+    index = 0;
+  } else {
+    sieveIndex = -1;
+    i = 63;
+  }
+
+  while(p <= sr) {
+    count = 0;
+    while((m % p) == 0) {
+      m /= p;
+      count++;
+      if(count > 1) ret *= p;
+    }
+    if(count > 0) ret *= p - 1;
+
+    if(isArrayType) {
+      index++;
+      sprintf(buf, fmt, index);
+      v = btree.findVariable(buf);
+      if(v == (Variable *) 0) slexception.chuck("Can't find next prime.", getLexInfo());
+      n = v->getObject()->getNumber(getLexInfo());
+      p = n->getInt();
+      n->release(getLexInfo());
+    } else {
+      while(true) {
+        if(i == 63) {
+          sieveIndex++;
+          sprintf(buf, fmt, (INT) 0);
+          v = btree.findVariable(buf);
+          if(v == (Variable *) 0) slexception.chuck("Can't find next prime.", getLexInfo());
+          n = v->getObject()->getNumber(getLexInfo());
+          word = n->getInt();
+          bit = 1;
+          i = 0;
+          n->release(getLexInfo());
+        } else {
+          bit <<= 1;
+          i++;
+        }
+        if(word & bit) {
+          p = ((sieveIndex * 64) + i) * 2 + 3;
+          break;
+        }
+      }
+    }
+  }
+  if(m > 1) ret *= m - 1;
+
+  stack.push(cache.newNumber(ret));
+
+  no->release(getLexInfo());
+  nso->release(getLexInfo());
+
+  return or_continue;
+}
+
 PrimesMap::PrimesMap(LexInfo *li) : Operation(li) { }
 
 OperatorReturn PrimesMap::action() {
@@ -683,7 +815,7 @@ OperatorReturn PrimesMap::action() {
   v = btree.findVariable(buf);
   if(v != (Variable *) 0) {
     type = v->getObject()->getString(getLexInfo());
-    if(strcmp(type->getValue(), "array") != 0) slexception.chuck("map primes::() is only available for array memory type", getLexInfo());
+    if(strcmp(type->getValue(), "array") != 0) slexception.chuck("map primes::() is only available for the array memory layout", getLexInfo());
     type->release(getLexInfo());
   }
 
