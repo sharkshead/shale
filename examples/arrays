@@ -1,104 +1,168 @@
 #!/usr/local/bin/shale
 
-// Arrays in shale are implemented using the namespace operator ::
-// 
-// Namespaces can be used for arrays, both fully populated and sparse,
-// and for something similar to structs and classes.
+// Arrays in shale are created using namespace variables.
+// For a full discussion of namespace variables see the
+// "namespaces" example. To recap, a namespace variable consists
+// of an index and a name, then call the :: operator
 //
-// Check the namespaces example file for how to create your own arrays.
-// The sudoku-solver contains uses multi-dimensional arrays.
+//  i ns::
 //
-// Described here is an example of using the array library to implement
-// fully populated and sparse arrays.
+// which is the variable i in the namespace ns.
 //
-// To recap namespaces, the :: operator takes an index and a name, as in
+// They can be nested, like
 //
-//  {index} {name}::
+//  i a:: b::
 //
-// eg
+// which is i in namespace a, which in turn is in namespace b.
 //
-//  i a::
+// The index and name can also be numbers or strings
 //
-// to refer to the name "i" in the namespace "a". Kind of equivalent to a::i in C++.
+//  0 a::                   <-- equivalent to a[0]
+//  5 8:: a::               <-- a[8][5]
+//  i.value a::             <-- a[i]
+//  j.value i.value:: a::   <-- a[i][j]
 //
-// However, {index} can also be a number, and this is where our array journey starts.
-// This:
+// You create and use namespace variables just like simple variables.
 //
-//  0 a::
+//  i ns:: var
+//  i ns:: 123 =
+//  i ns:: println
+//  hw funcs:: var
+//  hw funcs:: { "Hello, World!" println } =
+//  hw funcs::()
+//  "Joe Bloggs" dob:: var
+//  "Joe Bloggs" dob:: 1980 3 25 "%d/%d/%d" sprintf =
 //
-// is like a[0] in C.
+// Namespace variables are global and are are not tied to
+// any code fragment. When you create a namespace variable it
+// persists until the end of the shale script.
 //
-// And if you have a variable "i" and you want the equivalent of a[i], do
+// You can roll your own arrays or use the helper functions
+// in the array library. First we'll discuss rolling your own.
+
+
+
+// Rolling your own arrays.
+
+// The examples above give you a pretty good start for handling your
+// own arrays. There are a couple of considerations, though.
 //
-//  i.value a::
+// First, you must create your array elements with the var operator
+// before you use the element. If your array has a well known
+// size, like a chess board for example, you could start by creating
+// all the entries
+
+i var
+j var
+i 0 =
+{ i 8 < } {
+  j 0 =
+  {j 8 < } {
+    i.value j.value:: board:: var
+    i.value j.value:: board:: 0 =
+    j++
+  } while
+  i++
+} while
+
+// and then you can happily assign values to, or retrieve values from,
+// any element.
 //
-// The array library provides functions that might make using fully-populated
-// and sparse arrays easier.
+// If, on the other hand, you're dealing with a sparce array where the
+// exact size and index of each element is not known at the time of
+// writing your script, then you need to check whether the element
+// you're about the acccess is actually there. The three operators
+// defined, initialised and initialized help out here.
+//
+// Let's say you're about to add the value of "i" to the element "j"
+// in an array. You need to check that element "j" exists and has an
+// appropriate value before you add "i"
+
+i 100 =
+j 97 =
+j.value a:: defined not {
+  j.value a:: var
+  j.value a:: 0 =
+} ifthen
+j.value a:: j.value a:: i + =
+
+// The above says that if a[j] is not defined then create it and
+// assign it to 0. Then proceed to add i to a[j].
+//
+// Another consideration is to keep track of the count of elements
+// in a list as you're generating and adding new elements to the list.
+// Create a "count" element
+
+count list:: var
+count list:: 0 =
+
+// and then to add a new element to the end of the list
+
+count list:: value list:: var
+count list:: value list:: i =
+count list::++
+
+// To explain this a little, the first line reads as
+//  count list::    <-- the variable
+//  value           <-- get the value of the variable
+//  list::          <-- we now have the variable (not the value) list[count] on the stack
+//  var             <-- create list[count]
+// ditto the next line, although this time we're assigning list[count] = i
+//  count list::++  <-- increment the counter
+//
+// There are any ways if slicing and dicing arrays in shale. What is presented
+// here is just a single example.
+
+
+
+// The array library helper functions.
+//
+// Fist, load the array library
 
 array library
 
-// This loads in the dynamic library "array". Everything this library
-// offers in placed under the array:: namespace. This shows you what it provides
-
-help array::()
-
-// It provides array create, scooch, get and set functions. Create and scooch
-// are to support fully populated arrays, where every index between 0 and
-// maximum - 1 is created, and get and set are geared towards sparse arrays,
-// where you only create the indicies as needed.
+// The array library provides
 //
+//  create array::()
+//  scooch array::()
+//  get array::()
+//  set array::()
+//
+// Create and scooch are to support fully populated arrays, where every index
+// between 0 and maximum - 1 is created, and get and set are geared towards sparse arrays,
+// where you only create the indicies as needed.
+
 // Fully populated arrays.
 //
 // To create a fully populated array with create array::() you push the
 // initial value on the stack, then the count, then the array name
 
-123 10 a create array::()
+123 10 xyz create array::()
 
-// This creates the equivalent of a[0] through a[9], all with the initial value of 123.
+// This creates the equivalent of xyz[0] through xyz[9], all with the initial value of 123.
 //
 // You can then go ahead and use this like an array by refering to, for exmple
 
-5 a:: println
-i var
+5 xyz:: println
 i 5 =
-i.value a:: 987 =
-5 a:: println
+i.value xyz:: 987 =
+5 xyz:: println
 
-// Another function the array library provides is scooch. Is simply moves all the
-// entries along one and assigned a new value to the first element.
+// The scooch function moves all the entries along one and assigned a new value to the first element.
 
-"abc123" a scooch array::()
-3.141 a scooch array::()
+"abc123" xyz scooch array::()
+3.141 xyz scooch array::()
 
-// Now a[0] is 3.141, a[1] is "abc123" and a[7] is 987
+// Now xyz[0] is 3.141, xyz[1] is "abc123" and xyz[7] is 987
 
-0 a:: println
-1 a:: println
-7 a:: println
+0 xyz:: println
+1 xyz:: println
+7 xyz:: println
 
-// If you check the btree output (see debugging) you'll notice an entry "_$" a:: (as "/_$/a")
-// This is the count from when you used create array::(). You can use this
-// as well to iterate through the array, like this print function
-
-printArray var
-printArray {
-  0$ var 0$ swap &=         // the array name
-  1$ var 1$ "_$" 0$->:: =   // array entry count using the array's "_$" entry
-  2$ var 2$ 0 =             // loop variable
-
-  { 2$ 1$ < } {
-    2$.value 0$->:: 0$-> 2$.value "%d %n:: = %p\n" printf
-    2$++
-  } while
-} =
-a printArray()
-
-// Don't worry for now if printArray looks like complete jibberish.
-//
 // Sparse arrays.
 //
-// A sparse array is one where you don't create every entry from 0 through to maximum-1.
-// Indeed, a sparse array doesn't need to use integers as indicies. It can use integers,
+// A sparse array is one where you don't create every entry from 0 through to maximum - 1.
+// Indeed, a sparse array doesn't need to use integers as indicies. It can use also
 // float point numbers and strings.
 //
 // There's no setup required for a sparse array, you just use the set and get functions.
@@ -107,7 +171,8 @@ a printArray()
 "oiar" fq "Only in a rerun" set array::()
 "tgte" fq "These go to eleven" set array::()
 
-// This has created the "hlvb", "oiar" and "tgte" indicies with their given values in fq.
+// This has set the "hlvb", "oiar" and "tgte" indicies in the "fq" sparse array
+// with the given values.
 //
 // Getting an entry from a sparse array is a little more involved than a fully populated array.
 //
@@ -127,9 +192,58 @@ a printArray()
   "ibb does not exist" println
 } if
 
-// Access to array elements is pretty quick because all the entries are stored
-// in namespaces, which shale stores in a BTree. Creating a 1,000,000 entry
-// fully populated array might take a few seconds, but accessing entries is lightning fast.
 
-"" println
+
+// The array library version number.
 micro version:: array:: minor version:: array:: major version:: array:: "Array library version %d.%d.%d\n" printf
+
+
+
+// Closing comment.
+
+// There are a couple of ways the above code can be reduced and sped up.
+// Not necessarily made easier to understand, but reduced and sped up.
+//
+// For example, the code examples given in the namespaces recap above:
+//
+//  i ns:: var
+//  i ns:: 123 =
+//  hw funcs:: var
+//  hw funcs:: { "Hello, World!" println } =
+//  "Joe Bloggs" dob:: var
+//  "Joe Bloggs" dob:: 1980 3 25 "%d/%d/%d" sprintf =
+//
+// can be reduced to
+//
+//  i ns:: dup var 123 =
+//  hw funcs:: dup var { "Hello, World!" println } =
+//  "Joe Bloggs" dob:: dup var 1980 3 25 sprintf =
+//
+// by using the dup operator, which duplicates the top of the stack.
+//
+// And in the chess board example, elements were created like this
+//
+//  i.value j.value:: board:: var
+//  i.value j.value:: board:: 0 =
+//
+// can be reduced to 
+//
+//  i.value j.value:: board:: dup var 0 =
+//
+// And this code
+//
+//  j.value a:: var
+//  j.vaoue a:: 0 =
+//
+// in the example of adding a value to an element, can be simplified to
+//
+//  j.value a:: dup var 0 =
+//
+// Similarly for the case of adding a new element to the end of a list, the lines
+//
+//  count list:: value list:: var
+//  count list:: value list:: i =
+//
+// can be reduced to
+//
+//  count list:: value list:: dup var i =

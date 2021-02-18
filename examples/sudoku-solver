@@ -1,5 +1,7 @@
 #!/usr/local/bin/shale
 
+time library
+
 // This solves a sudoku with:
 //  row/column/3x3box constraints (standard sudoku)
 //  row/column/irregular, or jigsaw, region constraints
@@ -19,6 +21,8 @@
 // You can specify which of the sudokus to solve by specifying s={n} on the command line.
 // If it is not specified then you get a text explaining how to specify an option
 // and what the options are and the default (s=1) option is solved.
+
+startTime dup var now time::() =
 
 whichSudoku var
 
@@ -44,8 +48,7 @@ s initialised {
 } if
 
 // Prints the sudoku grid.
-printGrid var
-printGrid {
+printGrid dup var {
   r var
   c var
   doColour var
@@ -107,8 +110,7 @@ printGrid {
 9 colour:: 31 =
 
 // Assign the cell values to one row of the grid.
-setRow var
-setRow {
+setRow dup var {
   8$ var 8$ swap =    // cell 9 of the row
   7$ var 7$ swap =    // cell 8 of the row
   6$ var 6$ swap =    // ...
@@ -143,8 +145,7 @@ setRow {
 
 // Standard 3x3 box region checker.
 // This only works when called from within possible().
-standardRegions var
-standardRegions {
+standardRegions dup var {
   r0 var
   c0 var
 
@@ -165,8 +166,7 @@ standardRegions {
 
 // Irregular region checker.
 // This only works when called from within possible().
-irregularRegions var
-irregularRegions {
+irregularRegions dup var {
   region var
   i var
 
@@ -183,8 +183,7 @@ irregularRegions {
 
 // Convert the regions:: namespace into something a little more cpu-time friendly.
 // Only optimise if there are irregular regions defined.
-optimiseRegions var
-optimiseRegions {
+optimiseRegions dup var {
   0 0:: regions:: initialised {
     region var
     r var
@@ -199,10 +198,8 @@ optimiseRegions {
         c 0 =
         { c 9 < } {
           r.value c.value:: regions:: region == {
-            i.value r:: region.value:: region:: var
-            i.value c:: region.value:: region:: var
-            i.value r:: region.value:: region:: r =
-            i.value c:: region.value:: region:: c =
+            i.value r:: region.value:: region:: dup var r =
+            i.value c:: region.value:: region:: dup var c =
             i++
           } ifthen
           c++
@@ -219,8 +216,7 @@ optimiseRegions {
 } =
 
 // Is it possible to place a digit in a given cell?
-possible var
-possible { function
+possible dup var { function
   n var n swap =
   c var c swap =
   r var r swap =
@@ -257,8 +253,7 @@ possible { function
 } =
 
 // This is a Knight's move constraint.
-knightsMoveConstraint var
-knightsMoveConstraint { function
+knightsMoveConstraint dup var { function
   0$ var 0$ swap =  // n
   1$ var 1$ swap =  // column
   2$ var 2$ swap =  // row
@@ -344,8 +339,7 @@ regionChecker var
 // to constraint code such as knightsMoveConstraint defined above.
 constraint var
 
-solve var
-solve { function
+solve dup var { function
   r var
   c var
   n var
@@ -373,6 +367,7 @@ solve { function
 
   "" println
   printGrid()
+  now time::() startTime - 1000.0 / "Solution in %0.3f seconds\n" printf
 } =
 
 found var
@@ -535,6 +530,8 @@ found {
   printGrid()
 
   solve()
+
+  now time::() startTime - 1000.0 / "Total runtime was %0.3f seconds\n" printf
 } {
   whichSudoku "Sudoku %d not found\n" printf
 } if
