@@ -14,6 +14,7 @@ primes library
 //  generate primes::()   generates primes
 //  get primes::()        fetch a prime at a given index
 //  isprime primes::()    primality check
+//  phi primes::()        Euler's totient function
 //  map primes::()        deprecated - use isprime primes::() instead
 //
 
@@ -167,12 +168,23 @@ i primesInAnArray isprime primes::() {
 //    - slow for anything other than sequential, non-decreasing
 //      access via get primes::()
 //
+// The good:
+//
+//  array
+//    - fast for non-sequential access
+//
+//  sieve
+//    - fast generation
+//    - fastest primality test
+//    - fastest phi calculation
+//    - small memory footprint
+//
 // We'll use the time library to measure the time it takes
 // to perform some operations.
 
 time library
 
-// Here is a snapshot of the memory usage before web begin. The numbers to watch
+// Here is a snapshot of the memory usage before we begin. The numbers to watch
 // are the BTree numbers.
 
 "" println
@@ -181,7 +193,7 @@ debug
 
 // Generating primes. We'll time the generation of all primes below 1,000,000
 // in both layout types. Please bear in mind that primesInAnArray already
-// has 1,000 primes generated.
+// has 1,000 or so primes generated.
 
 "" println
 now time::()
@@ -262,17 +274,9 @@ i 0 =
 } while
 now time::() swap - 1000.0 / "Array primality check of 10,000 numbers took %0.3f seconds\n" printf
 
-// And finally Euler's totient function.
+// And finally, Euler's totient function.
 
 "" println
-now time::()
-i 2 =
-{ i 10000 < } {
-  i primesInAnArray phi primes::() pop
-  i++
-} while
-now time::() swap - 1000.0 / "10,000 calls to phi primes::() with an array type took %0.3f seconds\n" printf
-
 now time::()
 i 2 =
 { i 10000 < } {
@@ -281,9 +285,15 @@ i 2 =
 } while
 now time::() swap - 1000.0 / "10,000 calls to phi primes::() with a sieve type took %0.3f seconds\n" printf
 
+now time::()
+i 2 =
+{ i 10000 < } {
+  i primesInAnArray phi primes::() pop
+  i++
+} while
+now time::() swap - 1000.0 / "10,000 calls to phi primes::() with an array type took %0.3f seconds\n" printf
 
 
-// And to round things out, the primes library version number.
 
 "" println
 micro version:: primes:: minor version:: primes:: major version:: primes:: "Primes library version %d.%d.%d\n" printf
