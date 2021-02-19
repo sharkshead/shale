@@ -110,7 +110,7 @@ count list::++
 // ditto the next line, although this time we're assigning list[count] = i
 //  count list::++  <-- increment the counter
 //
-// There are any ways if slicing and dicing arrays in shale. What is presented
+// There are many ways if slicing and dicing arrays in shale. What is presented
 // here is just a single example.
 
 
@@ -162,7 +162,7 @@ i.value xyz:: 987 =
 // Sparse arrays.
 //
 // A sparse array is one where you don't create every entry from 0 through to maximum - 1.
-// Indeed, a sparse array doesn't need to use integers as indicies. It can use also
+// Indeed, a sparse array doesn't need to use integers as indicies. It can also use
 // float point numbers and strings.
 //
 // There's no setup required for a sparse array, you just use the set and get functions.
@@ -226,7 +226,7 @@ micro version:: array:: minor version:: array:: major version:: array:: "Array l
 //  i.value j.value:: board:: var
 //  i.value j.value:: board:: 0 =
 //
-// can be reduced to 
+// which can be reduced to
 //
 //  i.value j.value:: board:: dup var 0 =
 //
