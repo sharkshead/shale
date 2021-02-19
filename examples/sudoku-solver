@@ -90,38 +90,29 @@ printGrid dup var {
 } =
 
 // This sets up the colour map for irregular sudokus.
-1 colour:: var
-1 colour:: 30 =
-2 colour:: var
-2 colour:: 31 =
-3 colour:: var
-3 colour:: 32 =
-4 colour:: var
-4 colour:: 33 =
-5 colour:: var
-5 colour:: 34 =
-6 colour:: var
-6 colour:: 35 =
-7 colour:: var
-7 colour:: 36 =
-8 colour:: var
-8 colour:: 30 =   // skip 37 (too light) and reuse 30 and 31 (with luck they won't be close to regions 1 and 2).
-9 colour:: var
-9 colour:: 31 =
+1 colour:: dup var 30 =
+2 colour:: dup var 31 =
+3 colour:: dup var 32 =
+4 colour:: dup var 33 =
+5 colour:: dup var 34 =
+6 colour:: dup var 35 =
+7 colour:: dup var 36 =
+8 colour:: dup var 30 =   // skip 37 (too light) and reuse 30 and 31 (with luck they won't be close to regions 1 and 2).
+9 colour:: dup var 31 =
 
 // Assign the cell values to one row of the grid.
 setRow dup var {
-  8$ var 8$ swap =    // cell 9 of the row
-  7$ var 7$ swap =    // cell 8 of the row
-  6$ var 6$ swap =    // ...
-  5$ var 5$ swap =
-  4$ var 4$ swap =
-  3$ var 3$ swap =
-  2$ var 2$ swap =
-  1$ var 1$ swap =    // ...
-  0$ var 0$ swap =    // cell 1 of the row
-  r var r swap =      // the row number
-  ns var ns swap &=   // the namespace to use
+  8$ dup var swap =   // cell 9 of the row
+  7$ dup var swap =   // cell 8 of the row
+  6$ dup var swap =   // ...
+  5$ dup var swap =
+  4$ dup var swap =
+  3$ dup var swap =
+  2$ dup var swap =
+  1$ dup var swap =   // ...
+  0$ dup var swap =   // cell 1 of the row
+  r dup var swap =    // the row number
+  ns dup var swap &=  // the namespace to use
   i var               // loop counter
 
   r 0 < r 8 > or {
@@ -217,9 +208,9 @@ optimiseRegions dup var {
 
 // Is it possible to place a digit in a given cell?
 possible dup var { function
-  n var n swap =
-  c var c swap =
-  r var r swap =
+  n dup var swap =
+  c dup var swap =
+  r dup var swap =
   i var
   j var
 
@@ -254,9 +245,9 @@ possible dup var { function
 
 // This is a Knight's move constraint.
 knightsMoveConstraint dup var { function
-  0$ var 0$ swap =  // n
-  1$ var 1$ swap =  // column
-  2$ var 2$ swap =  // row
+  0$ dup var swap =  // n
+  1$ dup var swap =  // column
+  2$ dup var swap =  // row
   nr var
   nc var
 
