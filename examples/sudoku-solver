@@ -339,18 +339,20 @@ solve dup var { function
   { r 9 < } {
     c 0 =
     { c 9 < } {
-      r.value c.value:: grid:: 0 == {
+      r.value c.value:: grid:: dup 0 == {   // dup r.value c.value:: grid:: so we don't have to recalculate it in the inner loop.
         n 1 =
         { n 10 < } {
           r.value c.value n.value possible() {
-            r.value c.value:: grid:: n =
+            dup n =   // picking up r.value c.value:: grid:: again.
             solve()
-            r.value c.value:: grid:: 0 =
+            dup 0 =   // picking up r.value c.value:: grid:: again.
           } ifthen
           n++
         } while
+        pop   // get rid of r.value c.value:: grid::
         return
       } ifthen
+      pop   // get rid of r.value c.value:: grid::
       c++
     } while
     r++
