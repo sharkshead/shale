@@ -110,14 +110,14 @@ count list::++
 // ditto the next line, although this time we're assigning list[count] = i
 //  count list::++  <-- increment the counter
 //
-// There are many ways if slicing and dicing arrays in shale. What is presented
+// There are many ways of slicing and dicing arrays in shale. What is presented
 // here is just a single example.
 
 
 
 // The array library helper functions.
 //
-// Fist, load the array library
+// First, load the array library
 
 array library
 
@@ -148,16 +148,22 @@ i 5 =
 i.value xyz:: 987 =
 5 xyz:: println
 
-// The scooch function moves all the entries along one and assigned a new value to the first element.
+// The scooch function moves all the entries along one and assigns a new value to the first element.
 
 "abc123" xyz scooch array::()
 3.141 xyz scooch array::()
 
 // Now xyz[0] is 3.141, xyz[1] is "abc123" and xyz[7] is 987
+//
+// Arrays created with create array::() have a special entry called "_$"
+// that contains the number of entries in the array (one of the arguments given
+// when you created the array). You can use this to loop through the array elements
 
-0 xyz:: println
-1 xyz:: println
-7 xyz:: println
+i 0 =
+{ i "_$" xyz:: < } {
+  i.value xyz:: i "xyz[%d] = %p\n" printf
+  i++
+} while
 
 // Sparse arrays.
 //
@@ -217,7 +223,7 @@ micro version:: array:: minor version:: array:: major version:: array:: "Array l
 //
 //  i ns:: dup var 123 =
 //  hw funcs:: dup var { "Hello, World!" println } =
-//  "Joe Bloggs" dob:: dup var 1980 3 25 sprintf =
+//  "Joe Bloggs" dob:: dup var 1980 3 25 "%d/%d/%d" sprintf =
 //
 // by using the dup operator, which duplicates the top of the stack.
 //
