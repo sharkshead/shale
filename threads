@@ -19,7 +19,7 @@ shale thread library
     - is this possible ?
 
 
-  {n} {cf} new thread::()
+  {n} {cf} create thread::()
 
   {tid} join thread::()
 
