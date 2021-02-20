@@ -2371,12 +2371,14 @@ bool BTreeNode::addDataToNode(BTreeNode *l, Variable *d, BTreeNode *r, BTreeNode
   return true;
 }
 
-BTree::BTree() : tree((BTreeNode *) 0), depth(0), nodes(0), entries(0) { }
+BTree::BTree() : tree((BTreeNode *) 0), depth(0), nodes(0), entries(0), mutex((pthread_mutex_t *) 0) { }
 
 bool BTree::addVariable(Variable *d) {
   BTreeNode *left;
   BTreeNode *right;
   Variable *data;
+
+  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_lock(mutex);
 
   if(tree == (BTreeNode *) 0) {
     tree = new BTreeNode(true, (BTreeNode *) 0, d, (BTreeNode *) 0);
@@ -2385,7 +2387,10 @@ bool BTree::addVariable(Variable *d) {
     entries = 1;
   } else {
     left = (BTreeNode *) 0;
-    if(! tree->addData(d, &left, &data, &right, &nodes)) return false;
+    if(! tree->addData(d, &left, &data, &right, &nodes)) {
+      if(mutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(mutex);
+      return false;
+    }
     if(left != (BTreeNode *) 0) {
       delete(tree);
       tree = new BTreeNode(false, left, data, right);
@@ -2394,6 +2399,8 @@ bool BTree::addVariable(Variable *d) {
     }
     entries++;
   }
+
+  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(mutex);
 
   return true;
 }
@@ -2407,26 +2414,43 @@ Variable *BTree::findVariable(const char *v) {
 
   if(tree == (BTreeNode *) 0) return (Variable *) 0;
 
+  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_lock(mutex);
+
   p = tree;
   while(p != (BTreeNode *) 0) {
     n = p->getNumber();
     for(i = 0; i < n; i++) {
       d = p->getData(i);
       c = strcmp(v, d->getName());
-      if(c == 0) return d;
+      if(c == 0) {
+        if(mutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(mutex);
+        return d;
+      }
       if(c < 0) {
-        if(p->isLeaf()) return (Variable *) 0;
+        if(p->isLeaf()) {
+          if(mutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(mutex);
+          return (Variable *) 0;
+        }
         p = p->getPointer(i);
         break;
       }
     }
     if(i >= n) {
-      if(p->isLeaf()) return (Variable *) 0;
+      if(p->isLeaf()) {
+        if(mutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(mutex);
+        return (Variable *) 0;
+      }
       p = p->getPointer(n);
     }
   }
 
+  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(mutex);
+
   return (Variable *) 0;
+}
+
+void BTree::setMutex(pthread_mutex_t *m) {
+  mutex = m;
 }
 
 void BTree::debug() {
@@ -2434,7 +2458,9 @@ void BTree::debug() {
 }
 
 void BTree::print() {
+  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_lock(mutex);
   printTree(tree);
+  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(mutex);
 }
 
 void BTree::printTree(BTreeNode *t) {

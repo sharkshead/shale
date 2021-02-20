@@ -43,6 +43,8 @@ SOFTWARE.
 #include <sys/select.h>
 #include <netdb.h>
 #include <dlfcn.h>
+#include <pthread.h>
+#include <semaphore.h>
 #include "config.h"
 
 using namespace std;
@@ -729,12 +731,14 @@ class BTree {
     Variable *findVariable(const char *);
     void debug();
     void print();
+    void setMutex(pthread_mutex_t *);
 
   private:
     BTreeNode *tree;
     int depth;
     int nodes;
     int entries;
+    pthread_mutex_t *mutex;
     void printTree(BTreeNode *);
     void printDetail(BTreeNode *, int);
 };
