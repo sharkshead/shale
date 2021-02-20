@@ -1,0 +1,68 @@
+#!/usr/local/bin/shale
+
+// Threads are implemented in the thread library
+
+thread library
+
+// The thread library provides POSIX thread support through
+// the following function
+//
+//  create thread::()       create a new thread
+//  semaphore thread::()    create a new semaphore
+//  wait thread::()         wait on a semaphore
+//  post thread::()         post to a semaphore
+//  mutex thread::()        create a new mutex
+//  lock thread::()         lock a murtex
+//  unlock thread::()       unlock a murex
+
+
+
+// Semaphores.
+
+// Creating a semaphore.
+
+// To create a semaphore you need to give it a name, which can either
+// be a nuber (integer of floating point), a string or a variable name.
+// All of the following create valid sempahores.
+
+123 semaphore thread::()
+3.141 semaphore thread::()
+"Joe Bloggs" semaphore thread::()
+ready semaphore thread::()
+5 8:: a:: semaphore thread::()
+
+// All semaphors are created under the semaphore:: thread:: namespace,
+// as you can se fron the btree output.
+
+btree
+
+// The value of each semaphore is of no importance to your shale scipt.
+// Thye are pointers to the dynamically allocated semaphore.
+// Change their value and disaster awaits.
+
+// Waiting on and releassing a semaphore.
+
+// To wait on a semaphore, push the semaphore's name and call wait thread::()
+//
+//  123 wait thread::()
+//
+// I'm not going to wait on this just yet because we haven't sent up threads
+// with wake up calles, etc. This will come later.
+
+// To release a semaphore, push the semaphore's name and call post thread::()
+//
+//  123 post thread::()
+//
+// Again, I'm not executing this just yet. Patience.
+
+
+
+// Creating a mutex.
+
+
+
+// Creating a thread, and bringing it all together.
+
+
+
+// Closing comment.
