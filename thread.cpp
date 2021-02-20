@@ -30,6 +30,11 @@ SOFTWARE.
 #define MINOR   (INT) 0
 #define MICRO   (INT) 0
 
+struct ThreadPack {
+  ExecutionEnvironment ee;
+  Code *code;
+};
+
 class ThreadHelp : public Operation {
   public:
     ThreadHelp(LexInfo *);
@@ -178,9 +183,37 @@ OperatorReturn ThreadHelp::action(ExecutionEnvironment *ee) {
   return or_continue;
 }
 
+void *theThread(void *arg) {
+  ThreadPack *tp = (ThreadPack *) arg;
+
+  tp->code->action(&tp->ee);
+  delete(tp);
+
+  return (void *) 0;
+}
+
 ThreadCreate::ThreadCreate(LexInfo *li) : Operation(li) { }
 
 OperatorReturn ThreadCreate::action(ExecutionEnvironment *ee) {
+  Object *o;
+  Code *code;
+  ThreadPack *tp;
+  pthread_t *thread;
+  pthread_attr_t attr;
+
+  o = ee->stack.pop(getLexInfo());
+
+  tp = new ThreadPack;
+  tp->code = o->getCode(getLexInfo(), ee);
+
+  thread = new pthread_t;
+  if(pthread_attr_init(&attr) != 0) slexception.chuck("Can't initialise thread attributes", getLexInfo());
+  if(pthread_attr_setstacksize(&attr, 1024*1024) != 0) slexception.chuck("Can't set thread stack size", getLexInfo());
+  if(pthread_create(thread, &attr, theThread, tp) != 0) slexception.chuck("Can't create thread", getLexInfo());
+  delete(thread);
+
+  o->release(getLexInfo());
+
   return or_continue;
 }
 

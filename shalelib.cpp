@@ -26,9 +26,7 @@ SOFTWARE.
 
 #include "shalelib.h"
 
-// VariableStack variableStack;
 BTree btree;
-// Stack stack;
 Exception slexception;
 
 // LexInfo and Exception classes. These tie an execution error to the input.
