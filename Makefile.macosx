@@ -1,4 +1,4 @@
-all: shale maths.so array.so primes.o teme.o file.so thread.so
+all: shale maths.so array.so primes.o time.o file.so thread.so
 
 install: /usr/local/bin/shale /usr/local/lib/shale/maths.so /usr/local/lib/shale/array.so /usr/local/lib/shale/primes.so /usr/local/lib/shale/time.so /usr/local/lib/shale/file.so /usr/local/lib/shale/thread.so
 
