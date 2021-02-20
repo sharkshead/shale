@@ -64,7 +64,7 @@ void CacheDebug::decUsed() { used--; }
 void CacheDebug::incNew() { news++; }
 void CacheDebug::debug() { printf("count %d, free %d", news, used); }
 
-Cache::Cache() : usedNumbers((ObjectBag *) 0), usedStrings((ObjectBag *) 0), usedPointers((ObjectBag *) 0), unusedBags((ObjectBag *) 0) { }
+Cache::Cache() : usedNumbers((ObjectBag *) 0), usedStrings((ObjectBag *) 0), usedPointers((ObjectBag *) 0), unusedBags((ObjectBag *) 0), mutex((pthread_mutex_t *) 0) { }
 
 void Cache::incUnused() { unused++; }
 void Cache::decUnused() { unused--; }
@@ -72,6 +72,8 @@ void Cache::decUnused() { unused--; }
 Number *Cache::newNumber(INT i) {
   ObjectBag *nb;
   Number *ret;
+
+  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_lock(mutex);
 
   if(usedNumbers != (ObjectBag *) 0) {
     nb = usedNumbers;
@@ -87,12 +89,16 @@ Number *Cache::newNumber(INT i) {
     numbers.incNew();
   }
 
+  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(mutex);
+
   return ret;
 }
 
 Number *Cache::newNumber(double d) {
   ObjectBag *nb;
   Number *ret;
+
+  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_lock(mutex);
 
   if(usedNumbers != (ObjectBag *) 0) {
     nb = usedNumbers;
@@ -108,11 +114,15 @@ Number *Cache::newNumber(double d) {
     numbers.incNew();
   }
 
+  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(mutex);
+
   return ret;
 }
 
 void Cache::deleteNumber(Number *n) {
   ObjectBag *ob;
+
+  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_lock(mutex);
 
   if(unusedBags != (ObjectBag *) 0) {
     ob = unusedBags;
@@ -125,6 +135,8 @@ void Cache::deleteNumber(Number *n) {
   ob->next = usedNumbers;
   usedNumbers = ob;
   numbers.incUsed();
+
+  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(mutex);
 }
 
 String *Cache::newString(const char *s) { return newString(s, false); }
@@ -132,6 +144,8 @@ String *Cache::newString(const char *s) { return newString(s, false); }
 String *Cache::newString(const char *s, bool rsf) {
   ObjectBag *ob;
   String *ret;
+
+  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_lock(mutex);
 
   if(usedStrings != (ObjectBag *) 0) {
     ob = usedStrings;
@@ -148,11 +162,15 @@ String *Cache::newString(const char *s, bool rsf) {
     strings.incNew();
   }
 
+  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(mutex);
+
   return ret;
 }
 
 void Cache::deleteString(String *str) {
   ObjectBag *ob;
+
+  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_lock(mutex);
 
   if(str->getRemoveStringFlag()) free((void *) str->getValue());
   if(unusedBags != (ObjectBag *) 0) {
@@ -166,11 +184,15 @@ void Cache::deleteString(String *str) {
   ob->next = usedStrings;
   usedStrings = ob;
   strings.incUsed();
+
+  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(mutex);
 }
 
 Pointer *Cache::newPointer(Object *o) {
   ObjectBag *pb;
   Pointer *ret;
+
+  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_lock(mutex);
 
   if(usedPointers != (ObjectBag *) 0) {
     pb = usedPointers;
@@ -186,11 +208,15 @@ Pointer *Cache::newPointer(Object *o) {
     pointers.incNew();
   }
 
+  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(mutex);
+
   return ret;
 }
 
 void Cache::deletePointer(Pointer *p) {
   ObjectBag *ob;
+
+  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_lock(mutex);
 
   if(unusedBags != (ObjectBag *) 0) {
     ob = unusedBags;
@@ -203,13 +229,23 @@ void Cache::deletePointer(Pointer *p) {
   ob->next = usedPointers;
   usedPointers = ob;
   pointers.incUsed();
+
+  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(mutex);
+}
+
+void Cache::setMutex(pthread_mutex_t *m) {
+  mutex = m;
 }
 
 void Cache::debug() {
+  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_lock(mutex);
+
   printf("Number: "); numbers.debug(); printf(".  ");
   printf("String: "); strings.debug(); printf(".  ");
   printf("Pointer: "); pointers.debug(); printf(".  ");
   printf("Free bags: %d\n", unused);
+
+  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(mutex);
 }
 
 Cache cache;

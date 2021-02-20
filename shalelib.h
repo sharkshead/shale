@@ -232,6 +232,7 @@ class Cache {
     ObjectBag *unusedBags;
     void incUnused();
     void decUnused();
+    void setMutex(pthread_mutex_t *);
     void debug();
 
   private:
@@ -239,6 +240,7 @@ class Cache {
     CacheDebug strings;
     CacheDebug pointers;
     int unused;
+    pthread_mutex_t *mutex;
 };
 
 // Start of the Operation classes

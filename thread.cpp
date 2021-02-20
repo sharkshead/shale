@@ -30,9 +30,10 @@ SOFTWARE.
 #define MINOR   (INT) 0
 #define MICRO   (INT) 0
 
-struct ThreadPack {
-  ExecutionEnvironment ee;
-  Code *code;
+class ThreadPack {
+  public:
+    ExecutionEnvironment ee;
+    Code *code;
 };
 
 class ThreadHelp : public Operation {
@@ -102,6 +103,7 @@ extern "C" void slmain() {
   OperationList *ol;
   Variable *v;
   pthread_mutex_t *btreeMutex;
+  pthread_mutex_t *cacheMutex;
 
   // Are we already loaded?
   if(btree.findVariable("/help/thread") != (Variable *) 0) return;
@@ -166,6 +168,10 @@ extern "C" void slmain() {
   v->setObject(new Code(ol));
   btree.addVariable(v);
 
+  cacheMutex = new pthread_mutex_t;
+  pthread_mutex_init(cacheMutex, NULL);
+  cache.setMutex(cacheMutex);
+
   btreeMutex = new pthread_mutex_t;
   pthread_mutex_init(btreeMutex, NULL);
   btree.setMutex(btreeMutex);
@@ -187,6 +193,7 @@ void *theThread(void *arg) {
   ThreadPack *tp = (ThreadPack *) arg;
 
   tp->code->action(&tp->ee);
+  tp->code->release((LexInfo *) 0);
   delete(tp);
 
   return (void *) 0;
@@ -198,7 +205,7 @@ OperatorReturn ThreadCreate::action(ExecutionEnvironment *ee) {
   Object *o;
   Code *code;
   ThreadPack *tp;
-  pthread_t *thread;
+  pthread_t thread;
   pthread_attr_t attr;
 
   o = ee->stack.pop(getLexInfo());
@@ -206,11 +213,15 @@ OperatorReturn ThreadCreate::action(ExecutionEnvironment *ee) {
   tp = new ThreadPack;
   tp->code = o->getCode(getLexInfo(), ee);
 
-  thread = new pthread_t;
-  if(pthread_attr_init(&attr) != 0) slexception.chuck("Can't initialise thread attributes", getLexInfo());
-  if(pthread_attr_setstacksize(&attr, 1024*1024) != 0) slexception.chuck("Can't set thread stack size", getLexInfo());
-  if(pthread_create(thread, &attr, theThread, tp) != 0) slexception.chuck("Can't create thread", getLexInfo());
-  delete(thread);
+  try {
+    if(pthread_attr_init(&attr) != 0) slexception.chuck("Can't initialise thread attributes", getLexInfo());
+    if(pthread_attr_setstacksize(&attr, 1024*1024) != 0) slexception.chuck("Can't set thread stack size", getLexInfo());
+    if(pthread_create(&thread, &attr, theThread, tp) != 0) slexception.chuck("Can't create thread", getLexInfo());
+  } catch(Exception *e) {
+    e->printError();
+  } catch(exception &e) {
+    printf("%s\n", e.what());
+  }
 
   o->release(getLexInfo());
 
