@@ -927,6 +927,7 @@ int main(int ac, char **av) {
   int node;
   int number;
   int i;
+  ExecutionEnvironment mainEE;
 
   interactive = false;
   lexLineNumber = 0;
@@ -987,14 +988,14 @@ int main(int ac, char **av) {
       lexNextToken(lex);
       while(lex.token != LEX_TOKEN_EOF) {
         olBuild(lex);
-        if(interactive && (olStackIndex == 0)) olStack[0]->actionLatest();
+        if(interactive && (olStackIndex == 0)) olStack[0]->actionLatest(&mainEE);
         lexNextToken(lex);
       }
       lexShutdown();
       olCheck();
 
       // Execute the code if there are no problems.
-      if(! interactive) olStack[0]->action();
+      if(! interactive) olStack[0]->action(&mainEE);
     } catch(Exception *e) {
       e->printError();
       if(interactive) lexLine[lexLineIndex] = 0;

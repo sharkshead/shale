@@ -34,25 +34,25 @@ SOFTWARE.
 class TimeHelp : public Operation {
   public:
     TimeHelp(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class TimeNow : public Operation {
   public:
     TimeNow(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class TimeDate : public Operation {
   public:
     TimeDate(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class TimeTime : public Operation {
   public:
     TimeTime(LexInfo *, bool);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 
   private:
     bool includeMs;
@@ -61,7 +61,7 @@ class TimeTime : public Operation {
 class TimeLocaltime : public Operation {
   public:
     TimeLocaltime(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 const char *timeHelp[] = {
@@ -153,7 +153,7 @@ extern "C" void slmain() {
 
 TimeHelp::TimeHelp(LexInfo *li) : Operation(li) { }
 
-OperatorReturn TimeHelp::action() {
+OperatorReturn TimeHelp::action(ExecutionEnvironment *ee) {
   const char **p;
 
   for(p = timeHelp; *p != (const char *) 0; p++) {
@@ -165,11 +165,11 @@ OperatorReturn TimeHelp::action() {
 
 TimeNow::TimeNow(LexInfo *li) : Operation(li) { }
 
-OperatorReturn TimeNow::action() {
+OperatorReturn TimeNow::action(ExecutionEnvironment *ee) {
   struct timespec tp;
 
   if(clock_gettime(CLOCK_REALTIME, &tp) == 0) {
-    stack.push(cache.newNumber((((INT) tp.tv_sec) * 1000) + (((INT) tp.tv_nsec) / 1000000)));
+    ee->stack.push(cache.newNumber((((INT) tp.tv_sec) * 1000) + (((INT) tp.tv_nsec) / 1000000)));
   } else {
     printf("Can't get the realtime clock. Bailing.\n");
     exit(1);
@@ -180,7 +180,7 @@ OperatorReturn TimeNow::action() {
 
 TimeDate::TimeDate(LexInfo *li) : Operation(li) { }
 
-OperatorReturn TimeDate::action() {
+OperatorReturn TimeDate::action(ExecutionEnvironment *ee) {
   static const char *en_month[12] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
   static const char *de_month[12] = { "Jan", "Feb", "Mar", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez" };
   static const char *fr_month[12] = { "Janv","Févr","Mars","Avr", "Mai", "Juin","Juil","Août","Sept","Oct", "Nov", "Déc" };
@@ -197,8 +197,8 @@ OperatorReturn TimeDate::action() {
   char *output;
   const char *fmt;
 
-  o = stack.pop(getLexInfo());
-  n = o->getNumber(getLexInfo());
+  o = ee->stack.pop(getLexInfo());
+  n = o->getNumber(getLexInfo(), ee);
 
   epoch = n->getInt();
   if(epoch == (INT) 0) {
@@ -217,7 +217,7 @@ OperatorReturn TimeDate::action() {
   }
   v = btree.findVariable("/language/option/shale");
   if(v != (Variable *) 0) {
-    s = v->getObject()->getString(getLexInfo());
+    s = v->getObject()->getString(getLexInfo(), ee);
     str = s->getValue();
     if(strcmp(str, "de") == 0) month = de_month;
     else if(strcmp(str, "fr") == 0) month = fr_month;
@@ -229,7 +229,7 @@ OperatorReturn TimeDate::action() {
 
   v = btree.findVariable("/dateformat/time");
   if(v != (Variable *) 0) {
-    s = v->getObject()->getString(getLexInfo());
+    s = v->getObject()->getString(getLexInfo(), ee);
     fmt = s->getValue();
     s->release(getLexInfo());
   } else {
@@ -245,7 +245,7 @@ OperatorReturn TimeDate::action() {
   } else {
     sprintf(output, "%2d %s %4d", tm->tm_mday, month[tm->tm_mon], tm->tm_year + 1900);
   }
-  stack.push(cache.newString(output, true));
+  ee->stack.push(cache.newString(output, true));
 
   n->release(getLexInfo());
   o->release(getLexInfo());
@@ -255,7 +255,7 @@ OperatorReturn TimeDate::action() {
 
 TimeTime::TimeTime(LexInfo *li, bool ms) : Operation(li), includeMs(ms) { }
 
-OperatorReturn TimeTime::action() {
+OperatorReturn TimeTime::action(ExecutionEnvironment *ee) {
   struct timespec tp;
   tm *tm;
   Object *o;
@@ -265,8 +265,8 @@ OperatorReturn TimeTime::action() {
   char *output;
   int ms;
 
-  o = stack.pop(getLexInfo());
-  n = o->getNumber(getLexInfo());
+  o = ee->stack.pop(getLexInfo());
+  n = o->getNumber(getLexInfo(), ee);
 
   epoch = n->getInt();
   if(epoch == (INT) 0) {
@@ -288,7 +288,7 @@ OperatorReturn TimeTime::action() {
     sprintf(output, "%2d:%02d:%02d.%03d", tm->tm_hour, tm->tm_min, tm->tm_sec, ms);
   else
     sprintf(output, "%2d:%02d:%02d", tm->tm_hour, tm->tm_min, tm->tm_sec);
-  stack.push(cache.newString(output, true));
+  ee->stack.push(cache.newString(output, true));
 
   n->release(getLexInfo());
   o->release(getLexInfo());
@@ -298,7 +298,7 @@ OperatorReturn TimeTime::action() {
 
 TimeLocaltime::TimeLocaltime(LexInfo *li) : Operation(li) { }
 
-OperatorReturn TimeLocaltime::action() {
+OperatorReturn TimeLocaltime::action(ExecutionEnvironment *ee) {
   struct timespec tp;
   tm *tm;
   Object *o;
@@ -309,8 +309,8 @@ OperatorReturn TimeLocaltime::action() {
   int ms;
   Variable *v;
 
-  o = stack.pop(getLexInfo());
-  n = o->getNumber(getLexInfo());
+  o = ee->stack.pop(getLexInfo());
+  n = o->getNumber(getLexInfo(), ee);
 
   epoch = n->getInt();
   if(epoch == (INT) 0) {

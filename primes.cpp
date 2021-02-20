@@ -33,43 +33,43 @@ SOFTWARE.
 class PrimesHelp : public Operation {
   public:
     PrimesHelp(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class PrimesType : public Operation {
   public:
     PrimesType(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class PrimesGenerate : public Operation {
   public:
     PrimesGenerate(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class PrimesGet : public Operation {
   public:
     PrimesGet(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class PrimesIsPrime : public Operation {
   public:
     PrimesIsPrime(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class PrimesPhi : public Operation {
   public:
     PrimesPhi(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class PrimesMap : public Operation {
   public:
     PrimesMap(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 const char *primesHelp[] = {
@@ -172,7 +172,7 @@ extern "C" void slmain() {
 
 PrimesHelp::PrimesHelp(LexInfo *li) : Operation(li) { }
 
-OperatorReturn PrimesHelp::action() {
+OperatorReturn PrimesHelp::action(ExecutionEnvironment *ee) {
   const char **p;
 
   for(p = primesHelp; *p != (const char *) 0; p++) {
@@ -184,7 +184,7 @@ OperatorReturn PrimesHelp::action() {
 
 PrimesType::PrimesType(LexInfo *li) : Operation(li) { }
 
-OperatorReturn PrimesType::action() {
+OperatorReturn PrimesType::action(ExecutionEnvironment *ee) {
   Object *ons;
   Object *otype;
   Name *type;
@@ -194,11 +194,11 @@ OperatorReturn PrimesType::action() {
   static char buf[128];
   char *p;
 
-  otype = stack.pop(getLexInfo());
-  ons = stack.pop(getLexInfo());
-  type = otype->getName(getLexInfo());
+  otype = ee->stack.pop(getLexInfo());
+  ons = ee->stack.pop(getLexInfo());
+  type = otype->getName(getLexInfo(), ee);
   typeValue = type->getValue();
-  ns = ons->getName(getLexInfo());
+  ns = ons->getName(getLexInfo(), ee);
 
   if((strcmp(typeValue, "array") != 0) && (strcmp(typeValue, "sieve") != 0)) {
     sprintf(buf, "Unknown primes memory type: %s", typeValue);
@@ -229,7 +229,7 @@ OperatorReturn PrimesType::action() {
 
 PrimesGenerate::PrimesGenerate(LexInfo *li) : Operation(li) { }
 
-OperatorReturn PrimesGenerate::action() {
+OperatorReturn PrimesGenerate::action(ExecutionEnvironment *ee) {
   Object *ns;
   Object *n;
   Object *l;
@@ -258,12 +258,12 @@ OperatorReturn PrimesGenerate::action() {
   INT sieve;
   bool found;
 
-  ns = stack.pop(getLexInfo());
-  n = stack.pop(getLexInfo());
-  l = stack.pop(getLexInfo());
-  nn = n->getNumber(getLexInfo());
-  nl = l->getNumber(getLexInfo());
-  nsn = ns->getName(getLexInfo());
+  ns = ee->stack.pop(getLexInfo());
+  n = ee->stack.pop(getLexInfo());
+  l = ee->stack.pop(getLexInfo());
+  nn = n->getNumber(getLexInfo(), ee);
+  nl = l->getNumber(getLexInfo(), ee);
+  nsn = ns->getName(getLexInfo(), ee);
   name = nsn->getValue();
 
   lastReq = nl->getInt();
@@ -278,7 +278,7 @@ OperatorReturn PrimesGenerate::action() {
       v->setObject(cache.newNumber((INT) 0));
       btree.addVariable(v);
     }
-    num = v->getObject()->getNumber(getLexInfo());
+    num = v->getObject()->getNumber(getLexInfo(), ee);
     count = num->getInt();
     num->release(getLexInfo());
 
@@ -289,7 +289,7 @@ OperatorReturn PrimesGenerate::action() {
       v->setObject(cache.newNumber((INT) 0));
       btree.addVariable(v);
     }
-    num = v->getObject()->getNumber(getLexInfo());
+    num = v->getObject()->getNumber(getLexInfo(), ee);
     last = num->getInt();
     num->release(getLexInfo());
 
@@ -307,7 +307,7 @@ OperatorReturn PrimesGenerate::action() {
       btree.addVariable(v);
       isArrayType = true;
     } else {
-      memoryType = v->getObject()->getString(getLexInfo());
+      memoryType = v->getObject()->getString(getLexInfo(), ee);
       isArrayType = (strcmp(memoryType->getValue(), "array") == 0);
       memoryType->release(getLexInfo());
     }
@@ -333,7 +333,7 @@ OperatorReturn PrimesGenerate::action() {
           sprintf(buf, fmt, index, name);
           v = btree.findVariable(buf);
           if(v == (Variable *) 0) break;
-          num = v->getObject()->getNumber(getLexInfo());
+          num = v->getObject()->getNumber(getLexInfo(), ee);
           prime = num->getInt();
           num->release(getLexInfo());
           if(prime > squareRoot) break;
@@ -381,7 +381,7 @@ OperatorReturn PrimesGenerate::action() {
             v->setObject(cache.newNumber((INT) -1));
             btree.addVariable(v);
           }
-          num = v->getObject()->getNumber(getLexInfo());
+          num = v->getObject()->getNumber(getLexInfo(), ee);
           word = num->getInt();
           num->release(getLexInfo());
           if(word & bit) {
@@ -397,7 +397,7 @@ OperatorReturn PrimesGenerate::action() {
                 v->setObject(cache.newNumber((INT) -1));
                 btree.addVariable(v);
               }
-              num = v->getObject()->getNumber(getLexInfo());
+              num = v->getObject()->getNumber(getLexInfo(), ee);
               num->setInt(num->getInt() & (~ bit));
               num->release(getLexInfo());
 
@@ -417,7 +417,7 @@ OperatorReturn PrimesGenerate::action() {
           if(index != lastIndex) {
             sprintf(buf, fmt, index);
             v = btree.findVariable(buf);
-            num = v->getObject()->getNumber(getLexInfo());
+            num = v->getObject()->getNumber(getLexInfo(), ee);
             word = num->getInt();
             num->release(getLexInfo());
             lastIndex = index;
@@ -436,7 +436,7 @@ OperatorReturn PrimesGenerate::action() {
     if(v != (Variable *) 0) {
       v->setObject(cache.newNumber(count));
     }
-    num = v->getObject()->getNumber(getLexInfo());
+    num = v->getObject()->getNumber(getLexInfo(), ee);
     count = num->getInt();
     num->release(getLexInfo());
 
@@ -445,7 +445,7 @@ OperatorReturn PrimesGenerate::action() {
     if(v != (Variable *) 0) {
       v->setObject(cache.newNumber(last));
     }
-    num = v->getObject()->getNumber(getLexInfo());
+    num = v->getObject()->getNumber(getLexInfo(), ee);
     last = num->getInt();
     num->release(getLexInfo());
   }
@@ -461,7 +461,7 @@ OperatorReturn PrimesGenerate::action() {
 
 PrimesGet::PrimesGet(LexInfo *li) : Operation(li) { }
 
-OperatorReturn PrimesGet::action() {
+OperatorReturn PrimesGet::action(ExecutionEnvironment *ee) {
   Object *n;
   Object *ns;
   Variable *v;
@@ -487,11 +487,11 @@ OperatorReturn PrimesGet::action() {
   static INT cachedC = -1;
   static INT cachedI = -1;
 
-  ns = stack.pop(getLexInfo());
-  n = stack.pop(getLexInfo());
-  nsn = ns->getName(getLexInfo());
+  ns = ee->stack.pop(getLexInfo());
+  n = ee->stack.pop(getLexInfo());
+  nsn = ns->getName(getLexInfo(), ee);
   name = nsn->getValue();
-  num = n->getNumber(getLexInfo());
+  num = n->getNumber(getLexInfo(), ee);
   index = num->getInt();
   num->release(getLexInfo());
 
@@ -501,7 +501,7 @@ OperatorReturn PrimesGet::action() {
   if(v == (Variable *) 0) {
     isArrayType = true;
   } else {
-    memoryType = v->getObject()->getString(getLexInfo());
+    memoryType = v->getObject()->getString(getLexInfo(), ee);
     isArrayType = (strcmp(memoryType->getValue(), "array") == 0);
     memoryType->release(getLexInfo());
   }
@@ -513,7 +513,7 @@ OperatorReturn PrimesGet::action() {
     if((v = btree.findVariable(buf)) == (Variable *) 0) {
       ret = cache.newNumber((INT) 0);
     } else {
-      ret = v->getObject()->getNumber(getLexInfo());
+      ret = v->getObject()->getNumber(getLexInfo(), ee);
     }
   } else {
     // Sieve type
@@ -525,7 +525,7 @@ OperatorReturn PrimesGet::action() {
       sprintf(buf, "/count/%s", name);
       v = btree.findVariable(buf);
       if(v == (Variable *) 0) slexception.chuck("This doesn't look like a primes list", getLexInfo());
-      num = v->getObject()->getNumber(getLexInfo());
+      num = v->getObject()->getNumber(getLexInfo(), ee);
       count = num->getInt();
       num->release(getLexInfo());
       ret = (Number *) 0;
@@ -545,7 +545,7 @@ OperatorReturn PrimesGet::action() {
         sprintf(buf, fmt, i);
         v = btree.findVariable(buf);
         if(v == (Variable *) 0) break;
-        num = v->getObject()->getNumber(getLexInfo());
+        num = v->getObject()->getNumber(getLexInfo(), ee);
         word = num->getInt();
         num->release(getLexInfo());
         bit = 0x01;
@@ -571,7 +571,7 @@ OperatorReturn PrimesGet::action() {
     }
   }
 
-  stack.push(ret);
+  ee->stack.push(ret);
 
   n->release(getLexInfo());
   ns->release(getLexInfo());
@@ -581,7 +581,7 @@ OperatorReturn PrimesGet::action() {
 
 PrimesIsPrime::PrimesIsPrime(LexInfo *li) : Operation(li) { }
 
-OperatorReturn PrimesIsPrime::action() {
+OperatorReturn PrimesIsPrime::action(ExecutionEnvironment *ee) {
   Object *n;
   Object *ns;
   Variable *v;
@@ -604,11 +604,11 @@ OperatorReturn PrimesIsPrime::action() {
   INT lastMid;
   INT i;
 
-  ns = stack.pop(getLexInfo());
-  n = stack.pop(getLexInfo());
-  nsn = ns->getName(getLexInfo());
+  ns = ee->stack.pop(getLexInfo());
+  n = ee->stack.pop(getLexInfo());
+  nsn = ns->getName(getLexInfo(), ee);
   name = nsn->getValue();
-  num = n->getNumber(getLexInfo());
+  num = n->getNumber(getLexInfo(), ee);
   number = num->getInt();
   num->release(getLexInfo());
 
@@ -618,7 +618,7 @@ OperatorReturn PrimesIsPrime::action() {
   if(v == (Variable *) 0) {
     isArrayType = true;
   } else {
-    memoryType = v->getObject()->getString(getLexInfo());
+    memoryType = v->getObject()->getString(getLexInfo(), ee);
     isArrayType = (strcmp(memoryType->getValue(), "array") == 0);
     memoryType->release(getLexInfo());
   }
@@ -631,7 +631,7 @@ OperatorReturn PrimesIsPrime::action() {
     sprintf(buf, "/count/%s", name);
     v = btree.findVariable(buf);
     if(v == (Variable *) 0) slexception.chuck("This doesn't look like a primes:: array", getLexInfo());
-    num = v->getObject()->getNumber(getLexInfo());
+    num = v->getObject()->getNumber(getLexInfo(), ee);
     count = num->getInt();
     num->release(getLexInfo());
     lower = (INT) 0;
@@ -642,7 +642,7 @@ OperatorReturn PrimesIsPrime::action() {
       mid = (lower + upper) / 2;
       sprintf(buf, fmt, mid);
       if((v = btree.findVariable(buf)) == (Variable *) 0) slexception.chuck("Can't find the middle", getLexInfo());
-      num = v->getObject()->getNumber(getLexInfo());
+      num = v->getObject()->getNumber(getLexInfo(), ee);
       i = num->getInt();
       num->release(getLexInfo());
       if(i == number) {
@@ -661,12 +661,12 @@ OperatorReturn PrimesIsPrime::action() {
       bit = (INT) 1 << (((number - 3) / 2) % 64);
       sprintf(buf, fmt, index);
       v = btree.findVariable(buf);
-      num = v->getObject()->getNumber(getLexInfo());
+      num = v->getObject()->getNumber(getLexInfo(), ee);
       isPrime = (num->getInt() & bit);
       num->release(getLexInfo());
     }
   }
-  stack.push(cache.newNumber(isPrime ? (INT) 1 : (INT) 0));
+  ee->stack.push(cache.newNumber(isPrime ? (INT) 1 : (INT) 0));
 
   n->release(getLexInfo());
   ns->release(getLexInfo());
@@ -676,7 +676,7 @@ OperatorReturn PrimesIsPrime::action() {
 
 PrimesPhi::PrimesPhi(LexInfo *li) : Operation(li) { }
 
-OperatorReturn PrimesPhi::action() {
+OperatorReturn PrimesPhi::action(ExecutionEnvironment *ee) {
   Object *nso;
   Object *no;
   Name *ns;
@@ -700,12 +700,12 @@ OperatorReturn PrimesPhi::action() {
   INT i;
   INT ret;
 
-  nso = stack.pop(getLexInfo());
-  no = stack.pop(getLexInfo());
-  ns = nso->getName(getLexInfo());
+  nso = ee->stack.pop(getLexInfo());
+  no = ee->stack.pop(getLexInfo());
+  ns = nso->getName(getLexInfo(), ee);
 
   name = ns->getValue();
-  n = no->getNumber(getLexInfo());
+  n = no->getNumber(getLexInfo(), ee);
   num = n->getInt();
   n->release(getLexInfo());
 
@@ -716,7 +716,7 @@ OperatorReturn PrimesPhi::action() {
   if(v == (Variable *) 0) {
     isArrayType = true;
   } else {
-    layout = v->getObject()->getString(getLexInfo());
+    layout = v->getObject()->getString(getLexInfo(), ee);
     isArrayType = (strcmp(layout->getValue(), "array") == 0);
     layout->release(getLexInfo());
   }
@@ -724,7 +724,7 @@ OperatorReturn PrimesPhi::action() {
   sprintf(buf, "/last/%s", name);
   v = btree.findVariable(buf);
   if(v == (Variable *) 0) slexception.chuck("This does not appear to be a primes:: array", getLexInfo());
-  n = v->getObject()->getNumber(getLexInfo());
+  n = v->getObject()->getNumber(getLexInfo(), ee);
   lastPrime = n->getInt();
   n->release(getLexInfo());
 
@@ -756,7 +756,7 @@ OperatorReturn PrimesPhi::action() {
       sprintf(buf, fmt, index);
       v = btree.findVariable(buf);
       if(v == (Variable *) 0) slexception.chuck("Can't find next prime.", getLexInfo());
-      n = v->getObject()->getNumber(getLexInfo());
+      n = v->getObject()->getNumber(getLexInfo(), ee);
       p = n->getInt();
       n->release(getLexInfo());
     } else {
@@ -766,7 +766,7 @@ OperatorReturn PrimesPhi::action() {
           sprintf(buf, fmt, sieveIndex);
           v = btree.findVariable(buf);
           if(v == (Variable *) 0) slexception.chuck("Can't find next prime.", getLexInfo());
-          n = v->getObject()->getNumber(getLexInfo());
+          n = v->getObject()->getNumber(getLexInfo(), ee);
           word = n->getInt();
           bit = 1;
           i = 0;
@@ -784,7 +784,7 @@ OperatorReturn PrimesPhi::action() {
   }
   if(m > 1) ret *= m - 1;
 
-  stack.push(cache.newNumber(ret));
+  ee->stack.push(cache.newNumber(ret));
 
   no->release(getLexInfo());
   nso->release(getLexInfo());
@@ -794,7 +794,7 @@ OperatorReturn PrimesPhi::action() {
 
 PrimesMap::PrimesMap(LexInfo *li) : Operation(li) { }
 
-OperatorReturn PrimesMap::action() {
+OperatorReturn PrimesMap::action(ExecutionEnvironment *ee) {
   Object *ns;
   Name *nsn;
   char *name;
@@ -807,14 +807,14 @@ OperatorReturn PrimesMap::action() {
   INT index;
   INT prime;
 
-  ns = stack.pop(getLexInfo());
-  nsn = ns->getName(getLexInfo());
+  ns = ee->stack.pop(getLexInfo());
+  nsn = ns->getName(getLexInfo(), ee);
   name = nsn->getValue();
 
   sprintf(buf, "/type/%s", name);
   v = btree.findVariable(buf);
   if(v != (Variable *) 0) {
-    type = v->getObject()->getString(getLexInfo());
+    type = v->getObject()->getString(getLexInfo(), ee);
     if(strcmp(type->getValue(), "array") != 0) slexception.chuck("map primes::() is only available for the array memory layout", getLexInfo());
     type->release(getLexInfo());
   }
@@ -823,7 +823,7 @@ OperatorReturn PrimesMap::action() {
   v = btree.findVariable(buf);
   if(v == (Variable *) 0) return or_continue;
 
-  num = v->getObject()->getNumber(getLexInfo());
+  num = v->getObject()->getNumber(getLexInfo(), ee);
   count = num->getInt();
   num->release(getLexInfo());
 
@@ -832,7 +832,7 @@ OperatorReturn PrimesMap::action() {
     sprintf(buf, fmt, index, name);
     v = btree.findVariable(buf);
     if(v == (Variable *) 0) return or_continue;
-    num = v->getObject()->getNumber(getLexInfo());
+    num = v->getObject()->getNumber(getLexInfo(), ee);
     prime = num->getInt();
     num->release(getLexInfo());
 

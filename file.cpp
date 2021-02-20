@@ -33,43 +33,43 @@ SOFTWARE.
 class FileHelp : public Operation {
   public:
     FileHelp(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class FileOpen : public Operation {
   public:
     FileOpen(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class FileClose : public Operation {
   public:
     FileClose(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class FileFgets : public Operation {
   public:
     FileFgets(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class FileFprintf : public Operation {
   public:
     FileFprintf(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class FileFlush : public Operation {
   public:
     FileFlush(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 const char *fileHelp[] = {
   "File library",
   "  {filename} {mode} open file::()      - open filename according to fopen's mode. if the file cannot",
-  "                                         be opened it pushes false on the stack, otherwise it",
+  "                                         be opened it pushes false on the ee->stack, otherwise it",
   "                                         pushes the file handle then true on the stack.",
   "                                         file and mode must both be strings",
   "  {handle} close file::()              - close the given file handle",
@@ -165,7 +165,7 @@ extern "C" void slmain() {
 
 FileHelp::FileHelp(LexInfo *li) : Operation(li) { }
 
-OperatorReturn FileHelp::action() {
+OperatorReturn FileHelp::action(ExecutionEnvironment *ee) {
   const char **p;
 
   for(p = fileHelp; *p != (const char *) 0; p++) {
@@ -177,7 +177,7 @@ OperatorReturn FileHelp::action() {
 
 FileOpen::FileOpen(LexInfo *li) : Operation(li) { }
 
-OperatorReturn FileOpen::action() {
+OperatorReturn FileOpen::action(ExecutionEnvironment *ee) {
   Object *of;
   Object *om;
   String *filename;
@@ -185,10 +185,10 @@ OperatorReturn FileOpen::action() {
   int i;
   FILE *f;
 
-  om = stack.pop(getLexInfo());
-  of = stack.pop(getLexInfo());
-  mode = om->getString(getLexInfo());
-  filename = of->getString(getLexInfo());
+  om = ee->stack.pop(getLexInfo());
+  of = ee->stack.pop(getLexInfo());
+  mode = om->getString(getLexInfo(), ee);
+  filename = of->getString(getLexInfo(), ee);
 
   for(i = 0; i < HANDLES; i++) {
     if(handle[i] == (FILE *) 0) break;
@@ -196,13 +196,13 @@ OperatorReturn FileOpen::action() {
   if(i < HANDLES) {
     if((f = fopen(filename->getValue(), mode->getValue())) != (FILE *) 0) {
       handle[i] = f;
-      stack.push(cache.newNumber((INT) i));
-      stack.push(cache.newNumber((INT) 1));
+      ee->stack.push(cache.newNumber((INT) i));
+      ee->stack.push(cache.newNumber((INT) 1));
     } else {
-      stack.push(cache.newNumber((INT) 0));
+      ee->stack.push(cache.newNumber((INT) 0));
     }
   } else {
-    stack.push(cache.newNumber((INT) 0));
+    ee->stack.push(cache.newNumber((INT) 0));
   }
 
   mode->release(getLexInfo());
@@ -215,13 +215,13 @@ OperatorReturn FileOpen::action() {
 
 FileClose::FileClose(LexInfo *li) : Operation(li) { }
 
-OperatorReturn FileClose::action() {
+OperatorReturn FileClose::action(ExecutionEnvironment *ee) {
   Object *oh;
   Number *h;
   int i;
 
-  oh = stack.pop(getLexInfo());
-  h = oh->getNumber(getLexInfo());
+  oh = ee->stack.pop(getLexInfo());
+  h = oh->getNumber(getLexInfo(), ee);
 
   i = h->getInt();
   if((i >= 0) && (i < HANDLES) && (handle[i] != (FILE *) 0)) {
@@ -239,7 +239,7 @@ OperatorReturn FileClose::action() {
 
 FileFgets::FileFgets(LexInfo *li) : Operation(li) { }
 
-OperatorReturn FileFgets::action() {
+OperatorReturn FileFgets::action(ExecutionEnvironment *ee) {
   Object *oh;
   Number *h;
   int i;
@@ -247,8 +247,8 @@ OperatorReturn FileFgets::action() {
   char line[10240];
   char *p;
 
-  oh = stack.pop(getLexInfo());
-  h = oh->getNumber(getLexInfo());
+  oh = ee->stack.pop(getLexInfo());
+  h = oh->getNumber(getLexInfo(), ee);
 
   i = h->getInt();
   if((i >= 0) && (i < HANDLES) && (handle[i] != (FILE *) 0)) {
@@ -263,11 +263,11 @@ OperatorReturn FileFgets::action() {
         slexception.chuck("malloc error", getLexInfo());
       } else {
         strcpy(p, line);
-        stack.push(cache.newString(p, true));
-        stack.push(cache.newNumber((INT) 1));
+        ee->stack.push(cache.newString(p, true));
+        ee->stack.push(cache.newNumber((INT) 1));
       }
     } else {
-      stack.push(cache.newNumber((INT) 0));
+      ee->stack.push(cache.newNumber((INT) 0));
     }
   } else {
     slexception.chuck("Unknown file handle", getLexInfo());
@@ -281,7 +281,7 @@ OperatorReturn FileFgets::action() {
 
 FileFprintf::FileFprintf(LexInfo *li) : Operation(li) { }
 
-OperatorReturn FileFprintf::action() {
+OperatorReturn FileFprintf::action(ExecutionEnvironment *ee) {
   Object *handleObject;
   Object *formatObject;
   Object *o;
@@ -299,11 +299,11 @@ OperatorReturn FileFprintf::action() {
   bool found;
   char fmt[32];
 
-  handleObject = stack.pop(getLexInfo());
-  h = handleObject->getNumber(getLexInfo());
+  handleObject = ee->stack.pop(getLexInfo());
+  h = handleObject->getNumber(getLexInfo(), ee);
   i = h->getInt();
-  formatObject = stack.pop(getLexInfo());
-  format = formatObject->getString(getLexInfo());
+  formatObject = ee->stack.pop(getLexInfo());
+  format = formatObject->getString(getLexInfo(), ee);
 
   if((i < 0) || (i > HANDLES) || (handle[i] == (FILE *) 0)) slexception.chuck("Bad handle", getLexInfo());
 
@@ -322,10 +322,10 @@ OperatorReturn FileFprintf::action() {
         *op++ = '%';
         *op = 0;
       } else {
-        o = stack.pop(getLexInfo());
+        o = ee->stack.pop(getLexInfo());
         switch(*p) {
           case 'c':
-            n = o->getNumber(getLexInfo());
+            n = o->getNumber(getLexInfo(), ee);
             sprintf(op, buf, (char) n->getDouble());
             n->release(getLexInfo());
             break;
@@ -338,19 +338,19 @@ OperatorReturn FileFprintf::action() {
             while(*q != 0) q++;
             *q++ = *p;
             *q = 0;
-            n = o->getNumber(getLexInfo());
+            n = o->getNumber(getLexInfo(), ee);
             sprintf(op, buf, n->getInt());
             n->release(getLexInfo());
             break;
 
           case 'f':
-            n = o->getNumber(getLexInfo());
+            n = o->getNumber(getLexInfo(), ee);
             sprintf(op, buf, n->getDouble());
             n->release(getLexInfo());
             break;
 
           case 's':
-            str = o->getString(getLexInfo());
+            str = o->getString(getLexInfo(), ee);
             sprintf(op, buf, str->getValue());
             str->release(getLexInfo());
             break;
@@ -358,7 +358,7 @@ OperatorReturn FileFprintf::action() {
           case 'p':
             found = false;
             try {
-              n = o->getNumber(getLexInfo());
+              n = o->getNumber(getLexInfo(), ee);
               if(n->isInt()) {
                 sprintf(fmt, "%%%sd", PCTD);
                 sprintf(op, fmt, n->getInt());
@@ -369,7 +369,7 @@ OperatorReturn FileFprintf::action() {
 
             if(! found) {
               try {
-                str = o->getString(getLexInfo());
+                str = o->getString(getLexInfo(), ee);
                 sprintf(op, "%s", str->getValue());
                 str->release(getLexInfo());
                 found = true;
@@ -381,7 +381,7 @@ OperatorReturn FileFprintf::action() {
           case 'n':
             found = false;
             try {
-              name = o->getName(getLexInfo());
+              name = o->getName(getLexInfo(), ee);
               sprintf(op, "%s", name->getValue());
               found = true;
             } catch(Exception *e) { }
@@ -415,13 +415,13 @@ OperatorReturn FileFprintf::action() {
 
 FileFlush::FileFlush(LexInfo *li) : Operation(li) { }
 
-OperatorReturn FileFlush::action() {
+OperatorReturn FileFlush::action(ExecutionEnvironment *ee) {
   Object *oh;
   Number *h;
   int i;
 
-  oh = stack.pop(getLexInfo());
-  h = oh->getNumber(getLexInfo());
+  oh = ee->stack.pop(getLexInfo());
+  h = oh->getNumber(getLexInfo(), ee);
 
   i = h->getInt();
   if((i >= 0) && (i < HANDLES) && (handle[i] != (FILE *) 0)) {

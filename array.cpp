@@ -51,31 +51,31 @@ const char *arrayHelp[] = {
 class ArrayHelp : public Operation {
   public:
     ArrayHelp(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class ArrayCreate : public Operation {
   public:
     ArrayCreate(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class ArrayScooch : public Operation {
   public:
     ArrayScooch(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class ArrayGet : public Operation {
   public:
     ArrayGet(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class ArraySet : public Operation {
   public:
     ArraySet(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 extern "C" void slmain() {
@@ -136,7 +136,7 @@ extern "C" void slmain() {
 
 ArrayHelp::ArrayHelp(LexInfo *li) : Operation(li) { }
 
-OperatorReturn ArrayHelp::action() {
+OperatorReturn ArrayHelp::action(ExecutionEnvironment *ee) {
   const char **p;
 
   for(p = arrayHelp; *p != (const char *) 0; p++) {
@@ -148,7 +148,7 @@ OperatorReturn ArrayHelp::action() {
 
 ArrayCreate::ArrayCreate(LexInfo *li) : Operation(li) { }
 
-OperatorReturn ArrayCreate::action() {
+OperatorReturn ArrayCreate::action(ExecutionEnvironment *ee) {
   Object *oname;
   Object *size;
   Object *value;
@@ -164,21 +164,21 @@ OperatorReturn ArrayCreate::action() {
   bool found;
   char fmt[32];
 
-  oname = stack.pop(getLexInfo());
-  size = stack.pop(getLexInfo());
-  value = stack.pop(getLexInfo());
-  s = size->getNumber(getLexInfo());
+  oname = ee->stack.pop(getLexInfo());
+  size = ee->stack.pop(getLexInfo());
+  value = ee->stack.pop(getLexInfo());
+  s = size->getNumber(getLexInfo(), ee);
 
   found = false;
   try {
-    p = oname->getName(getLexInfo())->getValue();
+    p = oname->getName(getLexInfo(), ee)->getValue();
     sprintf(buf, "%s", p);
     found = true;
   } catch(Exception *e) { }
 
   if(! found) {
     try {
-      number = oname->getNumber(getLexInfo());
+      number = oname->getNumber(getLexInfo(), ee);
       if(number->isInt()) {
         sprintf(fmt, "%%%sd",PCTD);
         sprintf(buf, fmt, number->getInt());
@@ -190,7 +190,7 @@ OperatorReturn ArrayCreate::action() {
 
   if(! found) {
     try {
-    string = oname->getString(getLexInfo());
+    string = oname->getString(getLexInfo(), ee);
     sprintf(buf, "%s", string->getValue());
     string->release(getLexInfo());
     found = true;
@@ -226,7 +226,7 @@ OperatorReturn ArrayCreate::action() {
 
 ArrayScooch::ArrayScooch(LexInfo *li) : Operation(li) { }
 
-OperatorReturn ArrayScooch::action() {
+OperatorReturn ArrayScooch::action(ExecutionEnvironment *ee) {
   Object *name;
   Object *value;
   Name *arrayName;
@@ -241,14 +241,14 @@ OperatorReturn ArrayScooch::action() {
   char element[1024];
   char fmt[32];
 
-  name = stack.pop(getLexInfo());
-  value = stack.pop(getLexInfo());
-  arrayName = name->getName(getLexInfo());
+  name = ee->stack.pop(getLexInfo());
+  value = ee->stack.pop(getLexInfo());
+  arrayName = name->getName(getLexInfo(), ee);
   n = arrayName->getValue();
 
   sprintf(element, "/_$/%s", n);
   if((vc = btree.findVariable(element)) == (Variable *) 0) slexception.chuck("Internal count variable not found", getLexInfo());
-  c = vc->getObject()->getNumber(getLexInfo());
+  c = vc->getObject()->getNumber(getLexInfo(), ee);
   count = c->getInt();
   c->release(getLexInfo());
 
@@ -276,7 +276,7 @@ OperatorReturn ArrayScooch::action() {
 
 ArrayGet::ArrayGet(LexInfo *li) : Operation(li) { }
 
-OperatorReturn ArrayGet::action() {
+OperatorReturn ArrayGet::action(ExecutionEnvironment *ee) {
   Object *array;
   Object *index;
   Name *arrayName;
@@ -289,15 +289,15 @@ OperatorReturn ArrayGet::action() {
   bool found;
   char fmt[32];
 
-  array = stack.pop(getLexInfo());
-  index = stack.pop(getLexInfo());
+  array = ee->stack.pop(getLexInfo());
+  index = ee->stack.pop(getLexInfo());
 
-  arrayName = array->getName(getLexInfo());
+  arrayName = array->getName(getLexInfo(), ee);
 
   found = false;
 
   try {
-    indexNumber = index->getNumber(getLexInfo());
+    indexNumber = index->getNumber(getLexInfo(), ee);
     if(indexNumber->isInt()) {
       sprintf(fmt, "%%%sd", PCTD);
       sprintf(buf, fmt, indexNumber->getInt());
@@ -310,7 +310,7 @@ OperatorReturn ArrayGet::action() {
 
   if(! found) {
     try {
-      indexString = index->getString(getLexInfo());
+      indexString = index->getString(getLexInfo(), ee);
       sprintf(buf, "%s", indexString->getValue());
       indexString->release(getLexInfo());
       found = true;
@@ -324,13 +324,13 @@ OperatorReturn ArrayGet::action() {
   if(v != (Variable *) 0) {
     val = v->getObject();
     if(val != (Object *) 0) {
-      stack.push(val);
-      stack.push(cache.newNumber((INT) 1));
+      ee->stack.push(val);
+      ee->stack.push(cache.newNumber((INT) 1));
     } else {
-      stack.push(cache.newNumber((INT) 0));
+      ee->stack.push(cache.newNumber((INT) 0));
     }
   } else {
-    stack.push(cache.newNumber((INT) 0));
+    ee->stack.push(cache.newNumber((INT) 0));
   }
 
   array->release(getLexInfo());
@@ -341,7 +341,7 @@ OperatorReturn ArrayGet::action() {
 
 ArraySet::ArraySet(LexInfo *li) : Operation(li) { }
 
-OperatorReturn ArraySet::action() {
+OperatorReturn ArraySet::action(ExecutionEnvironment *ee) {
   Object *value;
   Object *array;
   Object *index;
@@ -354,16 +354,16 @@ OperatorReturn ArraySet::action() {
   bool found;
   char fmt[32];
 
-  value = stack.pop(getLexInfo());
-  array = stack.pop(getLexInfo());
-  index = stack.pop(getLexInfo());
+  value = ee->stack.pop(getLexInfo());
+  array = ee->stack.pop(getLexInfo());
+  index = ee->stack.pop(getLexInfo());
 
-  arrayName = array->getName(getLexInfo());
+  arrayName = array->getName(getLexInfo(), ee);
 
   found = false;
 
   try {
-    indexNumber = index->getNumber(getLexInfo());
+    indexNumber = index->getNumber(getLexInfo(), ee);
     if(indexNumber->isInt()) {
       sprintf(fmt, "%%%sd", PCTD);
       sprintf(buf, fmt, indexNumber->getInt());
@@ -376,7 +376,7 @@ OperatorReturn ArraySet::action() {
 
   if(! found) {
     try {
-      indexString = index->getString(getLexInfo());
+      indexString = index->getString(getLexInfo(), ee);
       sprintf(buf, "%s", indexString->getValue());
       indexString->release(getLexInfo());
       found = true;

@@ -26,9 +26,9 @@ SOFTWARE.
 
 #include "shalelib.h"
 
-VariableStack variableStack;
+// VariableStack variableStack;
 BTree btree;
-Stack stack;
+// Stack stack;
 Exception slexception;
 
 // LexInfo and Exception classes. These tie an execution error to the input.
@@ -220,12 +220,12 @@ Cache cache;
 
 Object::Object() : referenceCount(0) { }
 Object::~Object() { }
-Number *Object::getNumber(LexInfo *li) { slexception.chuck("number not found", li); return (Number *) 0; }
-String *Object::getString(LexInfo *li) { slexception.chuck("string not found", li); return (String *) 0; }
+Number *Object::getNumber(LexInfo *li, ExecutionEnvironment *ee) { slexception.chuck("number not found", li); return (Number *) 0; }
+String *Object::getString(LexInfo *li, ExecutionEnvironment *ee) { slexception.chuck("string not found", li); return (String *) 0; }
 bool Object::isName() { return false; }
-Name *Object::getName(LexInfo *li) { slexception.chuck("name not found", li); return (Name *) 0; }
-Code *Object::getCode(LexInfo *li) { slexception.chuck("code not found", li); return (Code *) 0; }
-Pointer *Object::getPointer(LexInfo *li) { slexception.chuck("pointer not found", li); return (Pointer *) 0; }
+Name *Object::getName(LexInfo *li, ExecutionEnvironment *ee) { slexception.chuck("name not found", li); return (Name *) 0; }
+Code *Object::getCode(LexInfo *li, ExecutionEnvironment *ee) { slexception.chuck("code not found", li); return (Code *) 0; }
+Pointer *Object::getPointer(LexInfo *li, ExecutionEnvironment *ee) { slexception.chuck("pointer not found", li); return (Pointer *) 0; }
 void Object::hold() { referenceCount++; }
 void Object::release(LexInfo *li) { if(referenceCount < 0) slexception.chuck("reference error", li); if(referenceCount == 0) delete(this); else referenceCount--; }
 
@@ -233,7 +233,7 @@ void Object::release(LexInfo *li) { if(referenceCount < 0) slexception.chuck("re
 
 Number::Number(INT i) : Object(), intRep(true), valueInt(i) { }
 Number::Number(double d) : Object(), intRep(false), valueDouble(d) { }
-Number *Number::getNumber(LexInfo *li) { this->hold(); return this; }
+Number *Number::getNumber(LexInfo *li, ExecutionEnvironment *ee) { this->hold(); return this; }
 bool Number::isInt() { return intRep; }
 INT Number::getInt() { if(intRep) return valueInt; return valueDouble; }
 void Number::setInt(INT i) { intRep = true; valueInt = i; }
@@ -247,7 +247,7 @@ void Number::debug() { char fmt[32]; printf("Number: "); if(intRep) { sprintf(fm
 String::String(const char *s) : Object(), str(s), removeStringFlag(false) { }
 String::String(const char *s, bool rsf) : Object(), str(s), removeStringFlag(rsf) { }
 String::~String() { if(removeStringFlag) free((void *) str); }
-String *String::getString(LexInfo *li) { this->hold(); return this; }
+String *String::getString(LexInfo *li, ExecutionEnvironment *ee) { this->hold(); return this; }
 const char *String::getValue() { return str; }
 bool String::getRemoveStringFlag() { return removeStringFlag; }
 void String::setString(const char *s) { str = s; }
@@ -270,7 +270,7 @@ bool Name::isName() {
   return true;
 }
 
-Name *Name::getName(LexInfo *li) {
+Name *Name::getName(LexInfo *li, ExecutionEnvironment *ee) {
   return this;
 }
 
@@ -278,36 +278,36 @@ char *Name::getValue() {
   return name;
 }
 
-Number *Name::getNumber(LexInfo *li) {
+Number *Name::getNumber(LexInfo *li, ExecutionEnvironment *ee) {
   static char buf[128];
-  Variable *v = variableStack.findVariable(name);
+  Variable *v = ee->variableStack.findVariable(name);
   if(v == (Variable *) 0) { sprintf(buf, "variable error: %s not found", name); slexception.chuck(buf, li); }
   if(! v->isInitialised()) { sprintf(buf, "variable error: %s not initialised", name); slexception.chuck(buf, li); }
-  return v->getObject()->getNumber(li);
+  return v->getObject()->getNumber(li, ee);
 }
 
-String *Name::getString(LexInfo *li) {
+String *Name::getString(LexInfo *li, ExecutionEnvironment *ee) {
   static char buf[128];
-  Variable *v = variableStack.findVariable(name);
+  Variable *v = ee->variableStack.findVariable(name);
   if(v == (Variable *) 0) { sprintf(buf, "variable error: %s not found", name); slexception.chuck(buf, li); }
   if(! v->isInitialised()) { sprintf(buf, "variable error: %s not initialised", name); slexception.chuck(buf, li); }
-  return v->getObject()->getString(li);
+  return v->getObject()->getString(li, ee);
 }
 
-Code *Name::getCode(LexInfo *li) {
+Code *Name::getCode(LexInfo *li, ExecutionEnvironment *ee) {
   static char buf[128];
-  Variable *v = variableStack.findVariable(name);
+  Variable *v = ee->variableStack.findVariable(name);
   if(v == (Variable *) 0) { sprintf(buf, "variable error: %s not found", name); slexception.chuck(buf, li); }
   if(! v->isInitialised()) { sprintf(buf, "variable error: %s not initialised", name); slexception.chuck(buf, li); }
-  return v->getObject()->getCode(li);
+  return v->getObject()->getCode(li, ee);
 }
 
-Pointer *Name::getPointer(LexInfo *li) {
+Pointer *Name::getPointer(LexInfo *li, ExecutionEnvironment *ee) {
   static char buf[128];
-  Variable *v = variableStack.findVariable(name);
+  Variable *v = ee->variableStack.findVariable(name);
   if(v == (Variable *) 0) { sprintf(buf, "variable error: %s not found", name); slexception.chuck(buf, li); }
   if(! v->isInitialised()) { sprintf(buf, "variable error: %s not initialised", name); slexception.chuck(buf, li); }
-  return v->getObject()->getPointer(li);
+  return v->getObject()->getPointer(li, ee);
 }
 
 void Name::debug() { printf("Name: %s\n", name); }
@@ -315,15 +315,15 @@ void Name::debug() { printf("Name: %s\n", name); }
 // Code class
 
 Code::Code(OperationList *ol) : Object(), operationList(ol) { }
-Code *Code::getCode(LexInfo *li) { this->hold(); return this; }
+Code *Code::getCode(LexInfo *li, ExecutionEnvironment *ee) { this->hold(); return this; }
 OperationList *Code::getOperationList() { return operationList; }
-OperatorReturn Code::action() { return operationList->action(); }
+OperatorReturn Code::action(ExecutionEnvironment *ee) { return operationList->action(ee); }
 void Code::debug() { printf("Code\n"); }
 
 // Pointer class
 
 Pointer::Pointer(Object *o) : Object(), object(o) { object->hold(); }
-Pointer *Pointer::getPointer(LexInfo *li) { this->hold(); return this; }
+Pointer *Pointer::getPointer(LexInfo *li, ExecutionEnvironment *ee) { this->hold(); return this; }
 void Pointer::setObject(Object *o) { object = o; object->hold(); }
 Object *Pointer::getObject() { return object; }
 void Pointer::hold() { Object::hold(); if(object != (Object *) 0) object->hold(); }
@@ -388,30 +388,30 @@ OperationListItem *OperationList::getOperationList() {
   return head;
 }
 
-OperatorReturn OperationList::action() {
+OperatorReturn OperationList::action(ExecutionEnvironment *ee) {
   OperatorReturn ret;
 
   ret = or_continue;
-  if(newVariableStack) variableStack.addVariableStack();
+  if(newVariableStack) ee->variableStack.addVariableStack();
   for(OperationListItem *oli = head; oli != (OperationListItem *) 0; oli = oli->getNext()) {
-    if((ret = oli->getOperation()->action()) != or_continue) {
+    if((ret = oli->getOperation()->action(ee)) != or_continue) {
       break;
     }
   }
-  if(newVariableStack) variableStack.popVariableStack();
+  if(newVariableStack) ee->variableStack.popVariableStack();
   if((ret == or_return) && isFn) ret = or_continue;
   return ret;
 }
 
-OperatorReturn OperationList::actionLatest() {
+OperatorReturn OperationList::actionLatest(ExecutionEnvironment *ee) {
   OperationListItem *oli;
   OperatorReturn ret;
 
   ret = or_continue;
-  if(newVariableStack && variableStack.isEmpty()) variableStack.addVariableStack();
+  if(newVariableStack && ee->variableStack.isEmpty()) ee->variableStack.addVariableStack();
   oli = tail;
   if(oli != (OperationListItem *) 0) {
-    ret = oli->getOperation()->action();
+    ret = oli->getOperation()->action(ee);
   }
   return ret;
 }
@@ -459,9 +459,9 @@ Object *ObjectList::getObject(int n) {
 
 Push::Push(Object *o, LexInfo *li) : Operation(li), object(o) { object->hold(); }
 
-OperatorReturn Push::action() {
+OperatorReturn Push::action(ExecutionEnvironment *ee) {
   object->hold();
-  stack.push(object);
+  ee->stack.push(object);
   return or_continue;
 }
 
@@ -469,10 +469,10 @@ OperatorReturn Push::action() {
 
 Pop::Pop(LexInfo *li) : Operation(li) { }
 
-OperatorReturn Pop::action() {
+OperatorReturn Pop::action(ExecutionEnvironment *ee) {
   Object *o;
 
-  o = stack.pop(getLexInfo());
+  o = ee->stack.pop(getLexInfo());
   o->release(getLexInfo());
 
   return or_continue;
@@ -480,28 +480,28 @@ OperatorReturn Pop::action() {
 
 Swap::Swap(LexInfo *li) : Operation(li) { }
 
-OperatorReturn Swap::action() {
+OperatorReturn Swap::action(ExecutionEnvironment *ee) {
   Object *o1;
   Object *o2;
 
-  o1 = stack.pop(getLexInfo());
-  o2 = stack.pop(getLexInfo());
+  o1 = ee->stack.pop(getLexInfo());
+  o2 = ee->stack.pop(getLexInfo());
 
-  stack.push(o1);
-  stack.push(o2);
+  ee->stack.push(o1);
+  ee->stack.push(o2);
 
   return or_continue;
 }
 
 Dup::Dup(LexInfo *li) : Operation(li) { }
 
-OperatorReturn Dup::action() {
+OperatorReturn Dup::action(ExecutionEnvironment *ee) {
   Object *o;
 
-  o = stack.pop(getLexInfo());
+  o = ee->stack.pop(getLexInfo());
   o->hold();
-  stack.push(o);
-  stack.push(o);
+  ee->stack.push(o);
+  ee->stack.push(o);
 
   return or_continue;
 }
@@ -510,13 +510,13 @@ OperatorReturn Dup::action() {
 
 Int::Int(LexInfo *li) : Operation(li) { }
 
-OperatorReturn Int::action() {
+OperatorReturn Int::action(ExecutionEnvironment *ee) {
   Object *o;
   Number *n;
 
-  o = stack.pop(getLexInfo());
-  n = o->getNumber(getLexInfo());
-  stack.push(cache.newNumber(n->getInt()));
+  o = ee->stack.pop(getLexInfo());
+  n = o->getNumber(getLexInfo(), ee);
+  ee->stack.push(cache.newNumber(n->getInt()));
   n->release(getLexInfo());
   o->release(getLexInfo());
 
@@ -525,13 +525,13 @@ OperatorReturn Int::action() {
 
 Double::Double(LexInfo *li) : Operation(li) { }
 
-OperatorReturn Double::action() {
+OperatorReturn Double::action(ExecutionEnvironment *ee) {
   Object *o;
   Number *n;
 
-  o = stack.pop(getLexInfo());
-  n = o->getNumber(getLexInfo());
-  stack.push(cache.newNumber(n->getDouble()));
+  o = ee->stack.pop(getLexInfo());
+  n = o->getNumber(getLexInfo(), ee);
+  ee->stack.push(cache.newNumber(n->getDouble()));
   n->release(getLexInfo());
   o->release(getLexInfo());
 
@@ -540,7 +540,7 @@ OperatorReturn Double::action() {
 
 Plus::Plus(LexInfo *li) : Operation(li) { }
 
-OperatorReturn Plus::action() {
+OperatorReturn Plus::action(ExecutionEnvironment *ee) {
   Object *o1;
   Object *o2;
   Number *n1;
@@ -552,14 +552,14 @@ OperatorReturn Plus::action() {
   OperationListItem *oli;
   bool found;
 
-  o2 = stack.pop(getLexInfo());
-  o1 = stack.pop(getLexInfo());
+  o2 = ee->stack.pop(getLexInfo());
+  o1 = ee->stack.pop(getLexInfo());
 
   found = false;
 
   try {
-    n1 = o1->getNumber(getLexInfo());
-    n2 = o2->getNumber(getLexInfo());
+    n1 = o1->getNumber(getLexInfo(), ee);
+    n2 = o2->getNumber(getLexInfo(), ee);
 
     if(n1->isInt()) {
       if(n2->isInt()) res = cache.newNumber(n1->getInt() + n2->getInt());
@@ -568,7 +568,7 @@ OperatorReturn Plus::action() {
       if(n2->isInt()) res = cache.newNumber(n1->getDouble() + n2->getInt());
       else res = cache.newNumber(n1->getDouble() + n2->getDouble());
     }
-    stack.push(res);
+    ee->stack.push(res);
 
     n1->release(getLexInfo());
     n2->release(getLexInfo());
@@ -578,8 +578,8 @@ OperatorReturn Plus::action() {
 
   if(! found) {
     try {
-      c1 = o1->getCode(getLexInfo());
-      c2 = o2->getCode(getLexInfo());
+      c1 = o1->getCode(getLexInfo(), ee);
+      c2 = o2->getCode(getLexInfo(), ee);
 
       ol = new OperationList;
       for(oli = c1->getOperationList()->getOperationList(); oli != (OperationListItem *) 0; oli = oli->getNext()) {
@@ -588,7 +588,7 @@ OperatorReturn Plus::action() {
       for(oli = c2->getOperationList()->getOperationList(); oli != (OperationListItem *) 0; oli = oli->getNext()) {
         ol->addOperation(oli->getOperation());
       }
-      stack.push(new Code(ol));
+      ee->stack.push(new Code(ol));
 
       c1->release(getLexInfo());
       c2->release(getLexInfo());
@@ -607,17 +607,17 @@ OperatorReturn Plus::action() {
 
 Minus::Minus(LexInfo *li) : Operation(li) { }
 
-OperatorReturn Minus::action() {
+OperatorReturn Minus::action(ExecutionEnvironment *ee) {
   Object *o1;
   Object *o2;
   Number *n1;
   Number *n2;
   Number *res;
 
-  o2 = stack.pop(getLexInfo());
-  o1 = stack.pop(getLexInfo());
-  n1 = o1->getNumber(getLexInfo());
-  n2 = o2->getNumber(getLexInfo());
+  o2 = ee->stack.pop(getLexInfo());
+  o1 = ee->stack.pop(getLexInfo());
+  n1 = o1->getNumber(getLexInfo(), ee);
+  n2 = o2->getNumber(getLexInfo(), ee);
 
   if(n1->isInt()) {
     if(n2->isInt()) res = cache.newNumber(n1->getInt() - n2->getInt());
@@ -626,7 +626,7 @@ OperatorReturn Minus::action() {
     if(n2->isInt()) res = cache.newNumber(n1->getDouble() - n2->getInt());
     else res = cache.newNumber(n1->getDouble() - n2->getDouble());
   }
-  stack.push(res);
+  ee->stack.push(res);
 
   n1->release(getLexInfo());
   n2->release(getLexInfo());
@@ -638,17 +638,17 @@ OperatorReturn Minus::action() {
 
 Times::Times(LexInfo *li) : Operation(li) { }
 
-OperatorReturn Times::action() {
+OperatorReturn Times::action(ExecutionEnvironment *ee) {
   Object *o1;
   Object *o2;
   Number *n1;
   Number *n2;
   Number *res;
 
-  o2 = stack.pop(getLexInfo());
-  o1 = stack.pop(getLexInfo());
-  n1 = o1->getNumber(getLexInfo());
-  n2 = o2->getNumber(getLexInfo());
+  o2 = ee->stack.pop(getLexInfo());
+  o1 = ee->stack.pop(getLexInfo());
+  n1 = o1->getNumber(getLexInfo(), ee);
+  n2 = o2->getNumber(getLexInfo(), ee);
 
   if(n1->isInt()) {
     if(n2->isInt()) res = cache.newNumber(n1->getInt() * n2->getInt());
@@ -657,7 +657,7 @@ OperatorReturn Times::action() {
     if(n2->isInt()) res = cache.newNumber(n1->getDouble() * n2->getInt());
     else res = cache.newNumber(n1->getDouble() * n2->getDouble());
   }
-  stack.push(res);
+  ee->stack.push(res);
 
   n1->release(getLexInfo());
   n2->release(getLexInfo());
@@ -669,17 +669,17 @@ OperatorReturn Times::action() {
 
 Divide::Divide(LexInfo *li) : Operation(li) { }
 
-OperatorReturn Divide::action() {
+OperatorReturn Divide::action(ExecutionEnvironment *ee) {
   Object *o1;
   Object *o2;
   Number *n1;
   Number *n2;
   Number *res;
 
-  o2 = stack.pop(getLexInfo());
-  o1 = stack.pop(getLexInfo());
-  n1 = o1->getNumber(getLexInfo());
-  n2 = o2->getNumber(getLexInfo());
+  o2 = ee->stack.pop(getLexInfo());
+  o1 = ee->stack.pop(getLexInfo());
+  n1 = o1->getNumber(getLexInfo(), ee);
+  n2 = o2->getNumber(getLexInfo(), ee);
 
   if(n1->isInt()) {
     if(n2->isInt()) res = cache.newNumber(n1->getInt() / n2->getInt());
@@ -688,7 +688,7 @@ OperatorReturn Divide::action() {
     if(n2->isInt()) res = cache.newNumber(n1->getDouble() / n2->getInt());
     else res = cache.newNumber(n1->getDouble() / n2->getDouble());
   }
-  stack.push(res);
+  ee->stack.push(res);
 
   n1->release(getLexInfo());
   n2->release(getLexInfo());
@@ -700,18 +700,18 @@ OperatorReturn Divide::action() {
 
 Mod::Mod(LexInfo *li) : Operation(li) { }
 
-OperatorReturn Mod::action() {
+OperatorReturn Mod::action(ExecutionEnvironment *ee) {
   Object *o1;
   Object *o2;
   Number *n1;
   Number *n2;
 
-  o2 = stack.pop(getLexInfo());
-  o1 = stack.pop(getLexInfo());
-  n1 = o1->getNumber(getLexInfo());
-  n2 = o2->getNumber(getLexInfo());
+  o2 = ee->stack.pop(getLexInfo());
+  o1 = ee->stack.pop(getLexInfo());
+  n1 = o1->getNumber(getLexInfo(), ee);
+  n2 = o2->getNumber(getLexInfo(), ee);
 
-  stack.push(cache.newNumber(n1->getInt() % n2->getInt()));
+  ee->stack.push(cache.newNumber(n1->getInt() % n2->getInt()));
 
   n1->release(getLexInfo());
   n2->release(getLexInfo());
@@ -723,18 +723,18 @@ OperatorReturn Mod::action() {
 
 BitwiseAnd::BitwiseAnd(LexInfo *li) : Operation(li) { }
 
-OperatorReturn BitwiseAnd::action() {
+OperatorReturn BitwiseAnd::action(ExecutionEnvironment *ee) {
   Object *o1;
   Object *o2;
   Number *n1;
   Number *n2;
 
-  o2 = stack.pop(getLexInfo());
-  o1 = stack.pop(getLexInfo());
-  n1 = o1->getNumber(getLexInfo());
-  n2 = o2->getNumber(getLexInfo());
+  o2 = ee->stack.pop(getLexInfo());
+  o1 = ee->stack.pop(getLexInfo());
+  n1 = o1->getNumber(getLexInfo(), ee);
+  n2 = o2->getNumber(getLexInfo(), ee);
 
-  stack.push(cache.newNumber(n1->getInt() & n2->getInt()));
+  ee->stack.push(cache.newNumber(n1->getInt() & n2->getInt()));
 
   n1->release(getLexInfo());
   n2->release(getLexInfo());
@@ -746,18 +746,18 @@ OperatorReturn BitwiseAnd::action() {
 
 BitwiseOr::BitwiseOr(LexInfo *li) : Operation(li) { }
 
-OperatorReturn BitwiseOr::action() {
+OperatorReturn BitwiseOr::action(ExecutionEnvironment *ee) {
   Object *o1;
   Object *o2;
   Number *n1;
   Number *n2;
 
-  o2 = stack.pop(getLexInfo());
-  o1 = stack.pop(getLexInfo());
-  n1 = o1->getNumber(getLexInfo());
-  n2 = o2->getNumber(getLexInfo());
+  o2 = ee->stack.pop(getLexInfo());
+  o1 = ee->stack.pop(getLexInfo());
+  n1 = o1->getNumber(getLexInfo(), ee);
+  n2 = o2->getNumber(getLexInfo(), ee);
 
-  stack.push(cache.newNumber(n1->getInt() | n2->getInt()));
+  ee->stack.push(cache.newNumber(n1->getInt() | n2->getInt()));
 
   n1->release(getLexInfo());
   n2->release(getLexInfo());
@@ -769,18 +769,18 @@ OperatorReturn BitwiseOr::action() {
 
 BitwiseXor::BitwiseXor(LexInfo *li) : Operation(li) { }
 
-OperatorReturn BitwiseXor::action() {
+OperatorReturn BitwiseXor::action(ExecutionEnvironment *ee) {
   Object *o1;
   Object *o2;
   Number *n1;
   Number *n2;
 
-  o2 = stack.pop(getLexInfo());
-  o1 = stack.pop(getLexInfo());
-  n1 = o1->getNumber(getLexInfo());
-  n2 = o2->getNumber(getLexInfo());
+  o2 = ee->stack.pop(getLexInfo());
+  o1 = ee->stack.pop(getLexInfo());
+  n1 = o1->getNumber(getLexInfo(), ee);
+  n2 = o2->getNumber(getLexInfo(), ee);
 
-  stack.push(cache.newNumber(n1->getInt() ^ n2->getInt()));
+  ee->stack.push(cache.newNumber(n1->getInt() ^ n2->getInt()));
 
   n1->release(getLexInfo());
   n2->release(getLexInfo());
@@ -792,14 +792,14 @@ OperatorReturn BitwiseXor::action() {
 
 BitwiseNot::BitwiseNot(LexInfo *li) : Operation(li) { }
 
-OperatorReturn BitwiseNot::action() {
+OperatorReturn BitwiseNot::action(ExecutionEnvironment *ee) {
   Object *o1;
   Number *n1;
 
-  o1 = stack.pop(getLexInfo());
-  n1 = o1->getNumber(getLexInfo());
+  o1 = ee->stack.pop(getLexInfo());
+  n1 = o1->getNumber(getLexInfo(), ee);
 
-  stack.push(cache.newNumber(~n1->getInt()));
+  ee->stack.push(cache.newNumber(~n1->getInt()));
 
   n1->release(getLexInfo());
   o1->release(getLexInfo());
@@ -809,18 +809,18 @@ OperatorReturn BitwiseNot::action() {
 
 LeftShift::LeftShift(LexInfo *li) : Operation(li) { }
 
-OperatorReturn LeftShift::action() {
+OperatorReturn LeftShift::action(ExecutionEnvironment *ee) {
   Object *o1;
   Object *o2;
   Number *n1;
   Number *n2;
 
-  o2 = stack.pop(getLexInfo());
-  o1 = stack.pop(getLexInfo());
-  n1 = o1->getNumber(getLexInfo());
-  n2 = o2->getNumber(getLexInfo());
+  o2 = ee->stack.pop(getLexInfo());
+  o1 = ee->stack.pop(getLexInfo());
+  n1 = o1->getNumber(getLexInfo(), ee);
+  n2 = o2->getNumber(getLexInfo(), ee);
 
-  stack.push(cache.newNumber(n1->getInt() << n2->getInt()));
+  ee->stack.push(cache.newNumber(n1->getInt() << n2->getInt()));
 
   n1->release(getLexInfo());
   n2->release(getLexInfo());
@@ -832,18 +832,18 @@ OperatorReturn LeftShift::action() {
 
 RightShift::RightShift(LexInfo *li) : Operation(li) { }
 
-OperatorReturn RightShift::action() {
+OperatorReturn RightShift::action(ExecutionEnvironment *ee) {
   Object *o1;
   Object *o2;
   Number *n1;
   Number *n2;
 
-  o2 = stack.pop(getLexInfo());
-  o1 = stack.pop(getLexInfo());
-  n1 = o1->getNumber(getLexInfo());
-  n2 = o2->getNumber(getLexInfo());
+  o2 = ee->stack.pop(getLexInfo());
+  o1 = ee->stack.pop(getLexInfo());
+  n1 = o1->getNumber(getLexInfo(), ee);
+  n2 = o2->getNumber(getLexInfo(), ee);
 
-  stack.push(cache.newNumber(n1->getInt() >> n2->getInt()));
+  ee->stack.push(cache.newNumber(n1->getInt() >> n2->getInt()));
 
   n1->release(getLexInfo());
   n2->release(getLexInfo());
@@ -857,7 +857,7 @@ OperatorReturn RightShift::action() {
 
 Function::Function(LexInfo *li) : Operation(li) { }
 
-OperatorReturn Function::action() { return or_continue; }
+OperatorReturn Function::action(ExecutionEnvironment *ee) { return or_continue; }
 
 bool Function::isFunction() { return true; }
 
@@ -865,11 +865,11 @@ bool Function::isFunction() { return true; }
 
 Var::Var(LexInfo *li) : Operation(li) { }
 
-OperatorReturn Var::action() {
+OperatorReturn Var::action(ExecutionEnvironment *ee) {
   Object *o;
 
-  o = stack.pop(getLexInfo());
-  variableStack.addVariable(o->getName(getLexInfo())->getValue(), getLexInfo());
+  o = ee->stack.pop(getLexInfo());
+  ee->variableStack.addVariable(o->getName(getLexInfo(), ee)->getValue(), getLexInfo());
   o->release(getLexInfo());
 
   return or_continue;
@@ -881,7 +881,7 @@ bool Var::isVar() { return true; }
 
 Assign::Assign(LexInfo *li) : Operation(li) { }
 
-OperatorReturn Assign::action() {
+OperatorReturn Assign::action(ExecutionEnvironment *ee) {
   Object *var;
   Object *val;
   Number *number;
@@ -892,16 +892,16 @@ OperatorReturn Assign::action() {
   Variable *v;
   bool found;
 
-  val = stack.pop(getLexInfo());
-  var = stack.pop(getLexInfo());
+  val = ee->stack.pop(getLexInfo());
+  var = ee->stack.pop(getLexInfo());
   found = false;
 
   // Is this a variable we're assigning?
   try {
-    v = variableStack.findVariable(var->getName(getLexInfo())->getValue());
+    v = ee->variableStack.findVariable(var->getName(getLexInfo(), ee)->getValue());
     if(v != (Variable *) 0) {
       try {
-        number = val->getNumber(getLexInfo());
+        number = val->getNumber(getLexInfo(), ee);
         v->setObject(number);
         number->release(getLexInfo());
         found = true;
@@ -909,7 +909,7 @@ OperatorReturn Assign::action() {
 
       if(! found) {
         try {
-          string = val->getString(getLexInfo());
+          string = val->getString(getLexInfo(), ee);
           v->setObject(string);
           string->release(getLexInfo());
           found = true;
@@ -918,7 +918,7 @@ OperatorReturn Assign::action() {
 
       if(! found) {
         try {
-          code = val->getCode(getLexInfo());
+          code = val->getCode(getLexInfo(), ee);
           v->setObject(code);
           code->release(getLexInfo());
           found = true;
@@ -927,7 +927,7 @@ OperatorReturn Assign::action() {
 
       if(! found) {
         try {
-          pointer = val->getPointer(getLexInfo());
+          pointer = val->getPointer(getLexInfo(), ee);
           v->setObject(pointer);
           pointer->release(getLexInfo());
           found = true;
@@ -948,19 +948,19 @@ OperatorReturn Assign::action() {
 
 PointerAssign::PointerAssign(LexInfo *li) : Operation(li) { }
 
-OperatorReturn PointerAssign::action() {
+OperatorReturn PointerAssign::action(ExecutionEnvironment *ee) {
   Object *var;
   Object *val;
   Variable *v;
   Pointer *p;
   bool found;
 
-  val = stack.pop(getLexInfo());
-  var = stack.pop(getLexInfo());
+  val = ee->stack.pop(getLexInfo());
+  var = ee->stack.pop(getLexInfo());
   found = false;
 
   try {
-    v = variableStack.findVariable(var->getName(getLexInfo())->getValue());
+    v = ee->variableStack.findVariable(var->getName(getLexInfo(), ee)->getValue());
     if(v != (Variable *) 0) {
       p = cache.newPointer(val);
       v->setObject(p);
@@ -981,17 +981,17 @@ OperatorReturn PointerAssign::action() {
 
 PointerDereference::PointerDereference(LexInfo *li) : Operation(li) { }
 
-OperatorReturn PointerDereference::action() {
+OperatorReturn PointerDereference::action(ExecutionEnvironment *ee) {
   Object *var;
   Pointer *p;
   Object *o;
 
-  var = stack.pop(getLexInfo());
+  var = ee->stack.pop(getLexInfo());
 
-  p = var->getPointer(getLexInfo());
+  p = var->getPointer(getLexInfo(), ee);
   o = p->getObject();
   o->hold();
-  stack.push(o);
+  ee->stack.push(o);
   p->release(getLexInfo());
 
   var->release(getLexInfo());
@@ -1003,17 +1003,17 @@ OperatorReturn PointerDereference::action() {
 
 PlusPlus::PlusPlus(LexInfo *li) : Operation(li) { }
 
-OperatorReturn PlusPlus::action() {
+OperatorReturn PlusPlus::action(ExecutionEnvironment *ee) {
   Object *o;
   Variable *v;
   Number *n;
   Number *newn;
 
-  o = stack.pop(getLexInfo());
+  o = ee->stack.pop(getLexInfo());
 
-  v = variableStack.findVariable(o->getName(getLexInfo())->getValue());
+  v = ee->variableStack.findVariable(o->getName(getLexInfo(), ee)->getValue());
   if(v == (Variable *) 0) slexception.chuck("variable error", getLexInfo());
-  n = v->getObject()->getNumber(getLexInfo());
+  n = v->getObject()->getNumber(getLexInfo(), ee);
 
   if(n->isInt()) v->setObject(newn = cache.newNumber(n->getInt() + (INT) 1));
   else v->setObject(newn = cache.newNumber(n->getDouble() + 1.0));
@@ -1030,17 +1030,17 @@ OperatorReturn PlusPlus::action() {
 
 MinusMinus::MinusMinus(LexInfo *li) : Operation(li) { }
 
-OperatorReturn MinusMinus::action() {
+OperatorReturn MinusMinus::action(ExecutionEnvironment *ee) {
   Object *o;
   Variable *v;
   Number *n;
   Number *newn;
 
-  o = stack.pop(getLexInfo());
+  o = ee->stack.pop(getLexInfo());
 
-  v = variableStack.findVariable(o->getName(getLexInfo())->getValue());
+  v = ee->variableStack.findVariable(o->getName(getLexInfo(), ee)->getValue());
   if(v == (Variable *) 0) slexception.chuck("variable error", getLexInfo());
-  n = v->getObject()->getNumber(getLexInfo());
+  n = v->getObject()->getNumber(getLexInfo(), ee);
 
   if(n->isInt()) v->setObject(newn = cache.newNumber(n->getInt() - (INT) 1));
   else v->setObject(newn = cache.newNumber(n->getDouble() - 1.0));
@@ -1057,17 +1057,17 @@ OperatorReturn MinusMinus::action() {
 
 LessThan::LessThan(LexInfo *li) : Operation(li) { }
 
-OperatorReturn LessThan::action() {
+OperatorReturn LessThan::action(ExecutionEnvironment *ee) {
   Object *a;
   Object *b;
   Number *an;
   Number *bn;
   bool r;
 
-  b = stack.pop(getLexInfo());
-  a = stack.pop(getLexInfo());
-  an = a->getNumber(getLexInfo());
-  bn = b->getNumber(getLexInfo());
+  b = ee->stack.pop(getLexInfo());
+  a = ee->stack.pop(getLexInfo());
+  an = a->getNumber(getLexInfo(), ee);
+  bn = b->getNumber(getLexInfo(), ee);
 
   if(an->isInt()) {
     if(bn->isInt()) r = (an->getInt() < bn->getInt());
@@ -1076,7 +1076,7 @@ OperatorReturn LessThan::action() {
     if(bn->isInt()) r = (an->getDouble() < bn->getInt());
     else r = (an->getDouble() < bn->getDouble());
   }
-  stack.push(cache.newNumber(r ? (INT) 1 : (INT) 0));
+  ee->stack.push(cache.newNumber(r ? (INT) 1 : (INT) 0));
 
   an->release(getLexInfo());
   bn->release(getLexInfo());
@@ -1088,17 +1088,17 @@ OperatorReturn LessThan::action() {
 
 LessThanOrEquals::LessThanOrEquals(LexInfo *li) : Operation(li) { }
 
-OperatorReturn LessThanOrEquals::action() {
+OperatorReturn LessThanOrEquals::action(ExecutionEnvironment *ee) {
   Object *a;
   Object *b;
   Number *an;
   Number *bn;
   bool r;
 
-  b = stack.pop(getLexInfo());
-  a = stack.pop(getLexInfo());
-  an = a->getNumber(getLexInfo());
-  bn = b->getNumber(getLexInfo());
+  b = ee->stack.pop(getLexInfo());
+  a = ee->stack.pop(getLexInfo());
+  an = a->getNumber(getLexInfo(), ee);
+  bn = b->getNumber(getLexInfo(), ee);
 
   if(an->isInt()) {
     if(bn->isInt()) r = (an->getInt() <= bn->getInt());
@@ -1107,7 +1107,7 @@ OperatorReturn LessThanOrEquals::action() {
     if(bn->isInt()) r = (an->getDouble() <= bn->getInt());
     else r = (an->getDouble() <= bn->getDouble());
   }
-  stack.push(cache.newNumber(r ? (INT) 1 : (INT) 0));
+  ee->stack.push(cache.newNumber(r ? (INT) 1 : (INT) 0));
 
   an->release(getLexInfo());
   bn->release(getLexInfo());
@@ -1119,17 +1119,17 @@ OperatorReturn LessThanOrEquals::action() {
 
 Equals::Equals(LexInfo *li) : Operation(li) { }
 
-OperatorReturn Equals::action() {
+OperatorReturn Equals::action(ExecutionEnvironment *ee) {
   Object *a;
   Object *b;
   Number *an;
   Number *bn;
   bool r;
 
-  b = stack.pop(getLexInfo());
-  a = stack.pop(getLexInfo());
-  an = a->getNumber(getLexInfo());
-  bn = b->getNumber(getLexInfo());
+  b = ee->stack.pop(getLexInfo());
+  a = ee->stack.pop(getLexInfo());
+  an = a->getNumber(getLexInfo(), ee);
+  bn = b->getNumber(getLexInfo(), ee);
 
   if(an->isInt()) {
     if(bn->isInt()) r = (an->getInt() == bn->getInt());
@@ -1138,7 +1138,7 @@ OperatorReturn Equals::action() {
     if(bn->isInt()) r = (an->getDouble() == bn->getInt());
     else r = (an->getDouble() == bn->getDouble());
   }
-  stack.push(cache.newNumber(r ? (INT) 1 : (INT) 0));
+  ee->stack.push(cache.newNumber(r ? (INT) 1 : (INT) 0));
 
   an->release(getLexInfo());
   bn->release(getLexInfo());
@@ -1150,17 +1150,17 @@ OperatorReturn Equals::action() {
 
 NotEquals::NotEquals(LexInfo *li) : Operation(li) { }
 
-OperatorReturn NotEquals::action() {
+OperatorReturn NotEquals::action(ExecutionEnvironment *ee) {
   Object *a;
   Object *b;
   Number *an;
   Number *bn;
   bool r;
 
-  b = stack.pop(getLexInfo());
-  a = stack.pop(getLexInfo());
-  an = a->getNumber(getLexInfo());
-  bn = b->getNumber(getLexInfo());
+  b = ee->stack.pop(getLexInfo());
+  a = ee->stack.pop(getLexInfo());
+  an = a->getNumber(getLexInfo(), ee);
+  bn = b->getNumber(getLexInfo(), ee);
 
   if(an->isInt()) {
     if(bn->isInt()) r = (an->getInt() != bn->getInt());
@@ -1169,7 +1169,7 @@ OperatorReturn NotEquals::action() {
     if(bn->isInt()) r = (an->getDouble() != bn->getInt());
     else r = (an->getDouble() != bn->getDouble());
   }
-  stack.push(cache.newNumber(r ? (INT) 1 : (INT) 0));
+  ee->stack.push(cache.newNumber(r ? (INT) 1 : (INT) 0));
 
   an->release(getLexInfo());
   bn->release(getLexInfo());
@@ -1181,17 +1181,17 @@ OperatorReturn NotEquals::action() {
 
 GreaterThanOrEquals::GreaterThanOrEquals(LexInfo *li) : Operation(li) { }
 
-OperatorReturn GreaterThanOrEquals::action() {
+OperatorReturn GreaterThanOrEquals::action(ExecutionEnvironment *ee) {
   Object *a;
   Object *b;
   Number *an;
   Number *bn;
   bool r;
 
-  b = stack.pop(getLexInfo());
-  a = stack.pop(getLexInfo());
-  an = a->getNumber(getLexInfo());
-  bn = b->getNumber(getLexInfo());
+  b = ee->stack.pop(getLexInfo());
+  a = ee->stack.pop(getLexInfo());
+  an = a->getNumber(getLexInfo(), ee);
+  bn = b->getNumber(getLexInfo(), ee);
 
   if(an->isInt()) {
     if(bn->isInt()) r = (an->getInt() >= bn->getInt());
@@ -1200,7 +1200,7 @@ OperatorReturn GreaterThanOrEquals::action() {
     if(bn->isInt()) r = (an->getDouble() >= bn->getInt());
     else r = (an->getDouble() >= bn->getDouble());
   }
-  stack.push(cache.newNumber(r ? (INT) 1 : (INT) 0));
+  ee->stack.push(cache.newNumber(r ? (INT) 1 : (INT) 0));
 
   an->release(getLexInfo());
   bn->release(getLexInfo());
@@ -1212,17 +1212,17 @@ OperatorReturn GreaterThanOrEquals::action() {
 
 GreaterThan::GreaterThan(LexInfo *li) : Operation(li) { }
 
-OperatorReturn GreaterThan::action() {
+OperatorReturn GreaterThan::action(ExecutionEnvironment *ee) {
   Object *a;
   Object *b;
   Number *an;
   Number *bn;
   bool r;
 
-  b = stack.pop(getLexInfo());
-  a = stack.pop(getLexInfo());
-  an = a->getNumber(getLexInfo());
-  bn = b->getNumber(getLexInfo());
+  b = ee->stack.pop(getLexInfo());
+  a = ee->stack.pop(getLexInfo());
+  an = a->getNumber(getLexInfo(), ee);
+  bn = b->getNumber(getLexInfo(), ee);
 
   if(an->isInt()) {
     if(bn->isInt()) r = (an->getInt() > bn->getInt());
@@ -1231,7 +1231,7 @@ OperatorReturn GreaterThan::action() {
     if(bn->isInt()) r = (an->getDouble() > bn->getInt());
     else r = (an->getDouble() > bn->getDouble());
   }
-  stack.push(cache.newNumber(r ? (INT) 1 : (INT) 0));
+  ee->stack.push(cache.newNumber(r ? (INT) 1 : (INT) 0));
 
   an->release(getLexInfo());
   bn->release(getLexInfo());
@@ -1243,7 +1243,7 @@ OperatorReturn GreaterThan::action() {
 
 LogicalAnd::LogicalAnd(LexInfo *li) : Operation(li) { }
 
-OperatorReturn LogicalAnd::action() {
+OperatorReturn LogicalAnd::action(ExecutionEnvironment *ee) {
   Object *a;
   Object *b;
   Object *co;
@@ -1254,32 +1254,32 @@ OperatorReturn LogicalAnd::action() {
   bool r;
   OperatorReturn ret;
 
-  b = stack.pop(getLexInfo());
-  a = stack.pop(getLexInfo());
-  an = a->getNumber(getLexInfo());
+  b = ee->stack.pop(getLexInfo());
+  a = ee->stack.pop(getLexInfo());
+  an = a->getNumber(getLexInfo(), ee);
 
   ret = or_continue;
   r = (an->getInt() != 0);
   if(r) {
     try {
       found = false;
-      c = b->getCode(getLexInfo());
-      ret = c->action();
-      co = stack.pop(getLexInfo());
-      bn = co->getNumber(getLexInfo());
+      c = b->getCode(getLexInfo(), ee);
+      ret = c->action(ee);
+      co = ee->stack.pop(getLexInfo());
+      bn = co->getNumber(getLexInfo(), ee);
       co->release(getLexInfo());
       c->release(getLexInfo());
       found = true;
     } catch(Exception *e) { }
 
     if(! found) {
-      bn = b->getNumber(getLexInfo());
+      bn = b->getNumber(getLexInfo(), ee);
     }
     r = (bn->getInt() != 0);
     bn->release(getLexInfo());
   }
 
-  stack.push(cache.newNumber(r ? (INT) 1 : (INT) 0));
+  ee->stack.push(cache.newNumber(r ? (INT) 1 : (INT) 0));
 
   an->release(getLexInfo());
   a->release(getLexInfo());
@@ -1290,7 +1290,7 @@ OperatorReturn LogicalAnd::action() {
 
 LogicalOr::LogicalOr(LexInfo *li) : Operation(li) { }
 
-OperatorReturn LogicalOr::action() {
+OperatorReturn LogicalOr::action(ExecutionEnvironment *ee) {
   Object *a;
   Object *b;
   Object *co;
@@ -1300,31 +1300,31 @@ OperatorReturn LogicalOr::action() {
   bool found;
   bool r;
 
-  b = stack.pop(getLexInfo());
-  a = stack.pop(getLexInfo());
-  an = a->getNumber(getLexInfo());
+  b = ee->stack.pop(getLexInfo());
+  a = ee->stack.pop(getLexInfo());
+  an = a->getNumber(getLexInfo(), ee);
 
   r = (an->getInt() != 0);
   if(! r) {
     try {
       found = false;
-      c = b->getCode(getLexInfo());
-      c->action();
-      co = stack.pop(getLexInfo());
-      bn = co->getNumber(getLexInfo());
+      c = b->getCode(getLexInfo(), ee);
+      c->action(ee);
+      co = ee->stack.pop(getLexInfo());
+      bn = co->getNumber(getLexInfo(), ee);
       co->release(getLexInfo());
       c->release(getLexInfo());
       found = true;
     } catch(Exception *e) { }
 
     if(! found) {
-      bn = b->getNumber(getLexInfo());
+      bn = b->getNumber(getLexInfo(), ee);
     }
     r = (bn->getInt() != 0);
     bn->release(getLexInfo());
   }
 
-  stack.push(cache.newNumber(r ? (INT) 1 : (INT) 0));
+  ee->stack.push(cache.newNumber(r ? (INT) 1 : (INT) 0));
 
   an->release(getLexInfo());
   a->release(getLexInfo());
@@ -1335,17 +1335,17 @@ OperatorReturn LogicalOr::action() {
 
 LogicalNot::LogicalNot(LexInfo *li) : Operation(li) { }
 
-OperatorReturn LogicalNot::action() {
+OperatorReturn LogicalNot::action(ExecutionEnvironment *ee) {
   Object *a;
   Number *an;
   bool r;
 
-  a = stack.pop(getLexInfo());
-  an = a->getNumber(getLexInfo());
+  a = ee->stack.pop(getLexInfo());
+  an = a->getNumber(getLexInfo(), ee);
 
   if(an->isInt()) r = ! an->getInt();
   else r = ! an->getDouble();
-  stack.push(cache.newNumber(r ? (INT) 1 : (INT) 0));
+  ee->stack.push(cache.newNumber(r ? (INT) 1 : (INT) 0));
 
   an->release(getLexInfo());
   a->release(getLexInfo());
@@ -1355,16 +1355,16 @@ OperatorReturn LogicalNot::action() {
 
 True::True(LexInfo *li) : Operation(li) { }
 
-OperatorReturn True::action() {
-  stack.push(cache.newNumber((INT) 1));
+OperatorReturn True::action(ExecutionEnvironment *ee) {
+  ee->stack.push(cache.newNumber((INT) 1));
 
   return or_continue;
 }
 
 False::False(LexInfo *li) : Operation(li) { }
 
-OperatorReturn False::action() {
-  stack.push(cache.newNumber((INT) 0));
+OperatorReturn False::action(ExecutionEnvironment *ee) {
+  ee->stack.push(cache.newNumber((INT) 0));
 
   return or_continue;
 }
@@ -1373,7 +1373,7 @@ OperatorReturn False::action() {
 
 Break::Break(LexInfo *li) : Operation(li) { }
 
-OperatorReturn Break::action() {
+OperatorReturn Break::action(ExecutionEnvironment *ee) {
   return or_break;
 }
 
@@ -1381,7 +1381,7 @@ OperatorReturn Break::action() {
 
 Return::Return(LexInfo *li) : Operation(li) { }
 
-OperatorReturn Return::action() {
+OperatorReturn Return::action(ExecutionEnvironment *ee) {
   return or_return;
 }
 
@@ -1389,12 +1389,12 @@ OperatorReturn Return::action() {
 
 Exit::Exit(LexInfo *li) : Operation(li) { }
 
-OperatorReturn Exit::action() {
+OperatorReturn Exit::action(ExecutionEnvironment *ee) {
   Object *o;
   Number *n;
 
-  o = stack.pop(getLexInfo());
-  n = o->getNumber(getLexInfo());
+  o = ee->stack.pop(getLexInfo());
+  n = o->getNumber(getLexInfo(), ee);
   exit(n->getInt());
 
   return or_continue;
@@ -1404,7 +1404,7 @@ OperatorReturn Exit::action() {
 
 While::While(LexInfo *li) : Operation(li) { }
 
-OperatorReturn While::action() {
+OperatorReturn While::action(ExecutionEnvironment *ee) {
   Object *cond;
   Object *body;
   Code *condCode;
@@ -1414,21 +1414,21 @@ OperatorReturn While::action() {
   INT num;
   OperatorReturn ret;
 
-  body = stack.pop(getLexInfo());
-  cond = stack.pop(getLexInfo());
-  condCode = cond->getCode(getLexInfo());
-  bodyCode = body->getCode(getLexInfo());
+  body = ee->stack.pop(getLexInfo());
+  cond = ee->stack.pop(getLexInfo());
+  condCode = cond->getCode(getLexInfo(), ee);
+  bodyCode = body->getCode(getLexInfo(), ee);
 
   ret = or_continue;
   while(true) {
-    condCode->action();
-    c = stack.pop(getLexInfo());
-    n = c->getNumber(getLexInfo());
+    condCode->action(ee);
+    c = ee->stack.pop(getLexInfo());
+    n = c->getNumber(getLexInfo(), ee);
     num = n->getInt();
     n->release(getLexInfo());
     c->release(getLexInfo());
     if(num == 0) break;
-    if((ret = bodyCode->action()) != or_continue) {
+    if((ret = bodyCode->action(ee)) != or_continue) {
       if(ret == or_break) ret = or_continue;
       break;
     }
@@ -1446,7 +1446,7 @@ OperatorReturn While::action() {
 
 If::If(LexInfo *li) : Operation(li) { }
 
-OperatorReturn If::action() {
+OperatorReturn If::action(ExecutionEnvironment *ee) {
   Object *cond;
   Object *thenPart;
   Object *elsePart;
@@ -1455,19 +1455,19 @@ OperatorReturn If::action() {
   Number *n;
   OperatorReturn ret;
 
-  elsePart = stack.pop(getLexInfo());
-  thenPart = stack.pop(getLexInfo());
-  cond = stack.pop(getLexInfo());
-  thenCode = thenPart->getCode(getLexInfo());
-  elseCode = elsePart->getCode(getLexInfo());
-  n = cond->getNumber(getLexInfo());
+  elsePart = ee->stack.pop(getLexInfo());
+  thenPart = ee->stack.pop(getLexInfo());
+  cond = ee->stack.pop(getLexInfo());
+  thenCode = thenPart->getCode(getLexInfo(), ee);
+  elseCode = elsePart->getCode(getLexInfo(), ee);
+  n = cond->getNumber(getLexInfo(), ee);
 
   if(n->isInt()) {
-    if(n->getInt() == 0) ret = elseCode->action();
-    else ret = thenCode->action();
+    if(n->getInt() == 0) ret = elseCode->action(ee);
+    else ret = thenCode->action(ee);
   } else {
-    if(n->getDouble() == 0) ret = elseCode->action();
-    else ret = thenCode->action();
+    if(n->getDouble() == 0) ret = elseCode->action(ee);
+    else ret = thenCode->action(ee);
   }
 
   n->release(getLexInfo());
@@ -1484,23 +1484,23 @@ OperatorReturn If::action() {
 
 IfThen::IfThen(LexInfo *li) : Operation(li) { }
 
-OperatorReturn IfThen::action() {
+OperatorReturn IfThen::action(ExecutionEnvironment *ee) {
   Object *cond;
   Object *thenPart;
   Code *thenCode;
   Number *n;
   OperatorReturn ret;
 
-  thenPart = stack.pop(getLexInfo());
-  cond = stack.pop(getLexInfo());
-  thenCode = thenPart->getCode(getLexInfo());
-  n = cond->getNumber(getLexInfo());
+  thenPart = ee->stack.pop(getLexInfo());
+  cond = ee->stack.pop(getLexInfo());
+  thenCode = thenPart->getCode(getLexInfo(), ee);
+  n = cond->getNumber(getLexInfo(), ee);
   ret = or_continue;
 
   if(n->isInt()) {
-    if(n->getInt() != 0) ret = thenCode->action();
+    if(n->getInt() != 0) ret = thenCode->action(ee);
   } else {
-    if(n->getDouble() != 0) ret = thenCode->action();
+    if(n->getDouble() != 0) ret = thenCode->action(ee);
   }
 
   n->release(getLexInfo());
@@ -1515,25 +1515,25 @@ OperatorReturn IfThen::action() {
 
 Value::Value(LexInfo *li) : Operation(li) { }
 
-OperatorReturn Value::action() {
+OperatorReturn Value::action(ExecutionEnvironment *ee) {
   Object *o;
 
-  o = stack.pop(getLexInfo());
+  o = ee->stack.pop(getLexInfo());
 
   try {
-    stack.push(o->getNumber(getLexInfo()));
+    ee->stack.push(o->getNumber(getLexInfo(), ee));
     o->release(getLexInfo());
     return or_continue;
   } catch (Exception *e) { }
 
   try {
-    stack.push(o->getString(getLexInfo()));
+    ee->stack.push(o->getString(getLexInfo(), ee));
     o->release(getLexInfo());
     return or_continue;
   } catch (Exception *e) { }
 
   try {
-    stack.push(o->getCode(getLexInfo()));
+    ee->stack.push(o->getCode(getLexInfo(), ee));
     o->release(getLexInfo());
     return or_continue;
   } catch (Exception *e) { }
@@ -1547,30 +1547,30 @@ OperatorReturn Value::action() {
 
 ToName::ToName(LexInfo *li) : Operation(li) { }
 
-OperatorReturn ToName::action() {
+OperatorReturn ToName::action(ExecutionEnvironment *ee) {
   Object *o;
   Number *n;
   String *s;
   char buf[64];
   char fmt[32];
 
-  o = stack.pop(getLexInfo());
+  o = ee->stack.pop(getLexInfo());
 
   try {
-    n = o->getNumber(getLexInfo());
+    n = o->getNumber(getLexInfo(), ee);
     if(n->isInt()) {
       sprintf(fmt, "%%%sd", PCTD);
       sprintf(buf, fmt, n->getInt());
     } else sprintf(buf, "%0.3f", n->getDouble());
-    stack.push(new Name(buf));
+    ee->stack.push(new Name(buf));
     n->release(getLexInfo());
     o->release(getLexInfo());
     return or_continue;
   } catch (Exception *e) { }
 
   try {
-    s = o->getString(getLexInfo());
-    stack.push(new Name(s->getValue()));
+    s = o->getString(getLexInfo(), ee);
+    ee->stack.push(new Name(s->getValue()));
     s->release(getLexInfo());
     o->release(getLexInfo());
     return or_continue;
@@ -1585,7 +1585,7 @@ OperatorReturn ToName::action() {
 
 Namespace::Namespace(LexInfo *li) : Operation(li) { }
 
-OperatorReturn Namespace::action() {
+OperatorReturn Namespace::action(ExecutionEnvironment *ee) {
   Object *nsobject;
   Object *inobject;
   Name *nsname;
@@ -1607,21 +1607,21 @@ OperatorReturn Namespace::action() {
   int j;
   char fmt[32];
 
-  nsobject = stack.pop(getLexInfo());
-  inobject = stack.pop(getLexInfo());
+  nsobject = ee->stack.pop(getLexInfo());
+  inobject = ee->stack.pop(getLexInfo());
 
   found = false;
   nsreleasestring = false;
 
   try {
-    nsname = nsobject->getName(getLexInfo());
+    nsname = nsobject->getName(getLexInfo(), ee);
     nselementp = nsname->getValue();
     found = true;
   } catch(Exception *e) { }
 
   if(! found) {
     try {
-      nsnumber = nsobject->getNumber(getLexInfo());
+      nsnumber = nsobject->getNumber(getLexInfo(), ee);
       if(nsnumber->isInt()) {
         sprintf(fmt, "%%%sd", PCTD);
         sprintf(nselement, fmt, nsnumber->getInt());
@@ -1634,7 +1634,7 @@ OperatorReturn Namespace::action() {
 
   if(! found) {
     try {
-      nsstring = nsobject->getString(getLexInfo());
+      nsstring = nsobject->getString(getLexInfo(), ee);
       nselementp = nsstring->getValue();
       nsreleasestring = true;
       found =  true;
@@ -1647,14 +1647,14 @@ OperatorReturn Namespace::action() {
   inreleasestring = false;
 
   try {
-    inname = inobject->getName(getLexInfo());
+    inname = inobject->getName(getLexInfo(), ee);
     inelementp = inname->getValue();
     found = true;
   } catch(Exception *e) { }
 
   if(! found) {
     try {
-      innumber = inobject->getNumber(getLexInfo());
+      innumber = inobject->getNumber(getLexInfo(), ee);
       if(innumber->isInt()) {
         sprintf(fmt, "%%%sd", PCTD);
         sprintf(inelement, fmt, innumber->getInt());
@@ -1667,7 +1667,7 @@ OperatorReturn Namespace::action() {
 
   if(! found) {
     try {
-      instring = inobject->getString(getLexInfo());
+      instring = inobject->getString(getLexInfo(), ee);
       inelementp = instring->getValue();
       inreleasestring = true;
       found =  true;
@@ -1688,7 +1688,7 @@ OperatorReturn Namespace::action() {
   if(p[j] != 0) slexception.chuck("name too long", getLexInfo());
 
   namebuf[i] = 0;
-  stack.push(new Name(namebuf));
+  ee->stack.push(new Name(namebuf));
 
   if(nsreleasestring) nsstring->release(getLexInfo());
   if(inreleasestring) instring->release(getLexInfo());
@@ -1703,7 +1703,7 @@ OperatorReturn Namespace::action() {
 
 Library::Library(LexInfo *li) : Operation(li) { }
 
-OperatorReturn Library::action() {
+OperatorReturn Library::action(ExecutionEnvironment *ee) {
   Object *o;
   Name *n;
   char pluginName[256];
@@ -1711,8 +1711,8 @@ OperatorReturn Library::action() {
   void *(*slmain)();
   char *err;
 
-  o = stack.pop(getLexInfo());
-  n = o->getName(getLexInfo());
+  o = ee->stack.pop(getLexInfo());
+  n = o->getName(getLexInfo(), ee);
   sprintf(pluginName, "/usr/local/lib/shale/%s.so", n->getValue());
 
   dlerror();
@@ -1734,15 +1734,15 @@ OperatorReturn Library::action() {
 
 Execute::Execute(LexInfo *li) : Operation(li) { }
 
-OperatorReturn Execute::action() {
+OperatorReturn Execute::action(ExecutionEnvironment *ee) {
   Object *o;
   Code *code;
   OperatorReturn ret;
 
-  o = stack.pop(getLexInfo());
-  code = o->getCode(getLexInfo());
+  o = ee->stack.pop(getLexInfo());
+  code = o->getCode(getLexInfo(), ee);
 
-  ret = code->action();
+  ret = code->action(ee);
 
   code->release(getLexInfo());
   o->release(getLexInfo());
@@ -1754,19 +1754,19 @@ OperatorReturn Execute::action() {
 
 Print::Print(bool nl, LexInfo *li) : Operation(li), newline(nl) { }
 
-OperatorReturn Print::action() {
+OperatorReturn Print::action(ExecutionEnvironment *ee) {
   Object *o;
   Number *n;
   String *s;
   bool found;
   char fmt[32];
 
-  o = stack.pop(getLexInfo());
+  o = ee->stack.pop(getLexInfo());
   found = false;
 
   if(! found) {
     try {
-      n = o->getNumber(getLexInfo());
+      n = o->getNumber(getLexInfo(), ee);
       if(n->isInt()) {
         sprintf(fmt, "%%%sd", PCTD);
         printf(fmt, n->getInt());
@@ -1779,7 +1779,7 @@ OperatorReturn Print::action() {
 
   if(! found) {
     try {
-      s = o->getString(getLexInfo());
+      s = o->getString(getLexInfo(), ee);
       printf("%s", s->getValue());
       s->release(getLexInfo());
       found = true;
@@ -1799,7 +1799,7 @@ OperatorReturn Print::action() {
 
 Printf::Printf(bool o, LexInfo *li) : Operation(li), output(o) { }
 
-OperatorReturn Printf::action() {
+OperatorReturn Printf::action(ExecutionEnvironment *ee) {
   Object *formatObject;
   Object *o;
   String *format;
@@ -1814,8 +1814,8 @@ OperatorReturn Printf::action() {
   bool found;
   char fmt[32];
 
-  formatObject = stack.pop(getLexInfo());
-  format = formatObject->getString(getLexInfo());
+  formatObject = ee->stack.pop(getLexInfo());
+  format = formatObject->getString(getLexInfo(), ee);
 
   op = res;
   *op = 0;
@@ -1832,10 +1832,10 @@ OperatorReturn Printf::action() {
         *op++ = '%';
         *op = 0;
       } else {
-        o = stack.pop(getLexInfo());
+        o = ee->stack.pop(getLexInfo());
         switch(*p) {
           case 'c':
-            n = o->getNumber(getLexInfo());
+            n = o->getNumber(getLexInfo(), ee);
             sprintf(op, buf, (char) n->getInt());
             n->release(getLexInfo());
             break;
@@ -1848,19 +1848,19 @@ OperatorReturn Printf::action() {
             while(*q != 0) q++;
             *q++ = *p;
             *q = 0;
-            n = o->getNumber(getLexInfo());
+            n = o->getNumber(getLexInfo(), ee);
             sprintf(op, buf, n->getInt());
             n->release(getLexInfo());
             break;
 
           case 'f':
-            n = o->getNumber(getLexInfo());
+            n = o->getNumber(getLexInfo(), ee);
             sprintf(op, buf, n->getDouble());
             n->release(getLexInfo());
             break;
 
           case 's':
-            str = o->getString(getLexInfo());
+            str = o->getString(getLexInfo(), ee);
             sprintf(op, buf, str->getValue());
             str->release(getLexInfo());
             break;
@@ -1868,7 +1868,7 @@ OperatorReturn Printf::action() {
           case 'p':
             found = false;
             try {
-              n = o->getNumber(getLexInfo());
+              n = o->getNumber(getLexInfo(), ee);
               if(n->isInt()) {
                 sprintf(fmt, "%%%sd", PCTD);
                 sprintf(op, fmt, n->getInt());
@@ -1879,7 +1879,7 @@ OperatorReturn Printf::action() {
 
             if(! found) {
               try {
-                str = o->getString(getLexInfo());
+                str = o->getString(getLexInfo(), ee);
                 sprintf(op, "%s", str->getValue());
                 str->release(getLexInfo());
                 found = true;
@@ -1891,7 +1891,7 @@ OperatorReturn Printf::action() {
           case 'n':
             found = false;
             try {
-              name = o->getName(getLexInfo());
+              name = o->getName(getLexInfo(), ee);
               sprintf(op, "%s", name->getValue());
               found = true;
             } catch(Exception *e) { }
@@ -1916,7 +1916,7 @@ OperatorReturn Printf::action() {
   } else {
     if((q = (char *) malloc(strlen(res) + 1)) == (char *) 0) slexception.chuck("malloc error", getLexInfo());
     strcpy(q, res);
-    stack.push(cache.newString(q, true));
+    ee->stack.push(cache.newString(q, true));
   }
 
   format->release(getLexInfo());
@@ -1929,21 +1929,21 @@ OperatorReturn Printf::action() {
 
 Defined::Defined(LexInfo *li) : Operation(li) { }
 
-OperatorReturn Defined::action() {
+OperatorReturn Defined::action(ExecutionEnvironment *ee) {
   Object *o;
   Variable *v;
   INT n;
   Name *name;
   char *value;
 
-  o = stack.pop(getLexInfo());
+  o = ee->stack.pop(getLexInfo());
 
   n = 1;
   if(o->isName()) {
-    v = variableStack.findVariable(o->getName(getLexInfo())->getValue());
+    v = ee->variableStack.findVariable(o->getName(getLexInfo(), ee)->getValue());
     if(v == (Variable *) 0) n = 0;
   }
-  stack.push(cache.newNumber(n));
+  ee->stack.push(cache.newNumber(n));
 
   o->release(getLexInfo());
 
@@ -1952,19 +1952,19 @@ OperatorReturn Defined::action() {
 
 Initialised::Initialised(LexInfo *li) : Operation(li) { }
 
-OperatorReturn Initialised::action() {
+OperatorReturn Initialised::action(ExecutionEnvironment *ee) {
   Object *o;
   Variable *v;
   INT n;
 
-  o = stack.pop(getLexInfo());
+  o = ee->stack.pop(getLexInfo());
 
   n = 1;
   if(o->isName()) {
-    v = variableStack.findVariable(o->getName(getLexInfo())->getValue());
+    v = ee->variableStack.findVariable(o->getName(getLexInfo(), ee)->getValue());
     if((v == (Variable *) 0) || (! v->isInitialised())) n = 0;
   }
-  stack.push(cache.newNumber(n));
+  ee->stack.push(cache.newNumber(n));
 
   o->release(getLexInfo());
 
@@ -1975,7 +1975,7 @@ OperatorReturn Initialised::action() {
 
 PrintStack::PrintStack(LexInfo *li) : Operation(li) { }
 
-OperatorReturn PrintStack::action() {
+OperatorReturn PrintStack::action(ExecutionEnvironment *ee) {
   StackItem *si;
   Object *o;
   Name *na;
@@ -1986,21 +1986,21 @@ OperatorReturn PrintStack::action() {
   bool found;
   char fmt[32];
 
-  for(i = 0, si = stack.getStack(); si != (StackItem *) 0; si = si->getDown(), i++) {
+  for(i = 0, si = ee->stack.getStack(); si != (StackItem *) 0; si = si->getDown(), i++) {
     printf("%d: ", i);
 
     o = si->getObject();
     found = false;
 
     try {
-      na = o->getName(getLexInfo());
+      na = o->getName(getLexInfo(), ee);
       printf("%s\n", na->getValue());
       found = true;
     } catch(Exception *e) { }
 
     if(! found) {
       try {
-        s = o->getString(getLexInfo());
+        s = o->getString(getLexInfo(), ee);
         printf("\"%s\"\n", s->getValue());
         s->release(getLexInfo());
         found = true;
@@ -2009,7 +2009,7 @@ OperatorReturn PrintStack::action() {
 
     if(! found) {
       try {
-        c = o->getCode(getLexInfo());
+        c = o->getCode(getLexInfo(), ee);
         printf("{ ...code... }\n");
         c->release(getLexInfo());
         found = true;
@@ -2018,7 +2018,7 @@ OperatorReturn PrintStack::action() {
 
     if(! found) {
       try {
-        no = o->getNumber(getLexInfo());
+        no = o->getNumber(getLexInfo(), ee);
         if(no->isInt()) {
           sprintf(fmt, "%%%sd\n", PCTD);
           printf(fmt, no->getInt());
@@ -2038,9 +2038,9 @@ OperatorReturn PrintStack::action() {
 
 Debug::Debug(LexInfo *li) : Operation(li) { }
 
-OperatorReturn Debug::action() {
+OperatorReturn Debug::action(ExecutionEnvironment *ee) {
   cache.debug();
-  stack.debug();
+  ee->stack.debug();
   btree.debug();
 
   return or_continue;
@@ -2050,7 +2050,7 @@ OperatorReturn Debug::action() {
 
 BTreeDebug::BTreeDebug(LexInfo *li) : Operation(li) { }
 
-OperatorReturn BTreeDebug::action() {
+OperatorReturn BTreeDebug::action(ExecutionEnvironment *ee) {
   btree.print();
 
   return or_continue;
@@ -2494,7 +2494,7 @@ void BTree::printDetail(BTreeNode *t, int i) {
 
   found = false;
   try {
-    n = o->getNumber((LexInfo *) 0);
+    n = o->getNumber((LexInfo *) 0, (ExecutionEnvironment *) 0);
     if(n->isInt()) {
       sprintf(fmt, "%%%sd", PCTD);
       printf(fmt, n->getInt());
@@ -2505,7 +2505,7 @@ void BTree::printDetail(BTreeNode *t, int i) {
 
   if(! found) {
     try {
-      s = o->getString((LexInfo *) 0);
+      s = o->getString((LexInfo *) 0, (ExecutionEnvironment *) 0);
       printf("\"%s\"", s->getValue());
       s->release((LexInfo *) 0);
       found = true;
@@ -2514,7 +2514,7 @@ void BTree::printDetail(BTreeNode *t, int i) {
 
   if(! found) {
     try {
-      p = o->getPointer((LexInfo *) 0);
+      p = o->getPointer((LexInfo *) 0, (ExecutionEnvironment *) 0);
       printf("...pointer...");
       p->release((LexInfo *) 0);
       found = true;
@@ -2523,7 +2523,7 @@ void BTree::printDetail(BTreeNode *t, int i) {
 
   if(! found) {
     try {
-      c = o->getCode((LexInfo *) 0);
+      c = o->getCode((LexInfo *) 0, (ExecutionEnvironment *) 0);
       printf("{ ...code... }");
       c->release((LexInfo *) 0);
       found = true;

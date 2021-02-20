@@ -33,49 +33,49 @@ SOFTWARE.
 class ThreadHelp : public Operation {
   public:
     ThreadHelp(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class ThreadCreate : public Operation {
   public:
     ThreadCreate(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class ThreadMutex : public Operation {
   public:
     ThreadMutex(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class ThreadLock : public Operation {
   public:
     ThreadLock(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class ThreadUnlock : public Operation {
   public:
     ThreadUnlock(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class ThreadSemaphore : public Operation {
   public:
     ThreadSemaphore(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class ThreadWait : public Operation {
   public:
     ThreadWait(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class ThreadPost : public Operation {
   public:
     ThreadPost(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 const char *threadHelp[] = {
@@ -168,7 +168,7 @@ extern "C" void slmain() {
 
 ThreadHelp::ThreadHelp(LexInfo *li) : Operation(li) { }
 
-OperatorReturn ThreadHelp::action() {
+OperatorReturn ThreadHelp::action(ExecutionEnvironment *ee) {
   const char **p;
 
   for(p = threadHelp; *p != (const char *) 0; p++) {
@@ -180,13 +180,13 @@ OperatorReturn ThreadHelp::action() {
 
 ThreadCreate::ThreadCreate(LexInfo *li) : Operation(li) { }
 
-OperatorReturn ThreadCreate::action() {
+OperatorReturn ThreadCreate::action(ExecutionEnvironment *ee) {
   return or_continue;
 }
 
 ThreadMutex::ThreadMutex(LexInfo *li) : Operation(li) { }
 
-OperatorReturn ThreadMutex::action() {
+OperatorReturn ThreadMutex::action(ExecutionEnvironment *ee) {
   Object *o;
   Name *n;
   Number *no;
@@ -198,12 +198,12 @@ OperatorReturn ThreadMutex::action() {
   char semName[64];
   pthread_mutex_t *mutex;
 
-  o = stack.pop(getLexInfo());
+  o = ee->stack.pop(getLexInfo());
 
   name[0] = 0;
 
   try {
-    no = o->getNumber(getLexInfo());
+    no = o->getNumber(getLexInfo(), ee);
     if(no->isInt()) { sprintf(fmt, "%%%sd", PCTD); sprintf(name, fmt, no->getInt()); }
     else sprintf(name, "%0.3f", no->getDouble());
     no->release(getLexInfo());
@@ -211,7 +211,7 @@ OperatorReturn ThreadMutex::action() {
 
   if(name[0] == 0) {
     try {
-      s = o->getString(getLexInfo());
+      s = o->getString(getLexInfo(), ee);
       strcpy(name, s->getValue());
       s->release(getLexInfo());
     } catch(Exception *e) { }
@@ -219,7 +219,7 @@ OperatorReturn ThreadMutex::action() {
 
   if(name[0] == 0) {
     try {
-      n = o->getName(getLexInfo());
+      n = o->getName(getLexInfo(), ee);
       str = n->getValue();
       strcpy(name, str + (str[0] == '/' ? 1 : 0));
     } catch(Exception *e) { }
@@ -243,7 +243,7 @@ OperatorReturn ThreadMutex::action() {
 
 ThreadLock::ThreadLock(LexInfo *li) : Operation(li) { }
 
-OperatorReturn ThreadLock::action() {
+OperatorReturn ThreadLock::action(ExecutionEnvironment *ee) {
   Object *o;
   Name *n;
   Number *no;
@@ -255,12 +255,12 @@ OperatorReturn ThreadLock::action() {
   char semName[64];
   pthread_mutex_t *mutex;
 
-  o = stack.pop(getLexInfo());
+  o = ee->stack.pop(getLexInfo());
 
   name[0] = 0;
 
   try {
-    no = o->getNumber(getLexInfo());
+    no = o->getNumber(getLexInfo(), ee);
     if(no->isInt()) { sprintf(fmt, "%%%sd", PCTD); sprintf(name, fmt, no->getInt()); }
     else sprintf(name, "%0.3f", no->getDouble());
     no->release(getLexInfo());
@@ -268,7 +268,7 @@ OperatorReturn ThreadLock::action() {
 
   if(name[0] == 0) {
     try {
-      s = o->getString(getLexInfo());
+      s = o->getString(getLexInfo(), ee);
       strcpy(name, s->getValue());
       s->release(getLexInfo());
     } catch(Exception *e) { }
@@ -276,7 +276,7 @@ OperatorReturn ThreadLock::action() {
 
   if(name[0] == 0) {
     try {
-      n = o->getName(getLexInfo());
+      n = o->getName(getLexInfo(), ee);
       str = n->getValue();
       strcpy(name, str + (str[0] == '/' ? 1 : 0));
     } catch(Exception *e) { }
@@ -287,7 +287,7 @@ OperatorReturn ThreadLock::action() {
   sprintf(semName, "/%s/semaphore/thread", name);
   v = btree.findVariable(semName);
   if(v == (Variable *) 0) slexception.chuck("Semaphore not found", getLexInfo());
-  no = v->getObject()->getNumber(getLexInfo());
+  no = v->getObject()->getNumber(getLexInfo(), ee);
   pthread_mutex_lock((pthread_mutex_t *) no->getInt());
   no->release(getLexInfo());
 
@@ -298,7 +298,7 @@ OperatorReturn ThreadLock::action() {
 
 ThreadUnlock::ThreadUnlock(LexInfo *li) : Operation(li) { }
 
-OperatorReturn ThreadUnlock::action() {
+OperatorReturn ThreadUnlock::action(ExecutionEnvironment *ee) {
   Object *o;
   Name *n;
   Number *no;
@@ -310,12 +310,12 @@ OperatorReturn ThreadUnlock::action() {
   char semName[64];
   pthread_mutex_t *mutex;
 
-  o = stack.pop(getLexInfo());
+  o = ee->stack.pop(getLexInfo());
 
   name[0] = 0;
 
   try {
-    no = o->getNumber(getLexInfo());
+    no = o->getNumber(getLexInfo(), ee);
     if(no->isInt()) { sprintf(fmt, "%%%sd", PCTD); sprintf(name, fmt, no->getInt()); }
     else sprintf(name, "%0.3f", no->getDouble());
     no->release(getLexInfo());
@@ -323,7 +323,7 @@ OperatorReturn ThreadUnlock::action() {
 
   if(name[0] == 0) {
     try {
-      s = o->getString(getLexInfo());
+      s = o->getString(getLexInfo(), ee);
       strcpy(name, s->getValue());
       s->release(getLexInfo());
     } catch(Exception *e) { }
@@ -331,7 +331,7 @@ OperatorReturn ThreadUnlock::action() {
 
   if(name[0] == 0) {
     try {
-      n = o->getName(getLexInfo());
+      n = o->getName(getLexInfo(), ee);
       str = n->getValue();
       strcpy(name, str + (str[0] == '/' ? 1 : 0));
     } catch(Exception *e) { }
@@ -342,7 +342,7 @@ OperatorReturn ThreadUnlock::action() {
   sprintf(semName, "/%s/semaphore/thread", name);
   v = btree.findVariable(semName);
   if(v == (Variable *) 0) slexception.chuck("Semaphore not found", getLexInfo());
-  no = v->getObject()->getNumber(getLexInfo());
+  no = v->getObject()->getNumber(getLexInfo(), ee);
   pthread_mutex_unlock((pthread_mutex_t *) no->getInt());
   no->release(getLexInfo());
 
@@ -353,7 +353,7 @@ OperatorReturn ThreadUnlock::action() {
 
 ThreadSemaphore::ThreadSemaphore(LexInfo *li) : Operation(li) { }
 
-OperatorReturn ThreadSemaphore::action() {
+OperatorReturn ThreadSemaphore::action(ExecutionEnvironment *ee) {
   Object *o;
   Name *n;
   Number *no;
@@ -365,12 +365,12 @@ OperatorReturn ThreadSemaphore::action() {
   char semName[64];
   sem_t *sem;
 
-  o = stack.pop(getLexInfo());
+  o = ee->stack.pop(getLexInfo());
 
   name[0] = 0;
 
   try {
-    no = o->getNumber(getLexInfo());
+    no = o->getNumber(getLexInfo(), ee);
     if(no->isInt()) { sprintf(fmt, "%%%sd", PCTD); sprintf(name, fmt, no->getInt()); }
     else sprintf(name, "%0.3f", no->getDouble());
     no->release(getLexInfo());
@@ -378,7 +378,7 @@ OperatorReturn ThreadSemaphore::action() {
 
   if(name[0] == 0) {
     try {
-      s = o->getString(getLexInfo());
+      s = o->getString(getLexInfo(), ee);
       strcpy(name, s->getValue());
       s->release(getLexInfo());
     } catch(Exception *e) { }
@@ -386,7 +386,7 @@ OperatorReturn ThreadSemaphore::action() {
 
   if(name[0] == 0) {
     try {
-      n = o->getName(getLexInfo());
+      n = o->getName(getLexInfo(), ee);
       str = n->getValue();
       strcpy(name, str + (str[0] == '/' ? 1 : 0));
     } catch(Exception *e) { }
@@ -410,7 +410,7 @@ OperatorReturn ThreadSemaphore::action() {
 
 ThreadWait::ThreadWait(LexInfo *li) : Operation(li) { }
 
-OperatorReturn ThreadWait::action() {
+OperatorReturn ThreadWait::action(ExecutionEnvironment *ee) {
   Object *o;
   Name *n;
   Number *no;
@@ -422,12 +422,12 @@ OperatorReturn ThreadWait::action() {
   char semName[64];
   sem_t *sem;
 
-  o = stack.pop(getLexInfo());
+  o = ee->stack.pop(getLexInfo());
 
   name[0] = 0;
 
   try {
-    no = o->getNumber(getLexInfo());
+    no = o->getNumber(getLexInfo(), ee);
     if(no->isInt()) { sprintf(fmt, "%%%sd", PCTD); sprintf(name, fmt, no->getInt()); }
     else sprintf(name, "%0.3f", no->getDouble());
     no->release(getLexInfo());
@@ -435,7 +435,7 @@ OperatorReturn ThreadWait::action() {
 
   if(name[0] == 0) {
     try {
-      s = o->getString(getLexInfo());
+      s = o->getString(getLexInfo(), ee);
       strcpy(name, s->getValue());
       s->release(getLexInfo());
     } catch(Exception *e) { }
@@ -443,7 +443,7 @@ OperatorReturn ThreadWait::action() {
 
   if(name[0] == 0) {
     try {
-      n = o->getName(getLexInfo());
+      n = o->getName(getLexInfo(), ee);
       str = n->getValue();
       strcpy(name, str + (str[0] == '/' ? 1 : 0));
     } catch(Exception *e) { }
@@ -454,7 +454,7 @@ OperatorReturn ThreadWait::action() {
   sprintf(semName, "/%s/semaphore/thread", name);
   v = btree.findVariable(semName);
   if(v == (Variable *) 0) slexception.chuck("Semaphore not found", getLexInfo());
-  no = v->getObject()->getNumber(getLexInfo());
+  no = v->getObject()->getNumber(getLexInfo(), ee);
   sem_wait((sem_t *) no->getInt());
   no->release(getLexInfo());
 
@@ -465,7 +465,7 @@ OperatorReturn ThreadWait::action() {
 
 ThreadPost::ThreadPost(LexInfo *li) : Operation(li) { }
 
-OperatorReturn ThreadPost::action() {
+OperatorReturn ThreadPost::action(ExecutionEnvironment *ee) {
   Object *o;
   Name *n;
   Number *no;
@@ -477,12 +477,12 @@ OperatorReturn ThreadPost::action() {
   char semName[64];
   sem_t *sem;
 
-  o = stack.pop(getLexInfo());
+  o = ee->stack.pop(getLexInfo());
 
   name[0] = 0;
 
   try {
-    no = o->getNumber(getLexInfo());
+    no = o->getNumber(getLexInfo(), ee);
     if(no->isInt()) { sprintf(fmt, "%%%sd", PCTD); sprintf(name, fmt, no->getInt()); }
     else sprintf(name, "%0.3f", no->getDouble());
     no->release(getLexInfo());
@@ -490,7 +490,7 @@ OperatorReturn ThreadPost::action() {
 
   if(name[0] == 0) {
     try {
-      s = o->getString(getLexInfo());
+      s = o->getString(getLexInfo(), ee);
       strcpy(name, s->getValue());
       s->release(getLexInfo());
     } catch(Exception *e) { }
@@ -498,7 +498,7 @@ OperatorReturn ThreadPost::action() {
 
   if(name[0] == 0) {
     try {
-      n = o->getName(getLexInfo());
+      n = o->getName(getLexInfo(), ee);
       str = n->getValue();
       strcpy(name, str + (str[0] == '/' ? 1 : 0));
     } catch(Exception *e) { }
@@ -509,7 +509,7 @@ OperatorReturn ThreadPost::action() {
   sprintf(semName, "/%s/semaphore/thread", name);
   v = btree.findVariable(semName);
   if(v == (Variable *) 0) slexception.chuck("Semaphore not found", getLexInfo());
-  no = v->getObject()->getNumber(getLexInfo());
+  no = v->getObject()->getNumber(getLexInfo(), ee);
   sem_post((sem_t *) no->getInt());
   no->release(getLexInfo());
 

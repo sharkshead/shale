@@ -81,6 +81,7 @@ class Exception {
     const char *message;
 };
 
+class ExecutionEnvironment;
 class Number;
 class String;
 class Name;
@@ -97,12 +98,12 @@ class Object {
   public:
     Object();
     virtual ~Object();
-    virtual Number *getNumber(LexInfo *);
-    virtual String *getString(LexInfo *);
+    virtual Number *getNumber(LexInfo *, ExecutionEnvironment *);
+    virtual String *getString(LexInfo *, ExecutionEnvironment *);
     virtual bool isName();
-    virtual Name *getName(LexInfo *);
-    virtual Code *getCode(LexInfo *);
-    virtual Pointer *getPointer(LexInfo *);
+    virtual Name *getName(LexInfo *, ExecutionEnvironment *);
+    virtual Code *getCode(LexInfo *, ExecutionEnvironment *);
+    virtual Pointer *getPointer(LexInfo *, ExecutionEnvironment *);
     virtual void hold();
     virtual void release(LexInfo *);
     int referenceCount;
@@ -113,7 +114,7 @@ class Number : public Object {
   public:
     Number(INT);
     Number(double);
-    Number *getNumber(LexInfo *);
+    Number *getNumber(LexInfo *, ExecutionEnvironment *);
     bool isInt();
     INT getInt();
     void setInt(INT);
@@ -133,7 +134,7 @@ class String : public Object {
     String(const char *);
     String(const char *, bool);
     ~String();
-    String *getString(LexInfo *);
+    String *getString(LexInfo *, ExecutionEnvironment *);
     const char *getValue();
     bool getRemoveStringFlag();
     void setString(const char *);
@@ -150,12 +151,12 @@ class Name : public Object {
   public:
     Name(const char *);
     bool isName();
-    Name *getName(LexInfo *);
+    Name *getName(LexInfo *, ExecutionEnvironment *);
     char *getValue();
-    Number *getNumber(LexInfo *);
-    String *getString(LexInfo *);
-    Code *getCode(LexInfo *);
-    Pointer *getPointer(LexInfo *);
+    Number *getNumber(LexInfo *, ExecutionEnvironment *);
+    String *getString(LexInfo *, ExecutionEnvironment *);
+    Code *getCode(LexInfo *, ExecutionEnvironment *);
+    Pointer *getPointer(LexInfo *, ExecutionEnvironment *);
     void debug();
 
   private:
@@ -167,9 +168,9 @@ class OperationList;
 class Code : public Object {
   public:
     Code(OperationList *);
-    Code *getCode(LexInfo *);
+    Code *getCode(LexInfo *, ExecutionEnvironment *);
     OperationList *getOperationList();
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
     void debug();
 
   private:
@@ -181,7 +182,7 @@ class ObjectList;
 class Pointer : public Object {
   public:
     Pointer(Object *);
-    Pointer *getPointer(LexInfo *);
+    Pointer *getPointer(LexInfo *, ExecutionEnvironment *);
     Object *getObject();
     void setObject(Object *);
     void hold();
@@ -245,7 +246,7 @@ class Cache {
 class Operation {
   public:
     Operation(LexInfo *);
-    virtual OperatorReturn action() = 0;
+    virtual OperatorReturn action(ExecutionEnvironment *) = 0;
     virtual bool isVar();
     virtual bool isFunction();
     LexInfo *getLexInfo();
@@ -257,25 +258,25 @@ class Operation {
 class PrintStack : public Operation {
   public:
     PrintStack(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class Debug : public Operation {
   public:
     Debug(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class BTreeDebug : public Operation {
   public:
     BTreeDebug(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class Push : public Operation {
   public:
     Push(Object *, LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 
   private:
     Object *object;
@@ -284,273 +285,273 @@ class Push : public Operation {
 class Pop : public Operation {
   public:
     Pop(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class Swap : public Operation {
   public:
     Swap(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class Dup : public Operation {
   public:
     Dup(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class Int : public Operation {
   public:
     Int(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class Double : public Operation {
   public:
     Double(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class Plus : public Operation {
   public:
     Plus(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class Minus : public Operation {
   public:
     Minus(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class Times : public Operation {
   public:
     Times(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class Divide : public Operation {
   public:
     Divide(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class Mod : public Operation {
   public:
     Mod(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class BitwiseAnd : public Operation {
   public:
     BitwiseAnd(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class BitwiseOr : public Operation {
   public:
     BitwiseOr(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class BitwiseXor : public Operation {
   public:
     BitwiseXor(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class BitwiseNot : public Operation {
   public:
     BitwiseNot(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class LeftShift : public Operation {
   public:
     LeftShift(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class RightShift : public Operation {
   public:
     RightShift(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class Function : public Operation {
   public:
     Function(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
     bool isFunction();
 };
 
 class Return : public Operation {
   public:
     Return(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class Var : public Operation {
   public:
     Var(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
     bool isVar();
 };
 
 class Defined : public Operation {
   public:
     Defined(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class Initialised : public Operation {
   public:
     Initialised(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class Assign : public Operation {
   public:
     Assign(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class PointerAssign : public Operation {
   public:
     PointerAssign(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class PointerDereference : public Operation {
   public:
     PointerDereference(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class PlusPlus : public Operation {
   public:
     PlusPlus(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class MinusMinus : public Operation {
   public:
     MinusMinus(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class LessThan : public Operation {
   public:
     LessThan(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class LessThanOrEquals : public Operation {
   public:
     LessThanOrEquals(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class Equals : public Operation {
   public:
     Equals(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class NotEquals : public Operation {
   public:
     NotEquals(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class GreaterThanOrEquals : public Operation {
   public:
     GreaterThanOrEquals(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class GreaterThan : public Operation {
   public:
     GreaterThan(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class LogicalAnd : public Operation {
   public:
     LogicalAnd(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class LogicalOr : public Operation {
   public:
     LogicalOr(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class LogicalNot : public Operation {
   public:
     LogicalNot(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class True : public Operation {
   public:
     True(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class False : public Operation {
   public:
     False(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class Stop : public Operation {
   public:
     Stop(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class Start : public Operation {
   public:
     Start(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class Break : public Operation {
   public:
     Break(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class Exit : public Operation {
   public:
     Exit(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class While : public Operation {
   public:
     While(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class If : public Operation {
   public:
     If(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class IfThen : public Operation {
   public:
     IfThen(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class Repeat : public Operation {
   public:
     Repeat(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 
   private:
     bool checkTimers(int *);
@@ -559,31 +560,31 @@ class Repeat : public Operation {
 class Value : public Operation {
   public:
     Value(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class ToName : public Operation {
   public:
     ToName(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class Namespace : public Operation {
   public:
     Namespace(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class Library : public Operation {
   public:
     Library(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class Print : public Operation {
   public:
     Print(bool, LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 
   private:
     bool newline;
@@ -592,7 +593,7 @@ class Print : public Operation {
 class Printf : public Operation {
   public:
     Printf(bool, LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 
   private:
     bool output;
@@ -601,7 +602,7 @@ class Printf : public Operation {
 class Execute : public Operation {
   public:
     Execute(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class OperationListItem {
@@ -621,8 +622,8 @@ class OperationList {
     OperationList();
     void addOperation(Operation *);
     OperationListItem *getOperationList();
-    OperatorReturn action();
-    OperatorReturn actionLatest();
+    OperatorReturn action(ExecutionEnvironment *);
+    OperatorReturn actionLatest(ExecutionEnvironment *);
     bool isFunction();
 
   private:
@@ -771,6 +772,12 @@ class Stack {
     StackItem *used;
     int stackSize;
     int usedSize;
+};
+
+class ExecutionEnvironment {
+  public:
+    VariableStack variableStack;
+    Stack stack;
 };
 
 // Plugin support classes

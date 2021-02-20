@@ -38,13 +38,13 @@ SOFTWARE.
 class MathsHelp : public Operation {
   public:
     MathsHelp(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 class MathsFunction : public Operation {
   public:
     MathsFunction(int, LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 
   private:
     int function;
@@ -53,7 +53,7 @@ class MathsFunction : public Operation {
 class MathsToThePower : public Operation {
   public:
     MathsToThePower(LexInfo *);
-    OperatorReturn action();
+    OperatorReturn action(ExecutionEnvironment *);
 };
 
 const char *mathsHelp[] = {
@@ -138,7 +138,7 @@ extern "C" void slmain() {
 
 MathsHelp::MathsHelp(LexInfo *li) : Operation(li) { }
 
-OperatorReturn MathsHelp::action() {
+OperatorReturn MathsHelp::action(ExecutionEnvironment *ee) {
   const char **p;
 
   for(p = mathsHelp; *p != (const char *) 0; p++) {
@@ -150,7 +150,7 @@ OperatorReturn MathsHelp::action() {
 
 MathsFunction::MathsFunction(int f, LexInfo *li) : Operation(li), function(f) { }
 
-OperatorReturn MathsFunction::action() {
+OperatorReturn MathsFunction::action(ExecutionEnvironment *ee) {
   Object *o;
   Object *o2;
   Number *n;
@@ -160,25 +160,25 @@ OperatorReturn MathsFunction::action() {
   INT b;
   INT t;
 
-  o = stack.pop(getLexInfo());
-  n = o->getNumber(getLexInfo());
+  o = ee->stack.pop(getLexInfo());
+  n = o->getNumber(getLexInfo(), ee);
 
   switch(function) {
     case FUNCTION_LN:
-      stack.push(cache.newNumber(log(n->getDouble())));
+      ee->stack.push(cache.newNumber(log(n->getDouble())));
       break;
 
     case FUNCTION_LOG:
-      stack.push(cache.newNumber(log10(n->getDouble())));
+      ee->stack.push(cache.newNumber(log10(n->getDouble())));
       break;
 
     case FUNCTION_SQRT:
-      stack.push(cache.newNumber(sqrt(n->getDouble())));
+      ee->stack.push(cache.newNumber(sqrt(n->getDouble())));
       break;
 
     case FUNCTION_GCD:
-      o2 = stack.pop(getLexInfo());
-      n2 = o2->getNumber(getLexInfo());
+      o2 = ee->stack.pop(getLexInfo());
+      n2 = o2->getNumber(getLexInfo(), ee);
       a = n->getInt();
       b = n2->getInt();
 
@@ -192,12 +192,11 @@ OperatorReturn MathsFunction::action() {
         b = a % b;
         a = t;
       }
-      stack.push(cache.newNumber(a));
+      ee->stack.push(cache.newNumber(a));
 
       n2->release(getLexInfo());
       o2->release(getLexInfo());
       break;
-
   }
 
   n->release(getLexInfo());
@@ -208,18 +207,18 @@ OperatorReturn MathsFunction::action() {
 
 MathsToThePower::MathsToThePower(LexInfo *li) : Operation(li) { }
 
-OperatorReturn MathsToThePower::action() {
+OperatorReturn MathsToThePower::action(ExecutionEnvironment *ee) {
   Object *o1;
   Object *o2;
   Number *n1;
   Number *n2;
 
-  o2 = stack.pop(getLexInfo());
-  o1 = stack.pop(getLexInfo());
-  n1 = o1->getNumber(getLexInfo());
-  n2 = o2->getNumber(getLexInfo());
+  o2 = ee->stack.pop(getLexInfo());
+  o1 = ee->stack.pop(getLexInfo());
+  n1 = o1->getNumber(getLexInfo(), ee);
+  n2 = o2->getNumber(getLexInfo(), ee);
     
-  stack.push(cache.newNumber(exp(n2->getDouble() * log(n1->getDouble()))));
+  ee->stack.push(cache.newNumber(exp(n2->getDouble() * log(n1->getDouble()))));
 
   n1->release(getLexInfo());
   n2->release(getLexInfo());
