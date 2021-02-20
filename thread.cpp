@@ -25,6 +25,8 @@ SOFTWARE.
 */
 
 #include "shalelib.h"
+#include <pthread.h>
+#include <semaphore.h>
 
 #define MAJOR   (INT) 1
 #define MINOR   (INT) 0
@@ -124,6 +126,24 @@ extern "C" void slmain() {
   v = new Variable("/micro/version/thread");
   v->setObject(cache.newNumber(MICRO));
   btree.addVariable(v);
+
+  ol = new OperationList;
+  ol->addOperation(new ThreadSemaphore((LexInfo *) 0));
+  v = new Variable("/semaphore/thread");
+  v->setObject(new Code(ol));
+  btree.addVariable(v);
+
+  ol = new OperationList;
+  ol->addOperation(new ThreadWait((LexInfo *) 0));
+  v = new Variable("/wait/thread");
+  v->setObject(new Code(ol));
+  btree.addVariable(v);
+
+  ol = new OperationList;
+  ol->addOperation(new ThreadPost((LexInfo *) 0));
+  v = new Variable("/post/thread");
+  v->setObject(new Code(ol));
+  btree.addVariable(v);
 }
 
 ThreadHelp::ThreadHelp(LexInfo *li) : Operation(li) { }
@@ -171,18 +191,167 @@ OperatorReturn ThreadUnlock::action() {
 ThreadSemaphore::ThreadSemaphore(LexInfo *li) : Operation(li) { }
 
 OperatorReturn ThreadSemaphore::action() {
+  Object *o;
+  Name *n;
+  Number *no;
+  String *s;
+  Variable *v;
+  char *str;
+  char fmt[16];
+  char name[64];
+  char semName[64];
+  sem_t *sem;
+
+  o = stack.pop(getLexInfo());
+
+  name[0] = 0;
+
+  try {
+    no = o->getNumber(getLexInfo());
+    if(no->isInt()) { sprintf(fmt, "%%%sd", PCTD); sprintf(name, fmt, no->getInt()); }
+    else sprintf(name, "%0.3f", no->getDouble());
+    no->release(getLexInfo());
+  } catch(Exception *e) { }
+
+  if(name[0] == 0) {
+    try {
+      s = o->getString(getLexInfo());
+      strcpy(name, s->getValue());
+      s->release(getLexInfo());
+    } catch(Exception *e) { }
+  }
+
+  if(name[0] == 0) {
+    try {
+      n = o->getName(getLexInfo());
+      str = n->getValue();
+      strcpy(name, str + (str[0] == '/' ? 1 : 0));
+    } catch(Exception *e) { }
+  }
+
+  if(name[0] == 0) slexception.chuck("Unknown argument type", getLexInfo());
+
+  sem = new sem_t;
+  sem_init(sem, 0, 0);
+  sprintf(semName, "/%s/semaphore/thread", name);
+  v = btree.findVariable(semName);
+  if(v != (Variable *) 0) slexception.chuck("Name already exists", getLexInfo());
+  v = new Variable(semName);
+  v->setObject(cache.newNumber((INT) sem));
+  btree.addVariable(v);
+
+  o->release(getLexInfo());
+
   return or_continue;
 }
 
 ThreadWait::ThreadWait(LexInfo *li) : Operation(li) { }
 
 OperatorReturn ThreadWait::action() {
+  Object *o;
+  Name *n;
+  Number *no;
+  String *s;
+  Variable *v;
+  char *str;
+  char fmt[16];
+  char name[64];
+  char semName[64];
+  sem_t *sem;
+
+  o = stack.pop(getLexInfo());
+
+  name[0] = 0;
+
+  try {
+    no = o->getNumber(getLexInfo());
+    if(no->isInt()) { sprintf(fmt, "%%%sd", PCTD); sprintf(name, fmt, no->getInt()); }
+    else sprintf(name, "%0.3f", no->getDouble());
+    no->release(getLexInfo());
+  } catch(Exception *e) { }
+
+  if(name[0] == 0) {
+    try {
+      s = o->getString(getLexInfo());
+      strcpy(name, s->getValue());
+      s->release(getLexInfo());
+    } catch(Exception *e) { }
+  }
+
+  if(name[0] == 0) {
+    try {
+      n = o->getName(getLexInfo());
+      str = n->getValue();
+      strcpy(name, str + (str[0] == '/' ? 1 : 0));
+    } catch(Exception *e) { }
+  }
+
+  if(name[0] == 0) slexception.chuck("Unknown argument type", getLexInfo());
+
+  sprintf(semName, "/%s/semaphore/thread", name);
+  v = btree.findVariable(semName);
+  if(v == (Variable *) 0) slexception.chuck("Semaphore not found", getLexInfo());
+  no = v->getObject()->getNumber(getLexInfo());
+  sem_wait((sem_t *) no->getInt());
+  no->release(getLexInfo());
+
+  o->release(getLexInfo());
+
   return or_continue;
 }
 
 ThreadPost::ThreadPost(LexInfo *li) : Operation(li) { }
 
 OperatorReturn ThreadPost::action() {
+  Object *o;
+  Name *n;
+  Number *no;
+  String *s;
+  Variable *v;
+  char *str;
+  char fmt[16];
+  char name[64];
+  char semName[64];
+  sem_t *sem;
+
+  o = stack.pop(getLexInfo());
+
+  name[0] = 0;
+
+  try {
+    no = o->getNumber(getLexInfo());
+    if(no->isInt()) { sprintf(fmt, "%%%sd", PCTD); sprintf(name, fmt, no->getInt()); }
+    else sprintf(name, "%0.3f", no->getDouble());
+    no->release(getLexInfo());
+  } catch(Exception *e) { }
+
+  if(name[0] == 0) {
+    try {
+      s = o->getString(getLexInfo());
+      strcpy(name, s->getValue());
+      s->release(getLexInfo());
+    } catch(Exception *e) { }
+  }
+
+  if(name[0] == 0) {
+    try {
+      n = o->getName(getLexInfo());
+      str = n->getValue();
+      strcpy(name, str + (str[0] == '/' ? 1 : 0));
+    } catch(Exception *e) { }
+  }
+
+  if(name[0] == 0) slexception.chuck("Unknown argument type", getLexInfo());
+
+  sprintf(semName, "/%s/semaphore/thread", name);
+  v = btree.findVariable(semName);
+  if(v == (Variable *) 0) slexception.chuck("Semaphore not found", getLexInfo());
+  no = v->getObject()->getNumber(getLexInfo());
+  sem_post((sem_t *) no->getInt());
+  no->release(getLexInfo());
+
+  o->release(getLexInfo());
+
   return or_continue;
 }
 

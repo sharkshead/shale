@@ -51,10 +51,10 @@ time.so: time.o
 	g++ -shared -o time.so time.o
 
 thread.o: thread.cpp shalelib.h
-	g++ -fPIC -c -o thread.o thread.cpp
+	g++ -fPIC -c -o thread.o thread.cpp -lpthread
 
 thread.so: thread.o
-	g++ -shared -o thread.so thread.o
+	g++ -shared -o thread.so thread.o -lpthread
 
 /usr/local/bin/shale: shale
 	sudo rm -f /usr/local/bin/shale
