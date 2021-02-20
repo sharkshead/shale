@@ -1,6 +1,6 @@
-all: shale maths.so array.so primes.o time.o file.so
+all: shale maths.so array.so primes.o teme.o file.so thread.so
 
-install: /usr/local/bin/shale /usr/local/lib/shale/maths.so /usr/local/lib/shale/array.so /usr/local/lib/shale/primes.so /usr/local/lib/shale/time.so /usr/local/lib/shale/file.so
+install: /usr/local/bin/shale /usr/local/lib/shale/maths.so /usr/local/lib/shale/array.so /usr/local/lib/shale/primes.so /usr/local/lib/shale/time.so /usr/local/lib/shale/file.so /usr/local/lib/shale/thread.so
 
 clean:
 	rm -f shale *.o *.so
@@ -50,6 +50,12 @@ time.o: time.cpp shalelib.h
 time.so: time.o
 	g++ -flat_namespace -bundle -undefined suppress -o time.so time.o
 
+thread.o: thread.cpp shalelib.h
+	g++ -c -o thread.o thread.cpp -lpthread
+
+thread.so: thread.o
+	g++ -flat_namespace -bundle -undefined suppress -o thread.so thread.o -lpthread
+
 /usr/local/bin/shale: shale
 	[ -d /usr/local/bin ] || sudo mkdir -p /usr/local/bin
 	sudo rm -f /usr/local/bin/shale
@@ -79,3 +85,8 @@ time.so: time.o
 	[ -d /usr/local/lib/shale ] || sudo mkdir -p /usr/local/lib/shale
 	sudo rm -f /usr/local/lib/shale/time.so
 	sudo cp time.so /usr/local/lib/shale/time.so
+
+/usr/local/lib/shale/thread.so: thread.so
+	[ -d /usr/local/lib/shale ] || sudo mkdir -p /usr/local/lib/shale
+	sudo rm -f /usr/local/lib/shale/thread.so
+	sudo cp thread.so /usr/local/lib/shale/thread.so
