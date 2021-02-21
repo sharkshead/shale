@@ -21,8 +21,8 @@ thread library
 
 // Creating mutexes.
 
-// To create a mutex you need to give it a name, which can either
-// be a number (integer or floating point), a string is a variable name.
+// To create a mutex you need to give it a name, which can be
+// a number (integer or floating point), a string or a variable name.
 // Here are some mutexes.
 
 123 mutex thread::()
@@ -31,7 +31,7 @@ thread library
 stop mutex thread::()
 5 8:: a:: mutex thread::()
 
-// All mutexes are created under the mutex:: thread:: namespace,
+// All mutexes are stored under the mutex:: thread:: namespace,
 // so you'll see them appear in the btree output (shown a little later).
 // The value of each mutex is of no importance to your shale scipt.
 // The value is the address of the dynamically allocated mutex.
@@ -52,7 +52,7 @@ stop mutex thread::()
 // Creating a semaphore.
 
 // Similar to mutexes, semaphores need a name.
-// All of the following create valid sempahores.
+// All of the following are valid sempahores.
 
 123 semaphore thread::()
 3.141 semaphore thread::()
@@ -60,7 +60,7 @@ stop mutex thread::()
 ready semaphore thread::()
 5 8:: a:: semaphore thread::()
 
-// All semaphors are created under the semaphore:: thread:: namespace,.
+// All semaphors are stored under the semaphore:: thread:: namespace.
 // And just like mutexes, the value of each semaphore is the address
 // of the dynamically allocated semaphore.
 
@@ -70,18 +70,15 @@ ready semaphore thread::()
 //
 //  123 wait thread::()
 //
-// I'm not going to wait on this just yet because we haven't sent up threads
-// with wake up calles, etc. This will come later.
+// You can see these in action below.
 
 // To release a semaphore, push the semaphore's name and call post thread::()
 //
 //  123 post thread::()
-//
-// Again, I'm not executing this just yet. Patience.
 
 
 
-// Here you'll see the muteexes and semaphores stored in their
+// Here you'll see the mutexes and semaphores stored in their
 // respective namespace variables.
 
 btree
@@ -90,17 +87,17 @@ btree
 
 // Creating a thread, and bringing it all together.
 
-// To create a thread you need to pass in a function (or any code fragment).
+// To create a thread you need to pass in a function (or a code fragment).
 // The thread will run until your function exits. While your function runs, the only
-// access it has to the calling thread is via namespace variables. It has a completely
-// separate stack and simple variable stack. You can synchronise your threads
-// by using semaphores, and you can lock critical pieces of data structures
+// access it has to the calling thread is via namespace variables. The thread has a
+// completely separate stack and simple variable stack. You can synchronise your threads
+// by using semaphores, and you can lock critical pieces of data structure
 // stored in namespace variables with mutexes.
 
 // In the following contrived example, the "main" thread will create two
 // new threads and then wait on a semaphore. Each of the new threads will sit in
-// a loop waiting for a bit, then update a namespae variable and wake up the main thread.
-// And just for kicks each thread will use a mutex to prevent access to
+// a loop waiting for a bit, then update a namespace variable and wake up the main thread.
+// And just for kicks each thread will use a mutex to prevent simultaneous access to
 // a couple of namespace variables.
 
 thread1 var
@@ -115,9 +112,9 @@ thread1 {
       i++
     } while
 
-    stop lock thread::()   // lock our important data structure
+    stop lock thread::()    // lock our important data structure
     1 ns::++                // really important task that must not be interrupted
-    stop unlock thread::() // and unlock it
+    stop unlock thread::()  // and unlock it
 
     ready post thread::()   // wake up the main thread
   } while
@@ -143,8 +140,8 @@ thread2 {
   } while
 } =
 
-thread2 create thread::()
 thread1 create thread::()
+thread2 create thread::()
 
 "" println
 i var
@@ -162,6 +159,11 @@ i 0 =
 
 
 // Closing comment.
+
+// While the BTree that supports all namespace variables is thread-safe, most
+// shale operator are not atomic, so something as simple as the ++ increment
+// operator should be surrounded by a mutex lock/unlock should you have two
+// or more threads changing the same variable.
 
 
 
