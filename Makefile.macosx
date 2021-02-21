@@ -51,7 +51,7 @@ time.so: time.o
 	g++ -flat_namespace -bundle -undefined suppress -o time.so time.o
 
 thread.o: thread.cpp shalelib.h
-	g++ -c -o thread.o thread.cpp -lpthread
+	g++ -c -o thread.o thread.cpp
 
 thread.so: thread.o
 	g++ -flat_namespace -bundle -undefined suppress -o thread.so thread.o -lpthread
