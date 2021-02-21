@@ -19,6 +19,14 @@ shale:
 
 
 
+thread library:
+     
+  1.0.0 - 21 Feb 2021
+    - initial release
+    - shale version 1.2.6.
+
+
+
 primes library:
 
   1.2.0 - 18 Feb 2021
