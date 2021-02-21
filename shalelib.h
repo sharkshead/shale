@@ -41,6 +41,7 @@ SOFTWARE.
 #include <sys/stat.h>
 #include <sys/socket.h>
 #include <sys/select.h>
+#include <fcntl.h>
 #include <netdb.h>
 #include <dlfcn.h>
 #include <pthread.h>

@@ -385,7 +385,7 @@ OperatorReturn ThreadUnlock::action(ExecutionEnvironment *ee) {
 
   sprintf(mutexName, "/%s/mutex/thread", name);
   v = btree.findVariable(mutexName);
-  if(v == (Variable *) 0) slexception.chuck("Semaphore not found", getLexInfo());
+  if(v == (Variable *) 0) slexception.chuck("Mutex not found", getLexInfo());
   no = v->getObject()->getNumber(getLexInfo(), ee);
   pthread_mutex_unlock((pthread_mutex_t *) no->getInt());
   no->release(getLexInfo());
@@ -407,7 +407,9 @@ OperatorReturn ThreadSemaphore::action(ExecutionEnvironment *ee) {
   char fmt[16];
   char name[64];
   char semName[64];
+  char externalName[64];
   sem_t *sem;
+  char *p;
 
   o = ee->stack.pop(getLexInfo());
 
@@ -438,11 +440,15 @@ OperatorReturn ThreadSemaphore::action(ExecutionEnvironment *ee) {
 
   if(name[0] == 0) slexception.chuck("Unknown argument type", getLexInfo());
 
-  sem = new sem_t;
-  sem_init(sem, 0, 0);
   sprintf(semName, "/%s/semaphore/thread", name);
+  sprintf(externalName, "/shale.%s", name);
+  for(p = externalName; *p != 0; p++) {
+    if(*p == '/') *p = '_';
+  }
   v = btree.findVariable(semName);
   if(v != (Variable *) 0) slexception.chuck("Name already exists", getLexInfo());
+  sem_unlink(externalName);
+  if((sem = sem_open(externalName, O_CREAT | O_EXCL, 0666, 0)) == SEM_FAILED) slexception.chuck("Can't create semaphore", getLexInfo());
   v = new Variable(semName);
   v->setObject(cache.newNumber((INT) sem));
   btree.addVariable(v);
