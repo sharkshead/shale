@@ -8,12 +8,42 @@ thread library
 // the following function
 //
 //  create thread::()       create a new thread
-//  semaphore thread::()    create a new semaphore
-//  wait thread::()         wait on a semaphore
-//  post thread::()         post to a semaphore
 //  mutex thread::()        create a new mutex
 //  lock thread::()         lock a murtex
 //  unlock thread::()       unlock a murex
+//  semaphore thread::()    create a new semaphore
+//  wait thread::()         wait on a semaphore
+//  post thread::()         post to a semaphore
+
+
+
+// Mutexes.
+
+// Creating mutexes.
+
+// To create a mutex you need to give it a name, which can either
+// be a number (integer or floating point), a string is a variable name.
+// Here are some mutexes.
+
+123 mutex thread::()
+3.141 mutex thread::()
+"Joe Bloggs" mutex thread::()
+stop mutex thread::()
+5 8:: a:: mutex thread::()
+
+// All mutexes are created under the mutex:: thread:: namespace,
+// so you'll see them appear in the btree output (shown a little later).
+// The value of each mutex is of no importance to your shale scipt.
+// The value is the address of the dynamically allocated mutex.
+// Change their value and disaster awaits.
+
+// To lock a mutex, just do
+
+123 lock thread::()
+
+// And to unlock one:
+
+123 unlock thread::()
 
 
 
@@ -21,8 +51,7 @@ thread library
 
 // Creating a semaphore.
 
-// To create a semaphore you need to give it a name, which can either
-// be a nuber (integer of floating point), a string or a variable name.
+// Similar to mutexes, semaphores need a name.
 // All of the following create valid sempahores.
 
 123 semaphore thread::()
@@ -31,14 +60,9 @@ thread library
 ready semaphore thread::()
 5 8:: a:: semaphore thread::()
 
-// All semaphors are created under the semaphore:: thread:: namespace,
-// as you can se fron the btree output.
-
-btree
-
-// The value of each semaphore is of no importance to your shale scipt.
-// Thye are pointers to the dynamically allocated semaphore.
-// Change their value and disaster awaits.
+// All semaphors are created under the semaphore:: thread:: namespace,.
+// And just like mutexes, the value of each semaphore is the address
+// of the dynamically allocated semaphore.
 
 // Waiting on and releassing a semaphore.
 
@@ -57,12 +81,88 @@ btree
 
 
 
-// Creating a mutex.
+// Here you'll see the muteexes and semaphores stored in their
+// respective namespace variables.
+
+btree
 
 
 
 // Creating a thread, and bringing it all together.
 
+// To create a thread you need to pass in a function (or any code fragment).
+// The thread will run until your function exits. While your function runs, the only
+// access it has to the calling thread is via namespace variables. It has a completely
+// separate stack and simple variable stack. You can synchronise your threads
+// by using semaphores, and you can lock critical pieces of data structures
+// stored in namespace variables with mutexes.
+
+// In the following contrived example, the "main" thread will create two
+// new threads and then wait on a semaphore. Each of the new threads will sit in
+// a loop waiting for a bit, then update a namespae variable and wake up the main thread.
+// And just for kicks each thread will use a mutex to prevent access to
+// a couple of namespace variables.
+
+thread1 var
+thread1 {
+  i var
+
+  1 ns:: var
+  1 ns:: 0 =
+  { true } {
+    i 0 =
+    { i 1000000 < } {       // waste a bit of time
+      i++
+    } while
+
+    stop lock thread::()   // lock our important data structure
+    1 ns::++                // really important task that must not be interrupted
+    stop unlock thread::() // and unlock it
+
+    ready post thread::()   // wake up the main thread
+  } while
+} =
+
+thread2 var
+thread2 {
+  i var
+
+  2 ns:: var
+  2 ns:: 0 =
+  { true } {
+    i 0 =
+    { i 1250000 < } {
+      i++
+    } while
+
+    stop lock thread::()
+    2 ns::++
+    stop unlock thread::()
+
+    ready post thread::()
+  } while
+} =
+
+thread2 create thread::()
+thread1 create thread::()
+
+"" println
+i var
+i 0 =
+{ i 10 < } {
+  ready wait thread::()
+
+  stop lock thread::()
+  1 ns:: 2 ns:: "%d %d\n" printf
+  stop unlock thread::()
+
+  i++
+} while
+
 
 
 // Closing comment.
+
+
+
+micro version:: thread:: minor version:: thread:: major version:: thread:: "\nThread library version %d.%d.%d\n" printf

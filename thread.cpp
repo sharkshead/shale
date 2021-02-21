@@ -239,7 +239,7 @@ OperatorReturn ThreadMutex::action(ExecutionEnvironment *ee) {
   char *str;
   char fmt[16];
   char name[64];
-  char semName[64];
+  char mutexName[64];
   pthread_mutex_t *mutex;
 
   o = ee->stack.pop(getLexInfo());
@@ -273,10 +273,10 @@ OperatorReturn ThreadMutex::action(ExecutionEnvironment *ee) {
 
   mutex = new pthread_mutex_t;
   pthread_mutex_init(mutex, NULL);
-  sprintf(semName, "/%s/mutex/thread", name);
-  v = btree.findVariable(semName);
+  sprintf(mutexName, "/%s/mutex/thread", name);
+  v = btree.findVariable(mutexName);
   if(v != (Variable *) 0) slexception.chuck("Name already exists", getLexInfo());
-  v = new Variable(semName);
+  v = new Variable(mutexName);
   v->setObject(cache.newNumber((INT) mutex));
   btree.addVariable(v);
 
@@ -296,7 +296,7 @@ OperatorReturn ThreadLock::action(ExecutionEnvironment *ee) {
   char *str;
   char fmt[16];
   char name[64];
-  char semName[64];
+  char mutexName[64];
   pthread_mutex_t *mutex;
 
   o = ee->stack.pop(getLexInfo());
@@ -328,9 +328,9 @@ OperatorReturn ThreadLock::action(ExecutionEnvironment *ee) {
 
   if(name[0] == 0) slexception.chuck("Unknown argument type", getLexInfo());
 
-  sprintf(semName, "/%s/semaphore/thread", name);
-  v = btree.findVariable(semName);
-  if(v == (Variable *) 0) slexception.chuck("Semaphore not found", getLexInfo());
+  sprintf(mutexName, "/%s/mutex/thread", name);
+  v = btree.findVariable(mutexName);
+  if(v == (Variable *) 0) slexception.chuck("Mutex not found", getLexInfo());
   no = v->getObject()->getNumber(getLexInfo(), ee);
   pthread_mutex_lock((pthread_mutex_t *) no->getInt());
   no->release(getLexInfo());
@@ -351,7 +351,7 @@ OperatorReturn ThreadUnlock::action(ExecutionEnvironment *ee) {
   char *str;
   char fmt[16];
   char name[64];
-  char semName[64];
+  char mutexName[64];
   pthread_mutex_t *mutex;
 
   o = ee->stack.pop(getLexInfo());
@@ -383,8 +383,8 @@ OperatorReturn ThreadUnlock::action(ExecutionEnvironment *ee) {
 
   if(name[0] == 0) slexception.chuck("Unknown argument type", getLexInfo());
 
-  sprintf(semName, "/%s/semaphore/thread", name);
-  v = btree.findVariable(semName);
+  sprintf(mutexName, "/%s/mutex/thread", name);
+  v = btree.findVariable(mutexName);
   if(v == (Variable *) 0) slexception.chuck("Semaphore not found", getLexInfo());
   no = v->getObject()->getNumber(getLexInfo(), ee);
   pthread_mutex_unlock((pthread_mutex_t *) no->getInt());
