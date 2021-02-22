@@ -35,7 +35,7 @@ stop mutex thread::()
 // so you'll see them appear in the btree output (shown a little later).
 // The value of each mutex is of no importance to your shale scipt.
 // The value is the address of the dynamically allocated mutex.
-// Change their value and disaster awaits.
+// Change its value and disaster awaits.
 
 // To lock a mutex, just do
 
@@ -64,7 +64,7 @@ ready semaphore thread::()
 // And just like mutexes, the value of each semaphore is the address
 // of the dynamically allocated semaphore.
 
-// Waiting on and releassing a semaphore.
+// Waiting on and releasing a semaphore.
 
 // To wait on a semaphore, push the semaphore's name and call wait thread::()
 //
@@ -87,24 +87,24 @@ btree
 
 // Creating a thread, and bringing it all together.
 
-// To create a thread you need to pass in a function (or a code fragment) and an argument.
-// The argument can be any object and will be placed on the new thread's stack.
+// To create a thread you pass in a function (or a code fragment) and an argument.
+// The argument can be any object and will be pushed on the new thread's stack.
 // The thread will run until the function exits. The thread has a completely separate stack
 // and simple variable stack. You can synchronise your threads by using semaphores,
 // and you can lock critical pieces of data structure stored in namespace variables with mutexes.
 // Namespace variables are the only means by which different threads can exchange data.
 
-// In the following contrived example, the "main" thread will create two
-// new threads and then wait on a semaphore. Each new thread takes an argument which
+// In the following contrived example, the main thread will create two new threads and then
+// wait on a semaphore inside a loop. Each new thread takes an argument which
 // is a namespace variable, the value of which is the number of times it goes around
 // a loop (effectively a time delay). It then reinitialises that variable to 0 and
 // enters a loop where is waits for a bit, increments the namespace variable value
-// then wakes up the main thread. The main thread terminates after 20 iterations.
-// And just for kicks, each thread will use a mutex to prevent simultaneous access to
-// a couple of namespace variables.
+// then wakes up the main thread. The main thread prints the value of each namespace variable
+// and terminates after 20 iterations. And just for kicks, each thread will use a mutex
+// to prevent simultaneous access to their namespace variable.
 
-thread var
-thread {
+threadCode var
+threadCode {
   p var p swap &=
   count var
   i var
@@ -118,7 +118,7 @@ thread {
     } while
 
     stop lock thread::()    // lock our important data structure
-    p->++                   // really important task that must not be interrupted
+    p->++                   // really important task. this is now thread-safe
     stop unlock thread::()  // and unlock it
 
     ready post thread::()   // wake up the main thread
@@ -130,16 +130,17 @@ thread {
 2 ns:: var
 2 ns:: 125000 =
 
-1 ns:: thread create thread::()
-2 ns:: thread create thread::()
+1 ns:: threadCode create thread::()
+2 ns:: threadCode create thread::()
 
+"" println
 i var
 i 0 =
 { i 20 < } {
   ready wait thread::()
 
   stop lock thread::()
-  1 ns:: 2 ns:: "%d %d\n" printf
+  2 ns:: 1 ns:: "thread 1: %2d,  thread 2: %2d\n" printf
   stop unlock thread::()
 
   i++
