@@ -54,6 +54,9 @@ primes library:
  
 
 time library:
+  1.1.1 - 22 Feb 2021
+    - add sleep time::()
+    = shale version 1.3.0
 
   1.1.0 - 17 Jan 2021
     - add dateformat time:: variable to control output format

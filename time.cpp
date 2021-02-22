@@ -29,7 +29,7 @@ SOFTWARE.
 
 #define MAJOR   (INT) 1
 #define MINOR   (INT) 1
-#define MICRO   (INT) 0
+#define MICRO   (INT) 1
 
 class TimeHelp : public Operation {
   public:
@@ -64,6 +64,12 @@ class TimeLocaltime : public Operation {
     OperatorReturn action(ExecutionEnvironment *);
 };
 
+class TimeSleep : public Operation {
+  public:
+    TimeSleep(LexInfo *);
+    OperatorReturn action(ExecutionEnvironment *);
+};
+
 const char *timeHelp[] = {
   "Time library:",
   "  now time::()                      - Returns the time library's tepoch time.",
@@ -80,6 +86,7 @@ const char *timeHelp[] = {
   "  {tepoch} localtime time::()       - stores the 9 elements of struct tm in the tm:: time:: namespace,",
   "                                      each entry without the tm_ prefix, eg, sec tm:: time::",
   "                                      If {tepoch} is zero then the current time is used",
+  "  {ms} sleep time::()               - sleep for the specified milli seconds",
   "  dateformat time:: {fmt} =         - Format of the output of date time::(). Default is \"DMY\"",
   "                                      with options \"MDY\", \"YMD\" or \"Y-M-D\"",
   "  language option:: shale:: {l} =   - Change the language output by date time::()",
@@ -147,6 +154,12 @@ extern "C" void slmain() {
   ol = new OperationList;
   ol->addOperation(new TimeLocaltime((LexInfo *) 0));
   v = new Variable("/localtime/time");
+  v->setObject(new Code(ol));
+  btree.addVariable(v);
+
+  ol = new OperationList;
+  ol->addOperation(new TimeSleep((LexInfo *) 0));
+  v = new Variable("/sleep/time");
   v->setObject(new Code(ol));
   btree.addVariable(v);
 }
@@ -414,6 +427,23 @@ OperatorReturn TimeLocaltime::action(ExecutionEnvironment *ee) {
   } else {
     v->setObject(cache.newNumber((INT) tm->tm_isdst));
   }
+
+  n->release(getLexInfo());
+  o->release(getLexInfo());
+
+  return or_continue;
+}
+
+TimeSleep::TimeSleep(LexInfo *li) : Operation(li) { }
+
+OperatorReturn TimeSleep::action(ExecutionEnvironment *ee) {
+  Object *o;
+  Number *n;
+
+  o = ee->stack.pop(getLexInfo());
+  n = o->getNumber(getLexInfo(), ee);
+
+  usleep(n->getInt() * 1000);
 
   n->release(getLexInfo());
   o->release(getLexInfo());

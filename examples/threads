@@ -103,23 +103,23 @@ btree
 // and terminates after 20 iterations. And each thread will use a mutex to mediate
 // access to their namespace variable across all three threads while their values are changed..
 
+// This uses sleep time::() to introduce a bit of delay, so we need the time library.
+
+time library
+
 threadCode var
 threadCode {
   p var p swap &=
-  count var
-  i var
+  delay var
 
-  count p-> =               // this is thread-safe because this is the only thread that changes p->
+  delay p-> =               // this is thread-safe because this is the only thread that changes p->
 
   stop lock thread::()      // prevent access while the value is changed
   p-> 0 =
   stop unlock thread::()    // unlock
 
   { true } {
-    i 0 =
-    { i count < } {         // waste a bit of time
-      i++
-    } while
+    delay sleep time::()
 
     stop lock thread::()    // prevent access while the value is changed
     p->++
@@ -130,9 +130,9 @@ threadCode {
 } =
 
 1 ns:: var
-1 ns:: 100000 =
+1 ns:: 1000 =
 2 ns:: var
-2 ns:: 125000 =
+2 ns:: 1471 =
 
 1 ns:: threadCode create thread::()
 2 ns:: threadCode create thread::()
