@@ -7,6 +7,7 @@
 //  {tepoch} timems time::()
 //  {tepoch} date time::()
 //  {tepoch} localtime time::()
+//  {ms} sleep time::()
 //  help time::()
 //
 // and it uses the variables
@@ -111,6 +112,16 @@ language option:: shale:: "en" =
 
 0 localtime time::()
 yday tm:: time:: "The current day of the year is %d\n" printf
+
+
+
+// {ms} sleep time::()
+//
+// This sleeps for the given number of milli seconds.
+
+now time::()
+1234 sleep time::()
+now time::() swap - "The sleep duration was %d ms\n" printf
 
 
 
