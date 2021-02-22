@@ -32,7 +32,7 @@ btree
 // All namespace variables are stored in a BTree (as opposed
 // to simple variables that have a separate variable stack).
 // The btree operator prints each namespace variable along
-// with its valus. You'll notice that the internal name of
+// with its value. You'll notice that the internal name of
 // each namespace variable resembles a Unix pathname, so a
 // name such as
 //
