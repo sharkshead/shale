@@ -10,6 +10,7 @@
 //  file
 //  maths
 //  primes
+//  thread
 //  time
 //
 // To load a library, use the library operator
@@ -18,6 +19,7 @@ array library
 file library
 maths library
 primes library
+thread library
 time library
 
 // Each library stores all their functions and variables under
@@ -41,5 +43,5 @@ help maths::()
 // interactively is great for this - run shale with no arguments
 // and enter, for example
 //
-//  file library
-//  help file::()
+//  thread library
+//  help thread::()

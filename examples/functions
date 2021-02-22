@@ -23,7 +23,7 @@ sf {
 sf execute
 sf()
 
-// You can create quite complex functions with this, but these is
+// You can create quite complex functions with this, but there is
 // a drawback - there is no return statement that will exit this code fragment.
 // This may complicate your code if you want to return from the
 // code fragment from deep within nested if/ifthen/while operators.

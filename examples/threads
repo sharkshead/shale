@@ -33,7 +33,7 @@ stop mutex thread::()
 
 // All mutexes are stored under the mutex:: thread:: namespace,
 // so you'll see them appear in the btree output (shown a little later).
-// The value of each mutex is of no importance to your shale scipt.
+// The value of each mutex is of no importance to the shale script.
 // The value is the address of the dynamically allocated mutex.
 // Change its value and disaster awaits.
 
@@ -90,7 +90,7 @@ btree
 // To create a thread you pass in a function (or a code fragment) and an argument.
 // The argument can be any object and will be pushed on the new thread's stack.
 // The thread will run until the function exits. The thread has a completely separate stack
-// and simple variable stack. You can synchronise your threads by using semaphores,
+// and simple variable stack. You can synchronise the threads by using semaphores,
 // and you can lock critical pieces of data structure stored in namespace variables with mutexes.
 // Namespace variables are the only means by which different threads can exchange data.
 
@@ -100,8 +100,8 @@ btree
 // a loop (effectively a time delay). It then reinitialises that variable to 0 and
 // enters a loop where is waits for a bit, increments the namespace variable value
 // then wakes up the main thread. The main thread prints the value of each namespace variable
-// and terminates after 20 iterations. And just for kicks, each thread will use a mutex
-// to prevent simultaneous access to their namespace variable.
+// and terminates after 20 iterations. And each thread will use a mutex to mediate
+// access to their namespace variable across all three threads while their values are changed..
 
 threadCode var
 threadCode {
@@ -109,17 +109,21 @@ threadCode {
   count var
   i var
 
-  count p-> =
+  count p-> =               // this is thread-safe because this is the only thread that changes p->
+
+  stop lock thread::()      // prevent access while the value is changed
   p-> 0 =
+  stop unlock thread::()    // unlock
+
   { true } {
     i 0 =
-    { i count < } {       // waste a bit of time
+    { i count < } {         // waste a bit of time
       i++
     } while
 
-    stop lock thread::()    // lock our important data structure
-    p->++                   // really important task. this is now thread-safe
-    stop unlock thread::()  // and unlock it
+    stop lock thread::()    // prevent access while the value is changed
+    p->++
+    stop unlock thread::()  // unlock
 
     ready post thread::()   // wake up the main thread
   } while
@@ -140,7 +144,7 @@ i 0 =
   ready wait thread::()
 
   stop lock thread::()
-  2 ns:: 1 ns:: "thread 1: %2d,  thread 2: %2d\n" printf
+  2 ns:: 1 ns:: "thread 1: %2d   thread 2: %2d\n" printf
   stop unlock thread::()
 
   i++
@@ -150,12 +154,7 @@ i 0 =
 
 // Closing comment.
 
-// While the BTree that supports all namespace variables is thread-safe,
-// some shale operator are not. Something as simple as the ++ increment
-// operator should be surrounded by a mutex lock/unlock should you have two
-// or more threads changing the same variable. The "really important" example above
-// isn't a case where a lock/unlock is required because p is pointing to different
-// variables in the two threads; it is included solely as an example.
+// Any data that is changed and communicated between threads needs a mutex lock/unlock surrounding it.
 
 
 
