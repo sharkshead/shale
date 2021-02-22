@@ -94,14 +94,14 @@ btree
 // and you can lock critical pieces of data structure stored in namespace variables with mutexes.
 // Namespace variables are the only means by which different threads can exchange data.
 
-// In the following contrived example, the main thread will create two new threads and then
-// wait on a semaphore inside a loop. Each new thread takes an argument which
-// is a namespace variable, the value of which is the number of times it goes around
-// a loop (effectively a time delay). It then reinitialises that variable to 0 and
-// enters a loop where is waits for a bit, increments the namespace variable value
-// then wakes up the main thread. The main thread prints the value of each namespace variable
-// and terminates after 20 iterations. And each thread will use a mutex to mediate
-// access to their namespace variable across all three threads while their values are changed..
+// In the following contrived example, the main thread creates two new threads and then
+// waits on a semaphore inside a loop. Each new thread takes an argument which
+// is a namespace variable, the value of which is the number of milli seconds to sleep.
+// It then reinitialises that variable to 0 and enters a loop where is sleep for the given time,
+// increments the namespace variable value then wakes up the main thread. The main thread
+// prints the value of each namespace variable and terminates after 20 iterations.
+// And each thread will use a mutex to mediate access to their namespace variable across
+// all three threads while their values are changed..
 
 // This uses sleep time::() to introduce a bit of delay, so we need the time library.
 
