@@ -28,7 +28,7 @@ SOFTWARE.
 
 #define MAJOR   (INT) 1
 #define MINOR   (INT) 0
-#define MICRO   (INT) 0
+#define MICRO   (INT) 1
 
 class ThreadPack {
   public:
@@ -86,16 +86,16 @@ class ThreadPost : public Operation {
 
 const char *threadHelp[] = {
   "Thread library",
-  "  {code} create thread::()    - create a new thread running the given code",
-  "  {m} mutex thread::()        - create and initialise a mutex",
-  "  {m} lock thread::()         - lock a mutex",
-  "  {m} unlock thread::()       - unlock a mutex",
-  "  {s} semaphore thread::()    - create and initialise a semaphore",
-  "  {s} wait thread::()         - wait on a semaphore",
-  "  {s} post thread::()         - post to a semaphore",
-  "  major version:: thread::    - major version number",
-  "  minor version:: thread::    - minor version number",
-  "  micro version:: number::    - micro version number",
+  "  {arg} {code} create thread::()  - create a new thread running the given code",
+  "  {m} mutex thread::()            - create and initialise a mutex",
+  "  {m} lock thread::()             - lock a mutex",
+  "  {m} unlock thread::()           - unlock a mutex",
+  "  {s} semaphore thread::()        - create and initialise a semaphore",
+  "  {s} wait thread::()             - wait on a semaphore",
+  "  {s} post thread::()             - post to a semaphore",
+  "  major version:: thread::        - major version number",
+  "  minor version:: thread::        - minor version number",
+  "  micro version:: number::        - micro version number",
   (const char *) 0
 };
 
@@ -168,6 +168,9 @@ extern "C" void slmain() {
   v->setObject(new Code(ol));
   btree.addVariable(v);
 
+  slmutex = new pthread_mutex_t;
+  pthread_mutex_init(slmutex, NULL);
+
   cacheMutex = new pthread_mutex_t;
   pthread_mutex_init(cacheMutex, NULL);
   cache.setMutex(cacheMutex);
@@ -192,8 +195,11 @@ OperatorReturn ThreadHelp::action(ExecutionEnvironment *ee) {
 void *theThread(void *arg) {
   ThreadPack *tp = (ThreadPack *) arg;
 
-  tp->code->action(&tp->ee);
-  tp->code->release((LexInfo *) 0);
+  try {
+    tp->code->action(&tp->ee);
+    tp->code->release((LexInfo *) 0);
+  } catch(Exception *e) { e->printError(); }
+
   delete(tp);
 
   return (void *) 0;
@@ -212,16 +218,11 @@ OperatorReturn ThreadCreate::action(ExecutionEnvironment *ee) {
 
   tp = new ThreadPack;
   tp->code = o->getCode(getLexInfo(), ee);
+  tp->ee.stack.push(ee->stack.pop(getLexInfo()));
 
-  try {
-    if(pthread_attr_init(&attr) != 0) slexception.chuck("Can't initialise thread attributes", getLexInfo());
-    if(pthread_attr_setstacksize(&attr, 1024*1024) != 0) slexception.chuck("Can't set thread stack size", getLexInfo());
-    if(pthread_create(&thread, &attr, theThread, tp) != 0) slexception.chuck("Can't create thread", getLexInfo());
-  } catch(Exception *e) {
-    e->printError();
-  } catch(exception &e) {
-    printf("%s\n", e.what());
-  }
+  if(pthread_attr_init(&attr) != 0) slexception.chuck("Can't initialise thread attributes", getLexInfo());
+  if(pthread_attr_setstacksize(&attr, 1024*1024) != 0) slexception.chuck("Can't set thread stack size", getLexInfo());
+  if(pthread_create(&thread, &attr, theThread, tp) != 0) slexception.chuck("Can't create thread", getLexInfo());
 
   o->release(getLexInfo());
 

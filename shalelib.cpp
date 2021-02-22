@@ -28,6 +28,7 @@ SOFTWARE.
 
 BTree btree;
 Exception slexception;
+pthread_mutex_t *slmutex;
 
 // LexInfo and Exception classes. These tie an execution error to the input.
 
@@ -260,8 +261,17 @@ bool Object::isName() { return false; }
 Name *Object::getName(LexInfo *li, ExecutionEnvironment *ee) { slexception.chuck("name not found", li); return (Name *) 0; }
 Code *Object::getCode(LexInfo *li, ExecutionEnvironment *ee) { slexception.chuck("code not found", li); return (Code *) 0; }
 Pointer *Object::getPointer(LexInfo *li, ExecutionEnvironment *ee) { slexception.chuck("pointer not found", li); return (Pointer *) 0; }
-void Object::hold() { referenceCount++; }
-void Object::release(LexInfo *li) { if(referenceCount < 0) slexception.chuck("reference error", li); if(referenceCount == 0) delete(this); else referenceCount--; }
+void Object::hold() {
+  if(slmutex != (pthread_mutex_t *) 0) pthread_mutex_lock(slmutex);
+  referenceCount++;
+  if(slmutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(slmutex);
+}
+void Object::release(LexInfo *li) {
+  if(slmutex != (pthread_mutex_t *) 0) pthread_mutex_lock(slmutex);
+  if(referenceCount < 0) slexception.chuck("reference error", li);
+  if(referenceCount == 0) delete(this); else referenceCount--;
+  if(slmutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(slmutex);
+}
 
 // Number class
 
@@ -273,7 +283,12 @@ INT Number::getInt() { if(intRep) return valueInt; return valueDouble; }
 void Number::setInt(INT i) { intRep = true; valueInt = i; }
 double Number::getDouble() { if(intRep) return valueInt; return valueDouble; }
 void Number::setDouble(double d) { intRep = false; valueDouble = d; }
-void Number::release(LexInfo *li) { if(referenceCount < 0) slexception.chuck("reference error", li); if(referenceCount == 0) cache.deleteNumber(this); else referenceCount--; }
+void Number::release(LexInfo *li) {
+  if(slmutex != (pthread_mutex_t *) 0) pthread_mutex_lock(slmutex);
+  if(referenceCount < 0) slexception.chuck("reference error", li);
+  if(referenceCount == 0) cache.deleteNumber(this); else referenceCount--;
+  if(slmutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(slmutex);
+}
 void Number::debug() { char fmt[32]; printf("Number: "); if(intRep) { sprintf(fmt, "%%%sd\n", PCTD); printf(fmt, valueInt); } else printf("%0.3f\n", valueDouble); }
 
 // String class
@@ -286,7 +301,12 @@ const char *String::getValue() { return str; }
 bool String::getRemoveStringFlag() { return removeStringFlag; }
 void String::setString(const char *s) { str = s; }
 void String::setRemoveStringFlag(bool rsf) { removeStringFlag = rsf; }
-void String::release(LexInfo *li) { if(referenceCount < 0) slexception.chuck("reference error", li); if(referenceCount == 0) cache.deleteString(this); else referenceCount--; }
+void String::release(LexInfo *li) {
+  if(slmutex != (pthread_mutex_t *) 0) pthread_mutex_lock(slmutex);
+  if(referenceCount < 0) slexception.chuck("reference error", li);
+  if(referenceCount == 0) cache.deleteString(this); else referenceCount--;
+  if(slmutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(slmutex);
+}
 void String::debug() { printf("String: %s\n", str); }
 
 // Name class
@@ -362,11 +382,15 @@ void Pointer::setObject(Object *o) { object = o; object->hold(); }
 Object *Pointer::getObject() { return object; }
 void Pointer::hold() { Object::hold(); if(object != (Object *) 0) object->hold(); }
 void Pointer::release(LexInfo *li) {
+  if(slmutex != (pthread_mutex_t *) 0) pthread_mutex_lock(slmutex);
   if(referenceCount < 0) slexception.chuck("reference error", li);
+  if(slmutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(slmutex);
   if(object != (Object *) 0) object->release(li);
+  if(slmutex != (pthread_mutex_t *) 0) pthread_mutex_lock(slmutex);
   if(referenceCount == 0) {
     cache.deletePointer(this);
   } else referenceCount--;
+  if(slmutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(slmutex);
 }
 void Pointer::debug() { printf("Pointer\n"); }
 

@@ -87,66 +87,55 @@ btree
 
 // Creating a thread, and bringing it all together.
 
-// To create a thread you need to pass in a function (or a code fragment).
-// The thread will run until your function exits. While your function runs, the only
-// access it has to the calling thread is via namespace variables. The thread has a
-// completely separate stack and simple variable stack. You can synchronise your threads
-// by using semaphores, and you can lock critical pieces of data structure
-// stored in namespace variables with mutexes.
+// To create a thread you need to pass in a function (or a code fragment) and an argument.
+// The argument can be any object and will be placed on the new thread's stack.
+// The thread will run until the function exits. The thread has a completely separate stack
+// and simple variable stack. You can synchronise your threads by using semaphores,
+// and you can lock critical pieces of data structure stored in namespace variables with mutexes.
+// Namespace variables are the only means by which different threads can exchange data.
 
 // In the following contrived example, the "main" thread will create two
-// new threads and then wait on a semaphore. Each of the new threads will sit in
-// a loop waiting for a bit, then update a namespace variable and wake up the main thread.
-// And just for kicks each thread will use a mutex to prevent simultaneous access to
+// new threads and then wait on a semaphore. Each new thread takes an argument which
+// is a namespace variable, the value of which is the number of times it goes around
+// a loop (effectively a time delay). It then reinitialises that variable to 0 and
+// enters a loop where is waits for a bit, increments the namespace variable value
+// then wakes up the main thread. The main thread terminates after 20 iterations.
+// And just for kicks, each thread will use a mutex to prevent simultaneous access to
 // a couple of namespace variables.
 
-thread1 var
-thread1 {
+thread var
+thread {
+  p var p swap &=
+  count var
   i var
 
-  1 ns:: var
-  1 ns:: 0 =
+  count p-> =
+  p-> 0 =
   { true } {
     i 0 =
-    { i 1000000 < } {       // waste a bit of time
+    { i count < } {       // waste a bit of time
       i++
     } while
 
     stop lock thread::()    // lock our important data structure
-    1 ns::++                // really important task that must not be interrupted
+    p->++                   // really important task that must not be interrupted
     stop unlock thread::()  // and unlock it
 
     ready post thread::()   // wake up the main thread
   } while
 } =
 
-thread2 var
-thread2 {
-  i var
+1 ns:: var
+1 ns:: 100000 =
+2 ns:: var
+2 ns:: 125000 =
 
-  2 ns:: var
-  2 ns:: 0 =
-  { true } {
-    i 0 =
-    { i 1250000 < } {
-      i++
-    } while
+1 ns:: thread create thread::()
+2 ns:: thread create thread::()
 
-    stop lock thread::()
-    2 ns::++
-    stop unlock thread::()
-
-    ready post thread::()
-  } while
-} =
-
-thread1 create thread::()
-thread2 create thread::()
-
-"" println
 i var
 i 0 =
-{ i 10 < } {
+{ i 20 < } {
   ready wait thread::()
 
   stop lock thread::()
@@ -160,10 +149,12 @@ i 0 =
 
 // Closing comment.
 
-// While the BTree that supports all namespace variables is thread-safe, most
-// shale operator are not atomic, so something as simple as the ++ increment
+// While the BTree that supports all namespace variables is thread-safe,
+// some shale operator are not. Something as simple as the ++ increment
 // operator should be surrounded by a mutex lock/unlock should you have two
-// or more threads changing the same variable.
+// or more threads changing the same variable. The "really important" example above
+// isn't a case where a lock/unlock is required because p is pointing to different
+// variables in the two threads; it is included solely as an example.
 
 
 

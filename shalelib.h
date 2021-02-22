@@ -804,5 +804,6 @@ extern Stack stack;
 extern BTree btree;
 extern Exception slexception;
 extern VariableStack variableStack;
+extern pthread_mutex_t *slmutex;
 
 #endif /* __SHALELIB */

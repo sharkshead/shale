@@ -619,7 +619,7 @@ void olBuild(Lex &lex) {
         case LEX_TOKEN_MATHS_OP_POINTER_DEREF: op = new PointerDereference(li); break;
         case LEX_TOKEN_MATHS_OP_PLUSPLUS: op = new PlusPlus(li); break;
         case LEX_TOKEN_MATHS_OP_MINUSMINUS: op = new MinusMinus(li); break;
-        default: shaleException.chuck("parse error", li); // throw parseException;
+        default: shaleException.chuck("parse error", li);
       }
       olStack[olStackIndex]->addOperation(op);
       break;
@@ -635,7 +635,7 @@ void olBuild(Lex &lex) {
         case LEX_TOKEN_LOGICAL_OP_AND: op = new LogicalAnd(li); break;
         case LEX_TOKEN_LOGICAL_OP_OR: op = new LogicalOr(li); break;
         case LEX_TOKEN_LOGICAL_OP_NOT: op = new LogicalNot(li); break;
-        default: shaleException.chuck("parse error", li); // throw parseException;
+        default: shaleException.chuck("parse error", li);
       }
       olStack[olStackIndex]->addOperation(op);
       break;
@@ -671,7 +671,7 @@ void olBuild(Lex &lex) {
         case LEX_TOKEN_KEYWORD_RETURN: op = new Return(li); break;
         case LEX_TOKEN_KEYWORD_DEBUG: op = new Debug(li); break;
         case LEX_TOKEN_KEYWORD_BTREE: op = new BTreeDebug(li); break;
-        default: shaleException.chuck("unexpected token", li); // throw unexpectedTokenException;
+        default: shaleException.chuck("unexpected token", li);
       }
       olStack[olStackIndex]->addOperation(op);
       break;
@@ -681,7 +681,7 @@ void olBuild(Lex &lex) {
         strcpy(p, lex.str);
         olStack[olStackIndex]->addOperation(new Push(new Name(p), li));
       } else {
-        shaleException.chuck("malloc failed", li); // throw mallocFailedException;
+        shaleException.chuck("malloc failed", li);
       }
       break;
 
@@ -703,7 +703,7 @@ void olBuild(Lex &lex) {
         olStackIndex++;
         olStack[olStackIndex] = new OperationList;
       } else {
-        shaleException.chuck("code stack too big", li); // throw codeStackTooBigException;
+        shaleException.chuck("code stack too big", li);
       }
       break;
 
@@ -712,7 +712,7 @@ void olBuild(Lex &lex) {
         olStackIndex--;
         olStack[olStackIndex]->addOperation(new Push(new Code(olStack[olStackIndex + 1]), li));
       } else {
-        shaleException.chuck("code stack underrun", li); // throw codeStackUnderrunException;
+        shaleException.chuck("code stack underrun", li);
       }
       break;
   }
@@ -977,6 +977,7 @@ int main(int ac, char **av) {
     }
   }
 
+  slmutex = (pthread_mutex_t *) 0;
   setupShaleNamespace(shaleFileName);
 
   do {
