@@ -384,12 +384,12 @@ void Pointer::hold() { Object::hold(); if(object != (Object *) 0) object->hold()
 void Pointer::release(LexInfo *li) {
   if(slmutex != (pthread_mutex_t *) 0) pthread_mutex_lock(slmutex);
   if(referenceCount < 0) slexception.chuck("reference error", li);
-  if(slmutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(slmutex);
-  if(object != (Object *) 0) object->release(li);
-  if(slmutex != (pthread_mutex_t *) 0) pthread_mutex_lock(slmutex);
-  if(referenceCount == 0) {
-    cache.deletePointer(this);
-  } else referenceCount--;
+  if(object != (Object *) 0) {
+    if(slmutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(slmutex);
+    object->release(li);
+    if(slmutex != (pthread_mutex_t *) 0) pthread_mutex_lock(slmutex);
+  }
+  if(referenceCount == 0) { cache.deletePointer(this); } else referenceCount--;
   if(slmutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(slmutex);
 }
 void Pointer::debug() { printf("Pointer\n"); }
