@@ -33,8 +33,8 @@ SOFTWARE.
 #include "shalelib.h"
 
 #define MAJOR ((INT)  1)
-#define MINOR ((INT)  2)
-#define MICRO ((INT)  6)
+#define MINOR ((INT)  3)
+#define MICRO ((INT)  0)
 
 // Lexical analyser stuff.
 
