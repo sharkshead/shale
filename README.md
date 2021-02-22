@@ -11,6 +11,6 @@ Extensible through libraries. Currently these include
 
 Compiles on Linux and Mac OS X. To compile, do
 
-  ./configure; make install
+* ./configure; make install
 
 See shale -h and shale -s for details, and the examples/ directory.
