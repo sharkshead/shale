@@ -977,7 +977,7 @@ int main(int ac, char **av) {
     }
   }
 
-  slmutex = (pthread_mutex_t *) 0;
+  useMutex = false;
   setupShaleNamespace(shaleFileName);
 
   do {

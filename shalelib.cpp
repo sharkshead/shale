@@ -28,7 +28,7 @@ SOFTWARE.
 
 BTree btree;
 Exception slexception;
-pthread_mutex_t *slmutex;
+bool useMutex;
 
 // LexInfo and Exception classes. These tie an execution error to the input.
 
@@ -253,8 +253,8 @@ Cache cache;
 
 // Object class
 
-Object::Object() : referenceCount(0) { }
-Object::~Object() { }
+Object::Object() : referenceCount(0) { pthread_mutex_init(&mutex, NULL); }
+Object::~Object() { pthread_mutex_destroy(&mutex); }
 Number *Object::getNumber(LexInfo *li, ExecutionEnvironment *ee) { slexception.chuck("number not found", li); return (Number *) 0; }
 String *Object::getString(LexInfo *li, ExecutionEnvironment *ee) { slexception.chuck("string not found", li); return (String *) 0; }
 bool Object::isName() { return false; }
@@ -262,15 +262,19 @@ Name *Object::getName(LexInfo *li, ExecutionEnvironment *ee) { slexception.chuck
 Code *Object::getCode(LexInfo *li, ExecutionEnvironment *ee) { slexception.chuck("code not found", li); return (Code *) 0; }
 Pointer *Object::getPointer(LexInfo *li, ExecutionEnvironment *ee) { slexception.chuck("pointer not found", li); return (Pointer *) 0; }
 void Object::hold() {
-  if(slmutex != (pthread_mutex_t *) 0) pthread_mutex_lock(slmutex);
+  if(useMutex) pthread_mutex_lock(&mutex);
   referenceCount++;
-  if(slmutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(slmutex);
+  if(useMutex) pthread_mutex_unlock(&mutex);
 }
 void Object::release(LexInfo *li) {
-  if(slmutex != (pthread_mutex_t *) 0) pthread_mutex_lock(slmutex);
+  if(useMutex) pthread_mutex_lock(&mutex);
   if(referenceCount < 0) slexception.chuck("reference error", li);
-  if(referenceCount == 0) delete(this); else referenceCount--;
-  if(slmutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(slmutex);
+  if(referenceCount == 0) {
+    delete(this);
+  } else {
+    referenceCount--;
+    if(useMutex) pthread_mutex_unlock(&mutex);
+  }
 }
 
 // Number class
@@ -284,10 +288,10 @@ void Number::setInt(INT i) { intRep = true; valueInt = i; }
 double Number::getDouble() { if(intRep) return valueInt; return valueDouble; }
 void Number::setDouble(double d) { intRep = false; valueDouble = d; }
 void Number::release(LexInfo *li) {
-  if(slmutex != (pthread_mutex_t *) 0) pthread_mutex_lock(slmutex);
+  if(useMutex) pthread_mutex_lock(&mutex);
   if(referenceCount < 0) slexception.chuck("reference error", li);
   if(referenceCount == 0) cache.deleteNumber(this); else referenceCount--;
-  if(slmutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(slmutex);
+  if(useMutex) pthread_mutex_unlock(&mutex);
 }
 void Number::debug() { char fmt[32]; printf("Number: "); if(intRep) { sprintf(fmt, "%%%sd\n", PCTD); printf(fmt, valueInt); } else printf("%0.3f\n", valueDouble); }
 
@@ -302,10 +306,10 @@ bool String::getRemoveStringFlag() { return removeStringFlag; }
 void String::setString(const char *s) { str = s; }
 void String::setRemoveStringFlag(bool rsf) { removeStringFlag = rsf; }
 void String::release(LexInfo *li) {
-  if(slmutex != (pthread_mutex_t *) 0) pthread_mutex_lock(slmutex);
+  if(useMutex) pthread_mutex_lock(&mutex);
   if(referenceCount < 0) slexception.chuck("reference error", li);
   if(referenceCount == 0) cache.deleteString(this); else referenceCount--;
-  if(slmutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(slmutex);
+  if(useMutex) pthread_mutex_unlock(&mutex);
 }
 void String::debug() { printf("String: %s\n", str); }
 
@@ -382,15 +386,11 @@ void Pointer::setObject(Object *o) { object = o; object->hold(); }
 Object *Pointer::getObject() { return object; }
 void Pointer::hold() { Object::hold(); if(object != (Object *) 0) object->hold(); }
 void Pointer::release(LexInfo *li) {
-  if(slmutex != (pthread_mutex_t *) 0) pthread_mutex_lock(slmutex);
+  if(useMutex) pthread_mutex_lock(&mutex);
   if(referenceCount < 0) slexception.chuck("reference error", li);
-  if(object != (Object *) 0) {
-    if(slmutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(slmutex);
-    object->release(li);
-    if(slmutex != (pthread_mutex_t *) 0) pthread_mutex_lock(slmutex);
-  }
-  if(referenceCount == 0) { cache.deletePointer(this); } else referenceCount--;
-  if(slmutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(slmutex);
+  if(object != (Object *) 0) object->release(li);
+  if(referenceCount == 0) cache.deletePointer(this); else referenceCount--;
+  if(useMutex) pthread_mutex_unlock(&mutex);
 }
 void Pointer::debug() { printf("Pointer\n"); }
 

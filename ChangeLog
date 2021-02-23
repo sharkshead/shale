@@ -1,5 +1,8 @@
 shale:
 
+  1.3.1 - 23 Feb 2021
+    - improved performance of threaded scripts
+
   1.3.0 - 22 Feb 2021
     - shalelib is now thread-safe
     - use "Error" rather than "Internal error" for exceptions raised
@@ -21,6 +24,10 @@ shale:
 
 
 thread library:
+
+  1.0.2 - 23 Feb 2021
+    - support improved performance of threaded scripts
+    - shale version 1.3.1
 
   1.0.1 - 22 Feb 2021
     - add argument to create thread::()

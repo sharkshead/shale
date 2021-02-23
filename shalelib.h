@@ -109,6 +109,9 @@ class Object {
     virtual void release(LexInfo *);
     int referenceCount;
     virtual void debug() = 0;
+
+  protected:
+    pthread_mutex_t mutex;
 };
 
 class Number : public Object {
@@ -804,6 +807,6 @@ extern Stack stack;
 extern BTree btree;
 extern Exception slexception;
 extern VariableStack variableStack;
-extern pthread_mutex_t *slmutex;
+extern bool useMutex;
 
 #endif /* __SHALELIB */

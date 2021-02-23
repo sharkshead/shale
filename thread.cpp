@@ -28,7 +28,7 @@ SOFTWARE.
 
 #define MAJOR   (INT) 1
 #define MINOR   (INT) 0
-#define MICRO   (INT) 1
+#define MICRO   (INT) 2
 
 class ThreadPack {
   public:
@@ -168,8 +168,7 @@ extern "C" void slmain() {
   v->setObject(new Code(ol));
   btree.addVariable(v);
 
-  slmutex = new pthread_mutex_t;
-  pthread_mutex_init(slmutex, NULL);
+  useMutex = true;
 
   cacheMutex = new pthread_mutex_t;
   pthread_mutex_init(cacheMutex, NULL);
