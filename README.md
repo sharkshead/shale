@@ -3,7 +3,7 @@ An elegant and extensible reverse-polish notation language.
 
 Elegant because of its power and simplicity.
 
-Extensible through libraries. Currently these include
+Extensible through libraries. Currently these include but are not limited to
 
 * a thread library to create threads, semaphores and mutexes
 * a maths library
