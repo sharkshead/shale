@@ -33,7 +33,7 @@
 //  "Joe Bloggs" dob:: var
 //  "Joe Bloggs" dob:: 1980 3 25 "%d/%d/%d" sprintf =
 //
-// Namespace variables are global and are are not tied to
+// Namespace variables are global and are not tied to
 // any code fragment. When you create a namespace variable it
 // persists until the end of the shale script.
 //
@@ -57,7 +57,7 @@ j var
 i 0 =
 { i 8 < } {
   j 0 =
-  {j 8 < } {
+  { j 8 < } {
     i.value j.value:: board:: var
     i.value j.value:: board:: 0 =
     j++
@@ -68,7 +68,7 @@ i 0 =
 // and then you can happily assign values to, or retrieve values from,
 // any element.
 //
-// If, on the other hand, you're dealing with a sparce array where the
+// If, on the other hand, you're dealing with a sparse array where the
 // exact size and index of each element is not known at the time of
 // writing your script, then you need to check whether the element
 // you're about the acccess is actually there. The three operators
@@ -146,7 +146,7 @@ array library
 5 xyz:: println
 i 5 =
 i.value xyz:: 987 =
-5 xyz:: println
+5 xyz:: println     // 987
 
 // The scooch function moves all the entries along one and assigns a new value to the first element.
 
