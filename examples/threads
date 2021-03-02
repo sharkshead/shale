@@ -5,15 +5,15 @@
 thread library
 
 // The thread library provides POSIX thread support through
-// the following function
+// the following functions
 //
 //  create thread::()       create a new thread
 //  mutex thread::()        create a new mutex
-//  lock thread::()         lock a murtex
+//  lock thread::()         lock a mutex
 //  unlock thread::()       unlock a murex
 //  semaphore thread::()    create a new semaphore
 //  wait thread::()         wait on a semaphore
-//  post thread::()         post to a semaphore
+//  post thread::()         post to (wake up) a semaphore
 
 
 
@@ -37,7 +37,7 @@ stop mutex thread::()
 // The value is the address of the dynamically allocated mutex.
 // Change its value and disaster awaits.
 
-// To lock a mutex, just do
+// To lock a mutex, do
 
 123 lock thread::()
 
@@ -70,7 +70,7 @@ ready semaphore thread::()
 //
 //  123 wait thread::()
 //
-// You can see these in action below.
+// You can see these in section below.
 
 // To release a semaphore, push the semaphore's name and call post thread::()
 //
@@ -96,12 +96,12 @@ btree
 
 // In the following contrived example, the main thread creates two new threads and then
 // waits on a semaphore inside a loop. Each new thread takes an argument which
-// is a namespace variable, the value of which is the number of milli seconds to sleep.
+// is a namespace variable, the value of which is the number of milliseconds to sleep.
 // It then reinitialises that variable to 0 and enters a loop where it sleeps for the given time,
 // increments the namespace variable value then wakes up the main thread. The main thread
 // prints the value of each namespace variable and terminates after 20 iterations.
 // And each thread will use a mutex to mediate access to their namespace variable across
-// all threads while their values are changed..
+// all threads while their values are changed.
 
 // This uses sleep time::() to introduce a bit of delay, so we need the time library.
 
@@ -151,9 +151,10 @@ i 0 =
 } while
 
 
+
 // Closing comment.
 
-// Any data that is changed and communicated between threads needs a mutex lock/unlock surrounding it.
+// Any data that is changed and read by different threads needs a mutex lock/unlock surrounding it.
 
 
 
