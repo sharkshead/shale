@@ -28,7 +28,7 @@ time library
 // now time::()
 //
 // This returns a tepoch, which is the standard Unix epoch time
-// multiplied by 1000 and with milli seconds added.
+// multiplied by 1000 and with milliseconds added.
 //
 // You can pass a tepoch to the time time::(), date time::()
 // and localtime time::() functions, or you can time the duration
@@ -57,7 +57,7 @@ now time::() swap - 1000.0 / "Time taken to count to 1 million is %0.3f seconds\
 
 // {tepoch} timems time::()
 //
-// Same as time time::() except it includes the milli seconds
+// Same as time time::() except it includes the milliseconds
 
 0 timems time::() "The current time is %s\n" printf
 
@@ -117,7 +117,7 @@ yday tm:: time:: "The current day of the year is %d\n" printf
 
 // {ms} sleep time::()
 //
-// This sleeps for the given number of milli seconds.
+// This sleeps for the given number of milliseconds.
 
 now time::()
 1234 sleep time::()
