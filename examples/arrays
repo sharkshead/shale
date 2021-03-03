@@ -239,7 +239,7 @@ micro version:: array:: minor version:: array:: major version:: array:: "Array l
 // And this code
 //
 //  j.value a:: var
-//  j.vaoue a:: 0 =
+//  j.value a:: 0 =
 //
 // in the example of adding a value to an element, can be simplified to
 //
