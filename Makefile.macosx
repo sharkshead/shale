@@ -56,11 +56,11 @@ thread.o: thread.cpp shalelib.h
 thread.so: thread.o
 	g++ -flat_namespace -bundle -undefined suppress -o thread.so thread.o -lpthread
 
-sring.o: sring.cpp shalelib.h
-	g++ -c -o sring.o sring.cpp
+string.o: string.cpp shalelib.h
+	g++ -c -o string.o string.cpp
 
-sring.so: sring.o
-	g++ -flat_namespace -bundle -undefined suppress -o sring.so sring.o
+string.so: string.o
+	g++ -flat_namespace -bundle -undefined suppress -o string.so string.o
 
 /usr/local/bin/shale: shale
 	[ -d /usr/local/bin ] || sudo mkdir -p /usr/local/bin
