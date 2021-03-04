@@ -10,6 +10,7 @@
 //  file
 //  maths
 //  primes
+//  string
 //  thread
 //  time
 //
@@ -19,6 +20,7 @@ array library
 file library
 maths library
 primes library
+string library
 thread library
 time library
 
