@@ -853,6 +853,7 @@ void syntax() {
   printf("    file        - some stdio functions. See help file::() for details.\n");
   printf("    maths       - pi, e, log functions, etc. See help maths::() for details.\n");
   printf("    primes      - generate primes\n");
+  printf("    string      - string handling\n");
   printf("    time        - date and time functions\n");
   printf("\n");
   printf("Generating new shale code from within shale\n");
