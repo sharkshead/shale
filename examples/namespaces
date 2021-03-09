@@ -113,6 +113,20 @@ i.value j.value:: a:: println
 "ibb" "Arnold Schwarzenegger":: "Famous Quotes":: var
 "ibb" "Arnold Schwarzenegger":: "Famous Quotes":: "I'll be back" =
 
+// There is a way to can shorten this example. And speed it up a tad at the same time.
+// There is a "dup" operator that duplicates the top of the stack, meaning is takes the
+// object off the top of the stack and pushes it back on twice. So you could reduce
+// this example to
+//
+//  "ibb" "Arnold Schwarzenegger":: "Famous Quotes":: dup var "I'll be back" =
+//                                                    ^ note the dup operator
+//
+// Reading this, push the namespace variable "ibb" "Arnold Schwarzenegger":: "Famous Quotes"::
+// on the stack, then dup(licate) it so there are two copies on the stack.
+// Then call the var operator which will pop one copy off the stack and create the variable,
+// then push the string value on the stack and assign it to the one remaining copy.
+// This dup trick isn't specific to namespace variables. It will work with any variable.
+
 
 
 // shale uses the shale:: namespace to store a couple of things you may find useful
