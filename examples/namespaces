@@ -81,7 +81,13 @@ i a:: b:: var
 i 0 =
 i.value a:: println
 
-// To effect multi-dimensional arrays, just nest them
+// ".value" is an operator that takes a variable name from the stack
+// and pushes the variable's value on the stack. As "." is not a valid variable name character,
+// you don't need a space. You could write it with a space: i .value a:: println
+// I don't use a space for purely asthetic reasons. There's also a "value" operator,
+// which is the same as .value, so you could write this as: i value a:: println
+
+// To effect multi-dimensional arrays, nest them
 
 5 8:: a:: var
 5 8:: a:: 987 =
@@ -102,15 +108,24 @@ i.value j.value:: a:: println
 // Taking it further, the index and namespace name can be strings
 // or floating point numbers. Floating point numbers may
 // not be that useful, but strings are ueful when your index or name
-// is not an integer, like a code composed of alphanumeric charaters.
-//
-// shale also uses the shale:: namespace to store a couple of things you may find useful
+// is an arbitrary string of characters.
+
+"ibb" "Arnold Schwarzenegger":: "Famous Quotes":: var
+"ibb" "Arnold Schwarzenegger":: "Famous Quotes":: "I'll be back" =
+
+
+
+// shale uses the shale:: namespace to store a couple of things you may find useful
 
 file arg:: shale:: "script name '%s'\n" printf
 language option:: shale:: "The language is currently set to \"%s\"\n" printf
 micro version:: shale:: minor version:: shale:: major version:: shale:: "shale version %d.%d.%d\n" printf
 
-// And finally, when you're developing a script that uses namespaces, it is handy to
+
+
+// Closing comment.
+
+// When you're developing a script that uses namespaces, it is handy to
 // know about the btree operator. It prints the contents of the BTree
 // that stores the namespace variables.
 
