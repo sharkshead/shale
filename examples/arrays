@@ -207,7 +207,7 @@ micro version:: array:: minor version:: array:: major version:: array:: "Array l
 
 // Closing comment.
 
-// There are a couple of ways the above code can be reduced and sped up.
+// There is a way the above code can be reduced and sped up.
 // Not necessarily made easier to understand, but reduced and sped up.
 //
 // For example, the code examples given in the namespaces recap above:
