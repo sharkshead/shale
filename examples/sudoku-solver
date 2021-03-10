@@ -29,7 +29,7 @@ whichSudoku var
 s initialised {
   whichSudoku s =
 } {
-  "You can choose to solve one of several sudoku's by adding s=n to the command line," println
+  "You can choose to solve one of several sudokus by adding s=n to the command line," println
   "where n is" println
   "  1: standard sudoku from Computerphile (the default)" println
   "  2: standard sudoku from Cracking The Cryptic" println
