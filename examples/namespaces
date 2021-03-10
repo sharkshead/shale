@@ -113,7 +113,7 @@ i.value j.value:: a:: println
 "ibb" "Arnold Schwarzenegger":: "Famous Quotes":: var
 "ibb" "Arnold Schwarzenegger":: "Famous Quotes":: "I'll be back" =
 
-// There is a way to can shorten this example. And speed it up a tad at the same time.
+// There is a way to shorten this example. And speed it up a tad at the same time.
 // There is a "dup" operator that duplicates the top of the stack, meaning is takes the
 // object off the top of the stack and pushes it back on twice. So you could reduce
 // this example to
