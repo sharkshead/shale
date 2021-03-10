@@ -367,14 +367,15 @@ found var
 found false =
 
 // As mentioned above, this is the example taken from the Computerphile video.
-// Raspberry Pi3 Model A time: 22 seconds to finish, but the solution is output
-// a little less than this.
+// Raspberry Pi3 Model A time: 17s to the solution, 19s to finish.
+// The time spent between the solution and the finish is the script searching
+// of other, non-existant, soultion.
 whichSudoku 1 == {
   found true =
   "From Computerphile: https://www.youtube.com/watch?v=G_UYXzGuqvM" println
   regionChecker standardRegions =
   grid 0 5 3 0 0 7 0 0 0 0 setRow()
-  grid 1 6 0 0 1 9 5 0 0 0 setRow()
+grid 1 6 0 0 1 9 5 0 0 0 setRow()
   grid 2 0 9 8 0 0 0 0 6 0 setRow()
   grid 3 8 0 0 0 6 0 0 0 3 setRow()
   grid 4 4 0 0 8 0 3 0 0 1 setRow()
@@ -386,9 +387,7 @@ whichSudoku 1 == {
 
 // From https://www.youtube.com/watch?v=MXUgYxHmKq4&t=0s
 // This sudoku was featured on Cracking The Cryptic, and takes considerably longer than the one above.
-// Raspberry Pi3 Model A time: 18 minutes total elapsed time, although the
-// solution only takes a couple of minutes to be produced. The rest of the time is spent
-// looking for other, non-existant, solutions.
+// Pi3 Model A time: 3m 23s to the solution, 15m 11s to finish.
 whichSudoku 2 == {
   found true =
   "From Cracking The Cryptic: https://www.youtube.com/watch?v=MXUgYxHmKq4&t=0s" println
@@ -406,8 +405,7 @@ whichSudoku 2 == {
 
 // From https://www.youtube.com/watch?v=rQHV-gIAG_0
 // Another Cracking The Cryptic video, this one with a Knight's move constraint.
-// Raspberry Pi3 Model A time: 50 seconds to the solution, and 6 1/2 minutes
-// to complete.
+// Pi3 Model A time: 48s to the solution, 6m 10s to finish.
 whichSudoku 3 == {
   found true =
   "From Cracking The Cryptic: https://www.youtube.com/watch?v=rQHV-gIAG_0" println
@@ -426,8 +424,7 @@ whichSudoku 3 == {
 } ifthen
 
 // Another CTC sudoku: https://www.youtube.com/watch?v=vH-JooV8RA4&t=0s
-// On a Pi3 Model A it takes a couple of minutes to produce the completed grid
-// but takes an hour to finish.
+// Pi3 Model A time: 1m 6s to the solution, 48m 35s to finish.
 whichSudoku 4 == {
   found true =
   "From Cracking The Cryptic: https://www.youtube.com/watch?v=vH-JooV8RA4&t=0s" println
@@ -445,7 +442,7 @@ whichSudoku 4 == {
 
 // Another Cracking The Cryptic sudoku: https://www.youtube.com/watch?v=eJIu8w3ZXo8
 // This is an irregular (jigsaw) sudoku.
-// Pi3 Modal A time to finish: 8m. Completed grid in about 4m.
+// Pi3 Model A time: 2m 5s to the solution, 7m 5s to finish.
 whichSudoku 5 == {
   found true =
   "From Cracking The Cryptic: https://www.youtube.com/watch?v=eJIu8w3ZXo8" println
@@ -478,7 +475,7 @@ whichSudoku 5 == {
 // The region layout is called "Andrew Stuart 24" and the numbering is taken directly
 // from Andrew's solver page. A big thanks goes to Andrew for giving me permission to include this sudoku.
 // The region numbers must be between 1 and 9 inclusive.
-// Pi3 model A time: 33 minutes to the completed grid and 1h 37m to finish.
+// Pi3 Model A time: 26m 23s to the solution, 1h 15m 20s to finish.
 whichSudoku 6 == {
   found true =
   "From Andrew Stuart's web page: https://www.sudokuwiki.org/Daily_Jigsaw_Sudoku" println
