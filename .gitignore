@@ -1,6 +1,5 @@
 *.o
 *.so
 shale
-Makefile
 config
 config.h

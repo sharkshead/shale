@@ -1,3 +1,4 @@
 #!/bin/sh -
 
+cd src
 uname -a | grep -q Darwin && ln -s Makefile.macosx Makefile || ln -s Makefile.linux Makefile
