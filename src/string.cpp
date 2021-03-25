@@ -28,7 +28,7 @@ SOFTWARE.
 
 #define MAJOR   (INT) 1
 #define MINOR   (INT) 0
-#define MICRO   (INT) 0
+#define MICRO   (INT) 1
 
 class StringHelp : public Operation {
   public:
@@ -48,10 +48,21 @@ class StringConcat : public Operation {
     OperatorReturn action(ExecutionEnvironment *);
 };
 
+class StringToNumber : public Operation {
+  public:
+    StringToNumber(LexInfo *, bool);
+    OperatorReturn action(ExecutionEnvironment *);
+
+  private:
+    bool toInt;
+};
+
 const char *stringHelp[] = {
   "String library:",
   "  equals string::()     - compare two strings",
   "  concat string::()     - concatenate two strings",
+  "  atoi string::()       - string to integer conversion",
+  "  atof string::()       - string to floating point conversion",
   "  help string::()       - this",
   (const char *) 0
 };
@@ -90,6 +101,18 @@ extern "C" void slmain() {
   ol = new OperationList;
   ol->addOperation(new StringConcat((LexInfo *) 0));
   v = new Variable("/concat/string");
+  v->setObject(new Code(ol));
+  btree.addVariable(v);
+
+  ol = new OperationList;
+  ol->addOperation(new StringToNumber((LexInfo *) 0, true));
+  v = new Variable("/atoi/string");
+  v->setObject(new Code(ol));
+  btree.addVariable(v);
+
+  ol = new OperationList;
+  ol->addOperation(new StringToNumber((LexInfo *) 0, false));
+  v = new Variable("/atof/string");
   v->setObject(new Code(ol));
   btree.addVariable(v);
 }
@@ -161,6 +184,29 @@ OperatorReturn StringConcat::action(ExecutionEnvironment *ee) {
 
   o1->release(getLexInfo());
   o2->release(getLexInfo());
+
+  return or_continue;
+}
+
+StringToNumber::StringToNumber(LexInfo *li, bool ti) : Operation(li), toInt(ti) { }
+
+OperatorReturn StringToNumber::action(ExecutionEnvironment *ee) {
+  Object *o;
+  String *s;
+  Number *n;
+
+  o = ee->stack.pop(getLexInfo());
+  s = o->getString(getLexInfo(), ee);
+
+  if(toInt) {
+    n = cache.newNumber((INT) atoi(s->getValue()));
+  } else {
+    n = cache.newNumber((double) atof(s->getValue()));
+  }
+  ee->stack.push(n);
+
+  s->release(getLexInfo());
+  o->release(getLexInfo());
 
   return or_continue;
 }

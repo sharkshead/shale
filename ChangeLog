@@ -28,6 +28,10 @@ shale:
 
 string library:
 
+  1.0.1 - 25 Mar 2021
+    - initial release of atoi and atof functions.
+    - shale version 1.3.2
+
   1.0.0 - 05 Mar 2021
     - initial release
     - shale version 1.3.2
