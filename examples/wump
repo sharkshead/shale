@@ -38,6 +38,11 @@ bat1Room var
 bat2Room var
 arrows var
 wumpusIsAwake var
+showStats var
+statPlayer var
+statWumpus var
+statPit var
+statArrow var
 
 haveWon var
 haveDied var
@@ -189,11 +194,22 @@ showPlayerRoom dup var {
 } =
 
 getAnswer dup var {
-  stdin file:: fgets file::() {
-    atoi string::()
-  } {
-    0 exit
-  } if
+  haveAnswer dup var false =
+
+  { haveAnswer not } {
+    stdin file:: fgets file::() {
+      dup
+      "xyzzy" equals string::() {
+        showStats showStats not =
+        pop
+      } {
+        atoi string::()
+        haveAnswer true =
+      } if
+    } {
+      0 exit
+    } if
+  } while
 } =
 
 // Handles the process of moving to a connected room.
@@ -277,14 +293,17 @@ shoot dup var {
   gotKilled {
     "You were killed by your own arrow." println
     haveDied true =
+    statArrow++
   } {
     gotTheWumpus {
       "Congratulations, you killed the Wumpus." println
       haveWon true =
+      statPlayer++
     } {
       arrows 0 == {
         "Your arrow missed and you have died because you have no arrows left." println
         haveDied true =
+        statArrow++
       } {
         wumpusIsAwake {
           "Your arrow missed." println
@@ -331,12 +350,14 @@ gameTurn dup var {
 // Check if something bad happened to the player.
 checkSituationAfterPlayerMove dup var {
   playerRoom wumpusRoom == {
-    haveDied true =
     "You have died, eaten by the Wumpus." println
+    haveDied true =
+    statWumpus++
   } {
     playerRoom pit1Room == playerRoom pit2Room == or {
-      haveDied true =
       "You have died by falling into a pit." println
+      haveDied true =
+      statPit++
     } ifthen
   } if
   haveDied not {
@@ -373,6 +394,7 @@ checkSituationAfterGameMove dup var {
   playerRoom wumpusRoom == {
     "You have died, eaten by the Wumpus." println
     haveDied true =
+    statWumpus++
   } ifthen
 } =
 
@@ -399,9 +421,19 @@ toplevel dup var {
   haveAnswer var
   req var
 
+  showStats false =
+  statPlayer 0 =
+  statWumpus 0 =
+  statPit 0 =
+  statArrow 0 =
+
   { true } {
     haveAnswer false =
     { haveAnswer not } {
+      showStats {
+        statArrow statPit statWumpus statPlayer "\nPlayer %d, Wumpus %d, Pit %d, Arrow %d\n" printf
+      } ifthen
+
       "" println
       "1 - play game" println
       "2 - quit" println
