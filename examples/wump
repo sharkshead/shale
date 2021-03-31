@@ -9,7 +9,7 @@
 // You are in a maze of 20 rooms, numbered 1 through 20. Each room is connected to
 // 3 other rooms. There is no light in the maze, and the game will tell you which
 // rooms are connected to the one you're in. The maze layout and numbering is the
-// same for every game. At the time of writing the Wikipedia page above has an
+// same for every game. At the time of writing, the Wikipedia page above has an
 // image showing the layout and numbering.
 //
 // In the maze is a Wumpus, 2 bottomless pits and 2 super bats. You will die if you
@@ -218,7 +218,7 @@ move dup var {
   req var
 
   { haveRoom not } {
-    2 playerRoom.value:: room:: 1 playerRoom.value:: room::  0 playerRoom.value:: room:: "Move to room (%d, %d or %d): " printf
+    2 playerRoom.value:: room:: 1 playerRoom.value:: room:: 0 playerRoom.value:: room:: "Move to room (%d, %d or %d): " printf
     req getAnswer() =
     req 0 playerRoom.value:: room:: == { req 1 playerRoom.value:: room:: == { req 2 playerRoom.value:: room:: == } or } or {
       playerRoom req =
@@ -253,7 +253,7 @@ shoot dup var {
       rooms req =
       haveAnswer true =
     } {
-      "Must specify 1, 2, 3, 4 or 5." println
+      "You must specify 1, 2, 3, 4 or 5." println
     } if
   } while
 
