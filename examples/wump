@@ -122,7 +122,7 @@ getRandomRoom dup var {
 } =
 
 getRandomConnectingRoom dup var {
-  random maths::() 12 >> 3 % swap room:: value
+  random maths::() 12 >> 3 % swap :: room:: value
 } =
 
 getRandomWumpusMove dup var {
@@ -225,63 +225,66 @@ shoot dup var {
   gotTheWumpus var
 
   "" println
-  arrows 0 > {
-    arrows 1 == { "" } { "s" } if arrows "You have %d arrow%s remaining.\n" printf
-    "How many rooms will your arrow pass through (1 to 5): " print
-    lastRoom playerRoom =
-    gotKilled false =
-    gotTheWumpus false =
+  arrows 1 == { "" } { "s" } if arrows "You have %d arrow%s remaining.\n" printf
+  "How many rooms will your arrow pass through (1 to 5): " print
+  lastRoom playerRoom =
+  gotKilled false =
+  gotTheWumpus false =
+  haveAnswer false =
+  { haveAnswer not } {
+    req getAnswer() =
+    req 1 >= req 5 <= and {
+      rooms req =
+      haveAnswer true =
+    } {
+      "Must specify 1, 2, 3, 4 or 5." println
+    } if
+  } while
+
+  i 1 =
+  { i rooms <= } {
     haveAnswer false =
     { haveAnswer not } {
-      req getAnswer() =
-      req 1 >= req 5 <= and {
-        rooms req =
-        haveAnswer true =
+      2 lastRoom.value:: room:: 1 lastRoom.value:: room:: 0 lastRoom.value:: room::
+      i rooms == {
+        rooms 1 == { "Only room" } { "Last room" } if
       } {
-        "Must specify 1, 2, 3, 4 or 5." println
+        i 1 == { "1st room" } ifthen
+        i 2 == { "2nd room" } ifthen
+        i 3 == { "3rd room" } ifthen
+        i 4 == { "4th room" } ifthen
       } if
-    } while
+      "%s (%d, %d or %d): " printf
 
-    i 1 =
-    { i rooms <= } {
-      haveAnswer false =
-      { haveAnswer not } {
-        2 lastRoom.value:: room:: 1 lastRoom.value:: room:: 0 lastRoom.value:: room::
-        i rooms == {
-          rooms 1 == { "Only room" } { "Last room" } if
-        } {
-          i 1 == { "1st room" } ifthen
-          i 2 == { "2nd room" } ifthen
-          i 3 == { "3rd room" } ifthen
-          i 4 == { "4th room" } ifthen
-        } if
-        "%s (%d, %d or %d): " printf
-
-        req getAnswer() =
-        req 0 lastRoom.value:: room:: == { req 1 lastRoom.value:: room:: == { req 2 lastRoom.value:: room:: == } or } or {
-          req playerRoom == {
-            gotKilled true =
-          } ifthen
-          req wumpusRoom == {
-            gotTheWumpus true =
-          } ifthen
-          lastRoom req =
-          haveAnswer true =
+      req getAnswer() =
+      req 0 lastRoom.value:: room:: == { req 1 lastRoom.value:: room:: == { req 2 lastRoom.value:: room:: == } or } or {
+        req playerRoom == {
+          gotKilled true =
         } ifthen
-      } while
-
-      i++
+        req wumpusRoom == {
+          gotTheWumpus true =
+        } ifthen
+        lastRoom req =
+        haveAnswer true =
+      } ifthen
     } while
-    arrows--
 
-    "" println
-    gotKilled {
-      "You were killed by your own arrow." println
-      haveDied true =
+    i++
+  } while
+  arrows--
+
+  "" println
+  gotKilled {
+    "You were killed by your own arrow." println
+    haveDied true =
+  } {
+    gotTheWumpus {
+      "Congratulations, you killed the Wumpus." println
+      haveWon true =
     } {
-      gotTheWumpus {
-        "Congratulations, you killed the Wumpus." println
-        haveWon true =
+      arrows 0 == {
+        "Your arrow missed and you have died because you have no arrows left." println
+        haveDied true =
       } {
         wumpusIsAwake {
           "Your arrow missed." println
@@ -291,8 +294,6 @@ shoot dup var {
         } if
       } if
     } if
-  } {
-    "You have no arrows left." println
   } if
 } =
 
