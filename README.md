@@ -1,5 +1,5 @@
 # shale
-An elegant and extensible reverse-polish notation language.
+An elegant and extensible reverse-polish notation programming language.
 
 Elegant because of its power and simplicity.
 
