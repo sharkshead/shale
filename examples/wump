@@ -6,25 +6,26 @@
 //
 // Here's a quick summary:
 //
-// You are in a maze of 20 rooms, numbered 1 through 20. Each room is connected to
-// 3 other rooms. There is no light in the maze, and the game will tell you which
-// rooms are connected to the one you're in. The maze layout and numbering is the
-// same for every game. At the time of writing, the Wikipedia page above has an
-// image showing the layout and numbering.
+// You are in a maze of 20 rooms, each of which is connected to 3 other rooms.
+// In the maze is a Wumpus, 2 bottomless pits and 2 super bats.
 //
-// In the maze is a Wumpus, 2 bottomless pits and 2 super bats. You will die if you
-// are in the same room as the Wumpus or if you fall into one of the pits.
-// If you enter a room where a super bat is you will be transported to another
-// random room.
+// You move about the maze by entering one of the connecting rooms.
+// As you move about the maze, if a connecting room contains the Wumpus,
+// a pit or a bat, the game will let you know that they are around
+// but not which room they are in.
 //
-// You can move about the maze by entering one of the connecting rooms.
-// If a connecting room contains the Wumpus, a pit or a super bat, the game
-// will let you know that they are around but not which room they are in.
+// You will die if you are in the same room as the Wumpus or fall into a pit.
+// If you enter a room containing a bat you will be transported to another
+// random room. You can be a Darwin award winner, too.
 //
-// To win you need to kill the Wumpus. You have 5 arrows at your disposal that
+// You will win if you kill the Wumpus. You have 5 arrows at your disposal that
 // may be shot through up to 5 connected rooms, and if your arrow passes through
 // the room containing the Wumpus then it dies and you win. If your arrow
 // misses it will wake the Wumpus up and it will move randomly through the maze.
+//
+// The maze layout and room numbering is the same for every game. At the time
+// of writing, the Wikipedia page above has an image showing the maze.
+// You can see an ASCII redition of the maze by entering m at any time.
 
 maths library
 file library
@@ -43,11 +44,12 @@ statPlayer var
 statWumpus var
 statPit var
 statArrow var
+statQuiver var
 
 haveWon var
 haveDied var
 
-// Initialises the maze.
+// Initialises the maze and other variables.
 init dup var {
   i dup var 1 =
 
@@ -58,66 +60,33 @@ init dup var {
     i++
   } while
 
-  0  1:: room::  2 =
-  1  1:: room::  5 =
-  2  1:: room::  8 =
-  0  2:: room::  1 =
-  1  2:: room::  3 =
-  2  2:: room:: 10 =
-  0  3:: room::  2 =
-  1  3:: room::  4 =
-  2  3:: room:: 12 =
-  0  4:: room::  3 =
-  1  4:: room::  5 =
-  2  4:: room:: 14 =
-  0  5:: room::  1 =
-  1  5:: room::  4 =
-  2  5:: room::  6 =
-  0  6:: room::  5 =
-  1  6:: room::  7 =
-  2  6:: room:: 15 =
-  0  7:: room::  6 =
-  1  7:: room::  8 =
-  2  7:: room:: 17 =
-  0  8:: room::  1 =
-  1  8:: room::  7 =
-  2  8:: room::  9 =
-  0  9:: room::  8 =
-  1  9:: room:: 10 =
-  2  9:: room:: 18 =
-  0 10:: room::  2 =
-  1 10:: room::  9 =
-  2 10:: room:: 11 =
-  0 11:: room:: 10 =
-  1 11:: room:: 12 =
-  2 11:: room:: 19 =
-  0 12:: room::  3 =
-  1 12:: room:: 11 =
-  2 12:: room:: 13 =
-  0 13:: room:: 12 =
-  1 13:: room:: 14 =
-  2 13:: room:: 20 =
-  0 14:: room::  4 =
-  1 14:: room:: 13 =
-  2 14:: room:: 15 =
-  0 15:: room::  6 =
-  1 15:: room:: 14 =
-  2 15:: room:: 16 =
-  0 16:: room:: 15 =
-  1 16:: room:: 17 =
-  2 16:: room:: 20 =
-  0 17:: room::  7 =
-  1 17:: room:: 16 =
-  2 17:: room:: 18 =
-  0 18:: room::  9 =
-  1 18:: room:: 17 =
-  2 18:: room:: 19 =
-  0 19:: room:: 11 =
-  1 19:: room:: 18 =
-  2 19:: room:: 20 =
-  0 20:: room:: 13 =
-  1 20:: room:: 16 =
-  2 20:: room:: 19 =
+  0  1:: room::  2 =    1  1:: room::  5 =    2  1:: room::  8 =
+  0  2:: room::  1 =    1  2:: room::  3 =    2  2:: room:: 10 =
+  0  3:: room::  2 =    1  3:: room::  4 =    2  3:: room:: 12 =
+  0  4:: room::  3 =    1  4:: room::  5 =    2  4:: room:: 14 =
+  0  5:: room::  1 =    1  5:: room::  4 =    2  5:: room::  6 =
+  0  6:: room::  5 =    1  6:: room::  7 =    2  6:: room:: 15 =
+  0  7:: room::  6 =    1  7:: room::  8 =    2  7:: room:: 17 =
+  0  8:: room::  1 =    1  8:: room::  7 =    2  8:: room::  9 =
+  0  9:: room::  8 =    1  9:: room:: 10 =    2  9:: room:: 18 =
+  0 10:: room::  2 =    1 10:: room::  9 =    2 10:: room:: 11 =
+  0 11:: room:: 10 =    1 11:: room:: 12 =    2 11:: room:: 19 =
+  0 12:: room::  3 =    1 12:: room:: 11 =    2 12:: room:: 13 =
+  0 13:: room:: 12 =    1 13:: room:: 14 =    2 13:: room:: 20 =
+  0 14:: room::  4 =    1 14:: room:: 13 =    2 14:: room:: 15 =
+  0 15:: room::  6 =    1 15:: room:: 14 =    2 15:: room:: 16 =
+  0 16:: room:: 15 =    1 16:: room:: 17 =    2 16:: room:: 20 =
+  0 17:: room::  7 =    1 17:: room:: 16 =    2 17:: room:: 18 =
+  0 18:: room::  9 =    1 18:: room:: 17 =    2 18:: room:: 19 =
+  0 19:: room:: 11 =    1 19:: room:: 18 =    2 19:: room:: 20 =
+  0 20:: room:: 13 =    1 20:: room:: 16 =    2 20:: room:: 19 =
+
+  showStats false =
+  statPlayer 0 =
+  statWumpus 0 =
+  statPit 0 =
+  statArrow 0 =
+  statQuiver 0 =
 } =
 
 // Couple of funciton to return various random numbers needed
@@ -193,18 +162,44 @@ showPlayerRoom dup var {
   "" println
 } =
 
+showMap dup var {
+  "" println
+  "         ---20----\n" printf
+  "        /    |    \\\n" printf
+  "       /   -13--   \\\n" printf
+  "      /   /     \\   \\\n" printf
+  "     /  12      14   \\\n" printf
+  "    /   / \\    /  \\   \\\n" printf
+  "  19--11   3--4   15--16\n" printf
+  "   |   |   /   \\   |   |\n" printf
+  "   |  10--2     5--6   |\n" printf
+  "   |    \\  \\   /  /    |\n" printf
+  "   |     9  -1-  7     |\n" printf
+  "   \\    / \\  |  / \\    /\n" printf
+  "    \\  /   --8--   \\  /\n" printf
+  "     \\/             \\/\n" printf
+  "     18-------------17\n" printf
+  "" println
+} =
+
 getAnswer dup var {
+  prompt dup var swap =
   haveAnswer dup var false =
+  ans var
 
   { haveAnswer not } {
+    prompt printf
     stdin file:: fgets file::() {
-      dup
-      "xyzzy" equals string::() {
+      ans swap =
+      ans "xyzzy" equals string::() {
         showStats showStats not =
-        pop
       } {
-        atoi string::()
-        haveAnswer true =
+        ans "m" equals string::() {
+          showMap()
+        } {
+          ans atoi string::()
+          haveAnswer true =
+        } if
       } if
     } {
       0 exit
@@ -218,8 +213,7 @@ move dup var {
   req var
 
   { haveRoom not } {
-    2 playerRoom.value:: room:: 1 playerRoom.value:: room:: 0 playerRoom.value:: room:: "Move to room (%d, %d or %d): " printf
-    req getAnswer() =
+    req 2 playerRoom.value:: room:: 1 playerRoom.value:: room:: 0 playerRoom.value:: room:: "Move to room (%d, %d or %d): " sprintf getAnswer() =
     req 0 playerRoom.value:: room:: == { req 1 playerRoom.value:: room:: == { req 2 playerRoom.value:: room:: == } or } or {
       playerRoom req =
       haveRoom true =
@@ -242,13 +236,12 @@ shoot dup var {
 
   "" println
   arrows 1 == { "" } { "s" } if arrows "You have %d arrow%s remaining.\n" printf
-  "How many rooms will your arrow pass through (1 to 5): " print
   lastRoom playerRoom =
   gotKilled false =
   gotTheWumpus false =
   haveAnswer false =
   { haveAnswer not } {
-    req getAnswer() =
+    req "How many rooms will your arrow pass through (1 to 5): " getAnswer() =
     req 1 >= req 5 <= and {
       rooms req =
       haveAnswer true =
@@ -261,6 +254,7 @@ shoot dup var {
   { i rooms <= } {
     haveAnswer false =
     { haveAnswer not } {
+      req
       2 lastRoom.value:: room:: 1 lastRoom.value:: room:: 0 lastRoom.value:: room::
       i rooms == {
         rooms 1 == { "Only room" } { "Last room" } if
@@ -270,9 +264,8 @@ shoot dup var {
         i 3 == { "3rd room" } ifthen
         i 4 == { "4th room" } ifthen
       } if
-      "%s (%d, %d or %d): " printf
+      "%s (%d, %d or %d): " sprintf getAnswer() =
 
-      req getAnswer() =
       req 0 lastRoom.value:: room:: == { req 1 lastRoom.value:: room:: == { req 2 lastRoom.value:: room:: == } or } or {
         req playerRoom == {
           gotKilled true =
@@ -303,7 +296,7 @@ shoot dup var {
       arrows 0 == {
         "Your arrow missed and you have died because you have no arrows left." println
         haveDied true =
-        statArrow++
+        statQuiver++
       } {
         wumpusIsAwake {
           "Your arrow missed." println
@@ -323,10 +316,7 @@ playerTurn dup var {
 
   { turnOver not } {
     showPlayerRoom()
-    "1 - move" println
-    "2 - shoot" println
-    "> " print
-    req getAnswer() =
+    req "1 - move\n2 - shoot\n> " getAnswer() =
     req 1 == {
       move()
       turnOver true =
@@ -421,24 +411,17 @@ toplevel dup var {
   haveAnswer var
   req var
 
-  showStats false =
-  statPlayer 0 =
-  statWumpus 0 =
-  statPit 0 =
-  statArrow 0 =
-
   { true } {
     haveAnswer false =
     { haveAnswer not } {
       showStats {
-        statArrow statPit statWumpus statPlayer "\nPlayer %d, Wumpus %d, Pit %d, Arrow %d\n" printf
+        statQuiver statArrow statPit statWumpus statPlayer "\nPlayer %d, Wumpus %d, Pit %d, Darwin %d, Quiver %d\n" printf
       } ifthen
 
       "" println
-      "1 - play game" println
-      "2 - quit" println
-      "> " print
-      req getAnswer() =
+      "Enter m at any time to see the maze layout" println
+      "" println
+      req "1 - play game\n2 - quit\n> " getAnswer() =
       req 2 == {
         0 exit
       } ifthen
