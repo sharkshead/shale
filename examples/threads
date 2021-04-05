@@ -60,7 +60,7 @@ stop mutex thread::()
 ready semaphore thread::()
 5 8:: a:: semaphore thread::()
 
-// All semaphors are stored under the semaphore:: thread:: namespace.
+// All semaphores are stored under the semaphore:: thread:: namespace.
 // And just like mutexes, the value of each semaphore is the address
 // of the dynamically allocated semaphore.
 
