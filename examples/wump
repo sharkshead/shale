@@ -162,23 +162,42 @@ showPlayerRoom dup var {
   "" println
 } =
 
+highlight dup var {
+  r dup var swap =
+
+  r playerRoom == {
+    0x1b r 0x1b "%c[1;4m%d%c[0m" sprintf
+  } {
+    r "%d" sprintf
+  } if
+} =
+
 showMap dup var {
   "" println
-  "      ------20-------\n" printf
+  20 highlight()
+  "      ------%s-------\n" printf
   "     /       |       \\\n" printf
-  "    /     --13--      \\\n" printf
-  "  19     /      \\     16\n" printf
-  "   |\\   12      14   / |\n" printf
+  13 highlight()
+  "    /     --%s--      \\\n" printf
+  16 highlight() 19 highlight()
+  "  %s     /      \\     %s\n" printf
+  14 highlight() 12 highlight()
+  "   |\\   %s      %s   / |\n" printf
   "   | \\ /  \\    /  \\ /  |\n" printf
-  "   |  11   3--4   15   |\n" printf
+  15 highlight() 4 highlight() 3 highlight() 11 highlight()
+  "   |  %s   %s--%s   %s   |\n" printf
   "   |   |   /   \\   |   |\n" printf
-  "   |  10--2     5--6   |\n" printf
+  6 highlight() 5 highlight() 2 highlight() 10 highlight()
+  "   |  %s--%s     %s--%s   |\n" printf
   "   |    \\  \\   /  /    |\n" printf
-  "   |     9  -1-  7     |\n" printf
+  7 highlight() 1 highlight() 9 highlight()
+  "   |     %s  -%s-  %s     |\n" printf
   "   \\    / \\  |  / \\    /\n" printf
-  "    \\  /   --8--   \\  /\n" printf
+  8 highlight()
+  "    \\  /   --%s--   \\  /\n" printf
   "     \\/             \\/\n" printf
-  "     18-------------17\n" printf
+  17 highlight() 18 highlight()
+  "     %s-------------%s\n" printf
   "" println
 } =
 
