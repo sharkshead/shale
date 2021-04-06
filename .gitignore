@@ -3,3 +3,4 @@
 shale
 config
 config.h
+src/Makefile
