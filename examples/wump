@@ -164,13 +164,13 @@ showPlayerRoom dup var {
 
 showMap dup var {
   "" println
-  "         ---20----\n" printf
-  "        /    |    \\\n" printf
-  "       /   -13--   \\\n" printf
-  "      /   /     \\   \\\n" printf
-  "     /  12      14   \\\n" printf
-  "    /   / \\    /  \\   \\\n" printf
-  "  19--11   3--4   15--16\n" printf
+  "      ------20-------\n" printf
+  "     /       |       \\\n" printf
+  "    /     --13--      \\\n" printf
+  "  19     /      \\     16\n" printf
+  "   |\\   12      14   / |\n" printf
+  "   | \\ /  \\    /  \\ /  |\n" printf
+  "   |  11   3--4   15   |\n" printf
   "   |   |   /   \\   |   |\n" printf
   "   |  10--2     5--6   |\n" printf
   "   |    \\  \\   /  /    |\n" printf
