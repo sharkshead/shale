@@ -180,7 +180,7 @@ showMap dup var {
   13 highlight()
   "    /     --%s--      \\\n" printf
   16 highlight() 19 highlight()
-  "  %s     /      \\     %s\n" printf
+  "   %s    /      \\     %s\n" printf
   14 highlight() 12 highlight()
   "   |\\   %s      %s   / |\n" printf
   "   | \\ /  \\    /  \\ /  |\n" printf
@@ -437,6 +437,7 @@ toplevel dup var {
         statQuiver statArrow statPit statWumpus statPlayer "\nPlayer %d, Wumpus %d, Pit %d, Darwin %d, Quiver %d\n" printf
       } ifthen
 
+      playerRoom 0 =
       "" println
       "Enter m at any time to see the maze layout" println
       "" println
