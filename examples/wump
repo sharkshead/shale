@@ -113,19 +113,19 @@ chooseStartingRooms dup var {
   pit1Room getRandomRoom() =
   pit1Room playerRoom == { pit1Room wumpusRoom == } or {
     pit1Room getRandomRoom() =
-  } ifthen
+  } while
   pit2Room getRandomRoom() =
   pit2Room playerRoom == { pit2Room wumpusRoom == { pit2Room pit1Room == } or } or {
     pit2Room getRandomRoom() =
-  } ifthen
+  } while
   bat1Room getRandomRoom() =
   bat1Room playerRoom == { bat1Room wumpusRoom == } or {
     bat1Room getRandomRoom() =
-  } ifthen
+  } while
   bat2Room getRandomRoom() =
   bat2Room playerRoom == { bat2Room wumpusRoom == { bat2Room bat1Room == } or } or {
     bat2Room getRandomRoom() =
-  } ifthen
+  } while
 } =
 
 // Details the connected rooms and whether the Wumpus, a pit or a bat is in a connected room.
