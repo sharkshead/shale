@@ -25,7 +25,7 @@
 //
 // The maze layout and room numbering is the same for every game. At the time
 // of writing, the Wikipedia page above has an image showing the maze.
-// You can see an ASCII redition of the maze by entering m at any time.
+// You can see an ASCII rendition of the maze by entering m at any time.
 
 maths library
 file library
