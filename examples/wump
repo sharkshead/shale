@@ -57,6 +57,7 @@ init dup var {
     0 i.value:: room:: var
     1 i.value:: room:: var
     2 i.value:: room:: var
+    visited i.value:: room:: var
     i++
   } while
 
@@ -106,6 +107,7 @@ getRandomWumpusMove dup var {
 // Randomise the starting locations.
 chooseStartingRooms dup var {
   playerRoom getRandomRoom() =
+  visited playerRoom.value:: room:: true =
   wumpusRoom getRandomRoom() =
   { wumpusRoom playerRoom == } {
     wumpusRoom getRandomRoom() =
@@ -166,9 +168,13 @@ highlight dup var {
   r dup var swap =
 
   r playerRoom == {
-    0x1b r 0x1b "%c[1;4m%d%c[0m" sprintf
+    0x1b r 0x1b "%c[1;4;31m%d%c[0m" sprintf
   } {
-    r "%d" sprintf
+    visited r.value:: room:: {
+      0x1b r 0x1b "%c[1;4;34m%d%c[0m" sprintf
+    } {
+      r "%d" sprintf
+    } if
   } if
 } =
 
@@ -235,6 +241,7 @@ move dup var {
     req 2 playerRoom.value:: room:: 1 playerRoom.value:: room:: 0 playerRoom.value:: room:: "Move to room (%d, %d or %d): " sprintf getAnswer() =
     req 0 playerRoom.value:: room:: == { req 1 playerRoom.value:: room:: == { req 2 playerRoom.value:: room:: == } or } or {
       playerRoom req =
+      visited playerRoom.value:: room:: true =
       haveRoom true =
     } {
       "That is not a connected room." println
@@ -375,6 +382,7 @@ checkSituationAfterPlayerMove dup var {
       { playerRoom bat1Room == playerRoom bat2Room == or } {
         playerRoom getRandomRoom() =
       } while
+      visited playerRoom.value:: room:: true =
       bat1Room getRandomRoom() =
       { bat1Room playerRoom == bat1Room bat2Room == or } {
         bat1Room getRandomRoom() =
@@ -387,6 +395,7 @@ checkSituationAfterPlayerMove dup var {
         { playerRoom bat1Room == playerRoom bat2Room == or } {
           playerRoom getRandomRoom() =
         } while
+        visited playerRoom.value:: room:: true =
         bat2Room getRandomRoom() =
         { bat2Room playerRoom == bat2Room bat1Room == or } {
           bat2Room getRandomRoom() =
@@ -426,6 +435,17 @@ play dup var {
   } while
 } =
 
+reset dup var {
+  i var
+
+  playerRoom 0 =
+  i 1 =
+  { i 20 <= } {
+    visited i.value:: room:: false =
+    i++
+  } while
+} =
+
 toplevel dup var {
   haveAnswer var
   req var
@@ -437,7 +457,7 @@ toplevel dup var {
         statQuiver statArrow statPit statWumpus statPlayer "\nPlayer %d, Wumpus %d, Pit %d, Darwin %d, Quiver %d\n" printf
       } ifthen
 
-      playerRoom 0 =
+      reset()
       "" println
       "Enter m at any time to see the maze layout" println
       "" println
