@@ -9,23 +9,26 @@
 // You are in a maze of 20 rooms, each of which is connected to 3 other rooms.
 // In the maze is a Wumpus, 2 bottomless pits and 2 super bats.
 //
-// You move about the maze by entering one of the connecting rooms.
-// As you move about the maze, if a connecting room contains the Wumpus,
+// At each turn you may choose to move to a connecting room or shoot an arrow.
+//
+// When you move into a room, if a connecting room contains the Wumpus,
 // a pit or a bat, the game will let you know that they are around
 // but not which room they are in.
+//
+// You will win if you kill the Wumpus with an arrow. You may shoot an arrow
+// through up to 5 connected rooms, and if your arrow passes through the room
+// containing the Wumpus then it dies and you win. If your arrow misses
+// it will wake up the Wumpus which will move randomly through the maze.
 //
 // You will die if you are in the same room as the Wumpus or fall into a pit.
 // If you enter a room containing a bat you will be transported to another
 // random room. You can be a Darwin award winner, too.
 //
-// You will win if you kill the Wumpus. You have 5 arrows at your disposal that
-// may be shot through up to 5 connected rooms, and if your arrow passes through
-// the room containing the Wumpus then it dies and you win. If your arrow
-// misses it will wake up the Wumpus which will move randomly through the maze.
-//
 // The maze layout and room numbering is the same for every game. At the time
 // of writing, the Wikipedia page above has an image showing the maze.
 // You can see an ASCII rendition of the maze by entering m at any time.
+// This rendition highlights in red the room you are in, and blue for the
+// rooms you have visited.
 
 maths library
 file library
@@ -168,17 +171,17 @@ highlight dup var {
   r dup var swap =
 
   r playerRoom == {
-    0x1b r 0x1b "%c[1;4;31m%d%c[0m" sprintf
+    0x1b r 0x1b "%c[1;31m%d%c[0m" sprintf
   } {
     visited r.value:: room:: {
-      0x1b r 0x1b "%c[1;4;34m%d%c[0m" sprintf
+      0x1b r 0x1b "%c[1;34m%d%c[0m" sprintf
     } {
       r "%d" sprintf
     } if
   } if
 } =
 
-showMap dup var {
+showMaze dup var {
   "" println
   20 highlight()
   "      ------%s-------\n" printf
@@ -220,7 +223,7 @@ getAnswer dup var {
         showStats showStats not =
       } {
         ans "m" equals string::() {
-          showMap()
+          showMaze()
         } {
           ans atoi string::()
           haveAnswer true =
