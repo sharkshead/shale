@@ -1,5 +1,9 @@
 shale:
 
+  1.3.3 - 9 Apr 2021
+    - fix zero pointer dereference in the ++ and -- operators when the variable
+      is defined but not initialised
+
   1.3.2 - 5 Mar 2021
     - add support for the string library
 

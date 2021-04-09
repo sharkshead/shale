@@ -1063,15 +1063,24 @@ PlusPlus::PlusPlus(LexInfo *li) : Operation(li) { }
 
 OperatorReturn PlusPlus::action(ExecutionEnvironment *ee) {
   Object *o;
+  Object *no;
   Variable *v;
   Number *n;
   Number *newn;
+  static char buf[128];
+  char *vname;
 
   o = ee->stack.pop(getLexInfo());
 
-  v = ee->variableStack.findVariable(o->getName(getLexInfo(), ee)->getValue());
+  vname = o->getName(getLexInfo(), ee)->getValue();
+  v = ee->variableStack.findVariable(vname);
   if(v == (Variable *) 0) slexception.chuck("variable error", getLexInfo());
-  n = v->getObject()->getNumber(getLexInfo(), ee);
+  no = v->getObject();
+  if(no == (Object *) 0) {
+    sprintf(buf, "variable %s undefined", vname);
+    slexception.chuck(buf, getLexInfo());
+  }
+  n = no->getNumber(getLexInfo(), ee);
 
   if(n->isInt()) v->setObject(newn = cache.newNumber(n->getInt() + (INT) 1));
   else v->setObject(newn = cache.newNumber(n->getDouble() + 1.0));
@@ -1090,15 +1099,24 @@ MinusMinus::MinusMinus(LexInfo *li) : Operation(li) { }
 
 OperatorReturn MinusMinus::action(ExecutionEnvironment *ee) {
   Object *o;
+  Object *no;
   Variable *v;
   Number *n;
   Number *newn;
+  static char buf[128];
+  char *vname;
 
   o = ee->stack.pop(getLexInfo());
 
-  v = ee->variableStack.findVariable(o->getName(getLexInfo(), ee)->getValue());
+  vname = o->getName(getLexInfo(), ee)->getValue();
+  v = ee->variableStack.findVariable(vname);
   if(v == (Variable *) 0) slexception.chuck("variable error", getLexInfo());
-  n = v->getObject()->getNumber(getLexInfo(), ee);
+  no = v->getObject();
+  if(no == (Object *) 0) {
+    sprintf(buf, "variable %s undefined", vname);
+    slexception.chuck(buf, getLexInfo());
+  }
+  n = no->getNumber(getLexInfo(), ee);
 
   if(n->isInt()) v->setObject(newn = cache.newNumber(n->getInt() - (INT) 1));
   else v->setObject(newn = cache.newNumber(n->getDouble() - 1.0));
