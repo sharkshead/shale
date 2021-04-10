@@ -14,8 +14,8 @@
 // Here's a simple example
 
 "Simple while loop" println
-i var   // the loop counter
-i 0 =
+i var                   // The loop counter ...
+i 0 =                   // ... is initialised
 { i 10 < } {            // The condition fragment and opening the body fragment
   i "i = %d\n" printf   // Do something interesting
   i++                   // Increment the loop counter
@@ -24,11 +24,11 @@ i 0 =
 
 
 // There are two controls you have over the execution of
-// the while loop. You can explicitly terminte the loop
-// or you can explicitly continue the body fragment before its natural end.
+// the while loop. You can explicitly terminte the loop,
+// or you can explicitly continue the body fragment, before its natural end.
 // In C-like languages you would use the break and continue keywords.
 // In shale there is a break operator, and the continue functionaliy
-// is available but is courtesy of the function andd return operrators.
+// is available courtesy of the function and return operators.
 
 
 
@@ -54,13 +54,13 @@ i 0 =
 // Continuing a loop
 
 // To get the same effect as a continue you use the function and return operators.
-// These are explaind in the functions example file, but I'll give a quick
+// These are explained in the functions example file, but I'll give a quick
 // overview here.
 //
 // You tag your body fragment as a function, then you use the return operator
 // anywhere within the body fragment or any fragments that are subsequently
 // executed by the body fragment. The scope of the return is the same as the scope
-// of the break which is the same as the scope of simple variables.
+// of the break, which is the same as the scope of simple variables.
 
 "" println
 "Continue a while loop" println
