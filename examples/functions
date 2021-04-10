@@ -47,19 +47,19 @@ pf var
 pf { function     // Tag this fragment as a function so a return operator knows where to exit.
   i 100 > {
     j 1000 < {
-      n var       // Let's assume this situation is bad. Print some
-      n 0 =       // diagnostics and return from the function.
-      "This is bad" println
+      n var       // Let's assume we've found what we're looking for.
+      n 0 =       // Print something and return from the function.
+      "Found it" println
       { n j < } {
         n "n = %d\n" printf
         n n 100 + =
       } while
       return      // we're out of here.
     } {
-      // do something constructive
+      // do something
     } if
   } {
-    // do something constructive
+    // do something
   } if
   "this will not be output" println
 } =
@@ -71,7 +71,7 @@ pf()
 // as being the end point of a "return" operator.
 
 // And just to be clear, the function operator will tag any code fragment,
-// not just those assigned to a variable. It is perfecely fine to tag an
+// not just those assigned to a variable. It is perfectly fine to tag an
 // inline code fragment that is part of an if or ifthen.
 
 i 100 < {
@@ -87,5 +87,15 @@ i 100 < {
 // Tagging the conditional code fragment of a while loop as a function and returning
 // from that fragment will work just fine, as long as you leave the expected boolean
 // on the stack, that is. However, taggng the body of the while loop and returning
-// from that body fragment will not terminate the loop, it will simply terminate
-// the body fragment after the return.
+// from that body fragment will act just like a "continue" statement in C - it will
+// terminate the body fragment and return control to the while operator where it will,
+// once again, execute the conditional code ... etc.
+
+"" println
+"Using function/return as a while loop continue" println
+i 0 =
+{ i 10 < } { function
+  i 5 < { i++ return } ifthen   // Don't forget the loop counter if your loop needs it.
+  i println
+  i++
+} while

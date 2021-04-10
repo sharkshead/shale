@@ -1,74 +1,91 @@
 #!/usr/local/bin/shale
 
-// Here's a simple while loop that sums the numbers from 1 to n.
+// The while operator
+
+// The while operator expectes two code fragments on the stack.
+// The first you push on is the conditon fragment and the second
+// is the body fragment.
 //
-// n is passed in as a replacement on the command line, eg:
-//
-//  ./while n=10
-//
-// Anywhere n appears in the script will be replaced with the n= text.
+// The condition fragment will be executed and must leave a boolean
+// on the stack. If that boolean is true then the body fragment
+// will be executed. And so it goes on until the condition fragment
+// leave a false on the stack.
 
-// First, check that n has been given on the command line,
-// and print a usage message and exit if it has not.
-n initialised not {
-  file arg:: shale:: "Usage: %s n={n}\n" printf
-  file arg:: shale:: "  eg: %s n=10\n" printf
-  1 exit
-} ifthen
+// Here's a simple example
 
-// Some sanity checking. n must be greater than 0.
-n 0 <= {
-  "n must be greater than 0" println
-  1 exit
-} ifthen
+"Simple while loop" println
+i var   // the loop counter
+i 0 =
+{ i 10 < } {            // The condition fragment and opening the body fragment
+  i "i = %d\n" printf   // Do something interesting
+  i++                   // Increment the loop counter
+} while                 // Close the body fragment and call the while operator
 
-// We're going to implement the equivalent of this C code
-//
-//  int i;
-//  int res;
-//  i = 1;
-//  res = 0;
-//  while(i <= n) {
-//    res = res + i;
-//    i++;
-//  }
-//  printf("%d\n", res);
 
-// The while operator expects two code fragments or variables whose
-// value is a code fragment on the stack,
-// one that indicates whether the loop should terminate or keep going,
-// and the other is the body of the while.
 
-// Define the variables.
-i var     // loop counter
-res var   // result
+// There are two controls you have over the execution of
+// the while loop. You can explicitly terminte the loop
+// or you can explicitly terminate the body fragment.
+// In C-like languages you would use the break and continue keywords.
+// In shale there is a break operator, and the continue functionaliy
+// is available but is courtesy of the function andd return operrators.
 
-// Initialise the variables.
-i 1 =
-res 0 =
 
-// The loop condition, and ...
-{ i n <= } {
-  // .. the body of the loop.
-  res res i + =     // res = res + 1;
-  i++               // i++;
+
+// Breaking from a loop
+
+// The break operator can be used anywhere within the body fragment
+// or any fragments that are subsequently executed by the body fragment.
+// The break scope is exactly the same as the scope of a simple variable.
+
+"" println
+"Break from while loop" println
+i 0 =
+{ i 10 < } {
+  i 5 == {        // When i hits 5 ...
+    break         // ... terminate the loop
+  } ifthen
+  i "i = %d\n" printf
+  i++
 } while
 
-res "%d\n" printf
 
-// One or both of the condition and body can also be variables
-// whose value is a code fragment.
 
-i 1 =
-res 0 =
-condition var
-condition {
-  i n <=
-} =
-body var
-body {
-  res res i + =
+// Continuing a loop
+
+// To get the same effect as a continue you use the function and return operators.
+// These are explaind in the functions example file, but I'll give a quick
+// overview here.
+//
+// You tag your body fragment as a function, then you use the return operator
+// anywhere within the body fragment or any fragments that are subsequently
+// executed by the body fragment. The scope of the return is the same as the scope
+// of the break which is the same as the scope of simple variables.
+
+"" println
+"Continue a while loop" println
+i 0 =
+{ i 10 < } { function   // Tag this fragment as a function
+  i 5 < {               // While i is less than 5 ...
+    i++                 // (don't forget the loop counter)
+    return              // ... skip the rest
+  } ifthen
+  i "i = %d\n" printf
   i++
-} =
+} while
+
+
+
+// Closing comment.
+
+// Like other operators that use code fragments, you can pass in variables
+// that have been assigned to a code fragment (a function) to the while operator.
+
+"" println
+"While loop using variables" println
+condition var
+condition { i 10 < } =
+body var
+body { i "i = %d\n" printf i++ } =
+i 0 =
 condition body while
-res "%d\n" printf
