@@ -25,7 +25,7 @@ i 0 =
 
 // There are two controls you have over the execution of
 // the while loop. You can explicitly terminte the loop
-// or you can explicitly terminate the body fragment.
+// or you can explicitly continue the body fragment before its natural end.
 // In C-like languages you would use the break and continue keywords.
 // In shale there is a break operator, and the continue functionaliy
 // is available but is courtesy of the function andd return operrators.
