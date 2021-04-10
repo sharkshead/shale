@@ -139,35 +139,42 @@ add dup var {
 } =
 
 filterList dup var {
-  firstTimeThrough {
-    a var
-    b var
-    c var
-    d var
+  a var
+  b var
+  c var
+  d var
+  bc var
 
+  // A score of 0/0 is really powerful.
+  bc bulls cows + =
+
+  count listb->:: 0 =
+  firstTimeThrough {
     a 1 =
     { a 10 < } {
-      b 1 =
-      { b 10 < } {
-        b a != {
-          c 1 =
-          { c 10 < } {
-            c a != c b != and {
-              d 1 =
-              { d 10 < } {
-                d a != { d b != d c != and } and {
-                  a b c d check() {
-                    a 1000 * b 100 * c 10 * d + + + add()
+      bc 0 > { a guess0 != { a guess1 != { a guess2 != { a guess3 != } and } and } and } or {
+        b 1 =
+        { b 10 < } {
+          b a != { bc 0 > { b guess0 != { b guess1 != { b guess2 != { b guess3 != } and } and } and } or } and {
+            c 1 =
+            { c 10 < } {
+              c a != { c b != { bc 0 > { c guess0 != { c guess1 != { c guess2 != { c guess3 != } and } and } and } or } and } and {
+                d 1 =
+                { d 10 < } {
+                  d a != { d b != { d c != { bc 0 > { d guess0 != { d guess1 != { d guess2 != { d guess3 != } and } and } and } or } and } and } and {
+                    a b c d check() {
+                      a 1000 * b 100 * c 10 * d + + + add()
+                    } ifthen
                   } ifthen
-                } ifthen
-                d++
-              } while
-            } ifthen
-            c++
-          } while
-        } ifthen
-        b++
-      } while
+                  d++
+                } while
+              } ifthen
+              c++
+            } while
+          } ifthen
+          b++
+        } while
+      } ifthen
       a++
     } while
   } {
@@ -175,15 +182,37 @@ filterList dup var {
     j var
     n var
 
-    count listb->:: 0 =
-    i 0 =
-    { i count lista->:: < } {
-      n i.value lista->:: =
-      n 1000 / n 100 / 10 % n 10 / 10 % n 10 % check() {
-        n.value add()
-      } ifthen
-      i++
-    } while
+    bc 0 == {
+      i 0 =
+      { i count lista->:: < } {
+        n i.value lista->:: =
+        a n 1000 / =
+        a guess0 != { a guess1 != { a guess2 != { a guess3 != } and } and } and {
+          b n 100 / 10 % =
+          b guess0 != { b guess1 != { b guess2 != { b guess3 != } and } and } and {
+            c n 10 / 10 % =
+            c guess0 != { c guess1 != { c guess2 != { c guess3 != } and } and } and {
+              d n 10 % =
+              d guess0 != { d guess1 != { d guess2 != { d guess3 != } and } and } and {
+                a.value b.value c.value d.value check() {
+                  n.value add()
+                } ifthen
+              } ifthen
+            } ifthen
+          } ifthen
+        } ifthen
+        i++
+      } while
+    } {
+      i 0 =
+      { i count lista->:: < } {
+        n i.value lista->:: =
+        n 1000 / n 100 / 10 % n 10 / 10 % n 10 % check() {
+          n.value add()
+        } ifthen
+        i++
+      } while
+    } if
   } if
 } =
 
