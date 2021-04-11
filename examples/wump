@@ -237,7 +237,7 @@ setPlayerPit dup var {
   } {
     gameInProgress false =
     { haveAnswer not } {
-      ans "Enter pit room: " getAnswer() =
+      ans "Pit room: " getAnswer() =
       ans 1 >= ans 20 <= and {
         haveAnswer true =
         playerPit1Room 0 == {
@@ -265,7 +265,7 @@ setPlayerBat dup var {
   } {
     gameInProgress false =
     { haveAnswer not } {
-      ans "Enter pit room: " getAnswer() =
+      ans "Bat room: " getAnswer() =
       ans 1 >= ans 20 <= and {
         haveAnswer true =
         playerBat1Room 0 == {
