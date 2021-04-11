@@ -2,7 +2,7 @@
 
 // This implements a Bulls and Cows game player.
 //
-//  Bulls and Cows is described here: https://en.wikipedia.org/wiki/Bulls_and_Cows
+// Bulls and Cows is described here: https://en.wikipedia.org/wiki/Bulls_and_Cows
 //
 // This is the reverse of the bulls-n-cows script in that you choose a
 // number and the script tries to guess it based on the bulls and cows
@@ -23,6 +23,13 @@
 //
 // Based on the cows and bulls score you enter the script will try to guess
 // your number.
+//
+// You can see some of the internal numbers as the game progresses if you add
+//  stats=true
+// to the command line. If you want to see the list of numbers that it has
+// to choose from, add this
+//  stats=true list=true
+// Be prepared, the starting list contains 3024 numbers.
 
 maths library
 file library
@@ -30,7 +37,6 @@ string library
 
 lista var
 listb var
-firstTimeThrough var
 guess var
 guess0 var
 guess1 var
@@ -38,10 +44,25 @@ guess2 var
 guess3 var
 bulls var
 cows var
+showStats var
+showList var
 
 init dup var {
+  stats defined {
+    showStats stats =
+  } {
+    showStats false =
+  } if
+  list defined {
+    showList list =
+  } {
+    showList false =
+  } if
+
   count a:: var
   count b:: var
+  lista a &=
+  listb b &=
 } =
 
 randomDigit dup var {
@@ -49,25 +70,14 @@ randomDigit dup var {
 } =
 
 makeGuess dup var {
-  firstTimeThrough {
-    guess0 randomDigit() =
-    guess1 randomDigit() =
-    { guess1 guess0 == } { guess1 randomDigit() = } while
-    guess2 randomDigit() =
-    { guess2 guess0 == guess2 guess1 == or } { guess2 randomDigit() = } while
-    guess3 randomDigit() =
-    { guess3 guess0 == guess3 guess1 == guess3 guess2 == or or } { guess3 randomDigit() = } while
-    guess guess3 1000 * guess2 100 * guess1 10 * guess0 + + + =
-  } {
-    i var
+  i var
 
-    i random maths::() count lista->:: % =
-    guess i.value lista->:: value =
-    guess0 guess 10 % =
-    guess1 guess 10 / 10 % =
-    guess2 guess 100 / 10 % =
-    guess3 guess 1000 / =
-  } if
+  i random maths::() count lista->:: % =
+  guess i.value lista->:: value =
+  guess0 guess 10 % =
+  guess1 guess 10 / 10 % =
+  guess2 guess 100 / 10 % =
+  guess3 guess 1000 / =
 } =
 
 getAnswer dup var {
@@ -138,81 +148,89 @@ add dup var {
   } ifthen
 } =
 
+fillA dup var {
+  a var
+  b var
+  c var
+  d var
+  n var
+
+  n 0 =
+  a 1 =
+  { a 10 < } {
+    b 1 =
+    { b 10 < } {
+      b a != {
+        c 1 =
+        { c 10 < } {
+          c a != { c b != } and {
+            d 1 =
+            { d 10 < } {
+              d a != { d b != { d c != } and } and {
+                n.value lista->:: defined not {
+                  n.value lista->:: var
+                } ifthen
+                n.value lista->:: a 1000 * b 100 * c 10 * d + + + =
+                n++
+              } ifthen
+              d++
+            } while
+          } ifthen
+          c++
+        } while
+      } ifthen
+      b++
+    } while
+    a++
+  } while
+
+  count lista->:: n =
+} =
+
 filterList dup var {
   a var
   b var
   c var
   d var
+  i var
+  j var
+  n var
   bc var
 
   // A score of 0/0 is really powerful.
   bc bulls cows + =
 
   count listb->:: 0 =
-  firstTimeThrough {
-    a 1 =
-    { a 10 < } {
-      bc 0 > { a guess0 != { a guess1 != { a guess2 != { a guess3 != } and } and } and } or {
-        b 1 =
-        { b 10 < } {
-          b a != { bc 0 > { b guess0 != { b guess1 != { b guess2 != { b guess3 != } and } and } and } or } and {
-            c 1 =
-            { c 10 < } {
-              c a != { c b != { bc 0 > { c guess0 != { c guess1 != { c guess2 != { c guess3 != } and } and } and } or } and } and {
-                d 1 =
-                { d 10 < } {
-                  d a != { d b != { d c != { bc 0 > { d guess0 != { d guess1 != { d guess2 != { d guess3 != } and } and } and } or } and } and } and {
-                    a b c d check() {
-                      a 1000 * b 100 * c 10 * d + + + add()
-                    } ifthen
-                  } ifthen
-                  d++
-                } while
-              } ifthen
-              c++
-            } while
-          } ifthen
-          b++
-        } while
-      } ifthen
-      a++
-    } while
-  } {
-    i var
-    j var
-    n var
-
-    bc 0 == {
-      i 0 =
-      { i count lista->:: < } {
-        n i.value lista->:: =
-        a n 1000 / =
-        a guess0 != { a guess1 != { a guess2 != { a guess3 != } and } and } and {
-          b n 100 / 10 % =
-          b guess0 != { b guess1 != { b guess2 != { b guess3 != } and } and } and {
-            c n 10 / 10 % =
-            c guess0 != { c guess1 != { c guess2 != { c guess3 != } and } and } and {
-              d n 10 % =
-              d guess0 != { d guess1 != { d guess2 != { d guess3 != } and } and } and {
-                a.value b.value c.value d.value check() {
-                  n.value add()
-                } ifthen
+  bc 0 == {
+    i 0 =
+    { i count lista->:: < } {
+      n i.value lista->:: =
+      a n 1000 / =
+      a guess0 != { a guess1 != { a guess2 != { a guess3 != } and } and } and {
+        b n 100 / 10 % =
+        b guess0 != { b guess1 != { b guess2 != { b guess3 != } and } and } and {
+          c n 10 / 10 % =
+          c guess0 != { c guess1 != { c guess2 != { c guess3 != } and } and } and {
+            d n 10 % =
+            d guess0 != { d guess1 != { d guess2 != { d guess3 != } and } and } and {
+              a.value b.value c.value d.value check() {
+                n.value add()
               } ifthen
             } ifthen
           } ifthen
         } ifthen
-        i++
-      } while
-    } {
-      i 0 =
-      { i count lista->:: < } {
-        n i.value lista->:: =
-        n 1000 / n 100 / 10 % n 10 / 10 % n 10 % check() {
-          n.value add()
-        } ifthen
-        i++
-      } while
-    } if
+      } ifthen
+      i++
+    } while
+  } {
+    i 0 =
+    { i count lista->:: < } {
+      n i.value lista->:: =
+      n 1000 / n 100 / 10 % n 10 / 10 % n 10 % check() {
+        n.value add()
+      } ifthen
+      i++
+    } while
   } if
 } =
 
@@ -221,17 +239,28 @@ solve dup var {
   f var
   n var
 
-  lista a &=
-  listb b &=
-  firstTimeThrough true =
-  count a:: 0 =
-  count b:: 0 =
+  count lista->:: 0 =
+  count listb->:: 0 =
+  fillA()
 
   n 1 =
   f 1 =
   { f } {
     makeGuess()
-    guess0 guess1 guess2 guess3 n "\nGuess %d: %d %d %d %d\n" printf
+    "" println
+    showStats { count lista->:: 0 > } and {
+      count lista->:: 1 == { "y" } { "ies" } if count lista->:: "%d entr%s to choose from\n" printf
+      showList {
+        i dup var 0 =
+        { i count lista->:: < } {
+          i.value lista->:: " %d" printf
+          i 32 % 31 == { "" println } ifthen
+          i++
+        } while
+        i 32 % 0 != { "" println } ifthen
+      } ifthen
+    } ifthen
+    guess0 guess1 guess2 guess3 n "Guess %d: %d %d %d %d\n" printf
     getScore()
     bulls 4 == {
       "\nWooHoo, I won!\n" printf
@@ -243,7 +272,6 @@ solve dup var {
     t lista =
     lista listb =
     listb t =
-    firstTimeThrough false =
     n++
   } while
 
