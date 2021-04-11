@@ -28,18 +28,25 @@
 // of writing, the Wikipedia page above has an image showing the maze.
 // You can see an ASCII rendition of the maze by entering m at any time.
 // This rendition highlights in red the room you are in, and blue for the
-// rooms you have visited.
+// rooms you have visited. You can also make a note of which rooms you believe
+// contain either a pit or a bat by entering p or b as appropriate. These notes
+// are shown along with the maze.
 
 maths library
 file library
 string library
 
+gameInProgress var
 playerRoom var
 wumpusRoom var
 pit1Room var
 pit2Room var
 bat1Room var
 bat2Room var
+playerPit1Room var
+playerPit2Room var
+playerBat1Room var
+playerBat2Room var
 arrows var
 wumpusIsAwake var
 showStats var
@@ -208,27 +215,106 @@ showMaze dup var {
   17 highlight() 18 highlight()
   "     %s-------------%s\n" printf
   "" println
+
+  playerPit1Room 0 > playerBat1Room 0 > or {
+    playerPit1Room 0 > { playerPit1Room "  Pit %2d" printf } ifthen
+    playerPit2Room 0 > { playerPit2Room " %2d" printf } ifthen
+    playerPit1Room 0 > { "" println } ifthen
+    playerBat1Room 0 > { playerBat1Room "  Bat %2d" printf } ifthen
+    playerBat2Room 0 > { playerBat2Room " %2d" printf } ifthen
+    playerBat1Room 0 > { "" println } ifthen
+    "" println
+  } ifthen
+  // "" println
+} =
+
+setPlayerPit dup var {
+  haveAnswer dup var false =
+  ans var
+
+  playerPit1Room 0 > playerPit2Room 0 > and {
+    "No more slots available" println
+  } {
+    gameInProgress false =
+    { haveAnswer not } {
+      ans "Enter pit room: " getAnswer() =
+      ans 1 >= ans 20 <= and {
+        haveAnswer true =
+        playerPit1Room 0 == {
+          playerPit1Room ans =
+        } {
+          ans playerPit1Room < {
+            playerPit2Room playerPit1Room =
+            playerPit1Room ans =
+          } {
+            playerPit2Room ans =
+          } if
+        } if
+      } ifthen
+    } while
+    gameInProgress true =
+  } if
+} =
+
+setPlayerBat dup var {
+  haveAnswer dup var false =
+  ans var
+
+  playerBat1Room 0 > playerBat2Room 0 > and {
+    "No more slots available" println
+  } {
+    gameInProgress false =
+    { haveAnswer not } {
+      ans "Enter pit room: " getAnswer() =
+      ans 1 >= ans 20 <= and {
+        haveAnswer true =
+        playerBat1Room 0 == {
+          playerBat1Room ans =
+        } {
+          ans playerBat1Room < {
+            playerBat2Room playerBat1Room =
+            playerBat1Room ans =
+          } {
+            playerBat2Room ans =
+          } if
+        } if
+      } ifthen
+    } while
+    gameInProgress true =
+  } if
 } =
 
 getAnswer dup var {
   prompt dup var swap =
   haveAnswer dup var false =
   ans var
+  doDefault var
 
   { haveAnswer not } {
+    doDefault true =
     prompt printf
     stdin file:: fgets file::() {
       ans swap =
       ans "xyzzy" equals string::() {
         showStats showStats not =
-      } {
-        ans "m" equals string::() {
-          showMaze()
-        } {
-          ans atoi string::()
-          haveAnswer true =
-        } if
-      } if
+        doDefault false =
+      } ifthen
+      ans "m" equals string::() {
+        showMaze()
+        doDefault false =
+      } ifthen
+      gameInProgress ans "p" equals string::() and {
+        setPlayerPit()
+        doDefault false =
+      } ifthen
+      gameInProgress ans "b" equals string::() and {
+        setPlayerBat()
+        doDefault false =
+      } ifthen
+      doDefault {
+        ans atoi string::()
+        haveAnswer true =
+      } ifthen
     } {
       0 exit
     } if
@@ -374,7 +460,7 @@ checkSituationAfterPlayerMove dup var {
     statWumpus++
   } {
     playerRoom pit1Room == playerRoom pit2Room == or {
-      "You have died by falling into a pit." println
+      "You fell into a pit and died." println
       haveDied true =
       statPit++
     } ifthen
@@ -427,6 +513,7 @@ play dup var {
   arrows 5 =
 
   chooseStartingRooms()
+  gameInProgress true =
   "" println
   { haveWon not haveDied not and } {
     playerTurn()
@@ -436,6 +523,7 @@ play dup var {
       checkSituationAfterGameMove()
     } ifthen
   } while
+  gameInProgress false =
 } =
 
 reset dup var {
@@ -447,12 +535,17 @@ reset dup var {
     visited i.value:: room:: false =
     i++
   } while
+  playerPit1Room 0 =
+  playerPit2Room 0 =
+  playerBat1Room 0 =
+  playerBat2Room 0 =
 } =
 
 toplevel dup var {
   haveAnswer var
   req var
 
+  gameInProgress false =
   { true } {
     haveAnswer false =
     { haveAnswer not } {
@@ -462,7 +555,9 @@ toplevel dup var {
 
       reset()
       "" println
-      "Enter m at any time to see the maze layout" println
+      "Enter m to see the maze layout" println
+      "      p to set a note about a pit room" println
+      "      b to set a note about a bat room" println
       "" println
       req "1 - play game\n2 - quit\n> " getAnswer() =
       req 2 == {
