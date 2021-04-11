@@ -1,5 +1,8 @@
 shale:
 
+  1.3.4 - 11 Apr 2021
+    - numbers now use lass memory
+
   1.3.3 - 9 Apr 2021
     - fix zero pointer dereference in the ++ and -- operators when the variable
       is defined but not initialised

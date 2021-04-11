@@ -129,8 +129,10 @@ class Number : public Object {
 
   private:
     bool intRep;
-    INT valueInt;
-    double valueDouble;
+    union {
+      INT valueInt;
+      double valueDouble;
+    };
 };
 
 class String : public Object {
