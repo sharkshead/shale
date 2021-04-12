@@ -240,16 +240,18 @@ setPlayerPit dup var {
       ans "Pit room: " getAnswer() =
       ans 1 >= ans 20 <= and {
         haveAnswer true =
-        playerPit1Room 0 == {
-          playerPit1Room ans =
-        } {
-          ans playerPit1Room < {
-            playerPit2Room playerPit1Room =
+        ans playerPit1Room != ans playerPit2Room != and {
+          playerPit1Room 0 == {
             playerPit1Room ans =
           } {
-            playerPit2Room ans =
+            ans playerPit1Room < {
+              playerPit2Room playerPit1Room =
+              playerPit1Room ans =
+            } {
+              playerPit2Room ans =
+            } if
           } if
-        } if
+        } ifthen
       } ifthen
     } while
     gameInProgress true =
@@ -268,16 +270,18 @@ setPlayerBat dup var {
       ans "Bat room: " getAnswer() =
       ans 1 >= ans 20 <= and {
         haveAnswer true =
-        playerBat1Room 0 == {
-          playerBat1Room ans =
-        } {
-          ans playerBat1Room < {
-            playerBat2Room playerBat1Room =
+        ans playerBat1Room != ans playerBat2Room != and {
+          playerBat1Room 0 == {
             playerBat1Room ans =
           } {
-            playerBat2Room ans =
+            ans playerBat1Room < {
+              playerBat2Room playerBat1Room =
+              playerBat1Room ans =
+            } {
+              playerBat2Room ans =
+            } if
           } if
-        } if
+        } ifthen
       } ifthen
     } while
     gameInProgress true =
