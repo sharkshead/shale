@@ -63,6 +63,7 @@ init dup var {
   count b:: var
   lista a &=
   listb b &=
+  count guess:: var
 } =
 
 randomDigit dup var {
@@ -78,6 +79,14 @@ makeGuess dup var {
   guess1 guess 10 / 10 % =
   guess2 guess 100 / 10 % =
   guess3 guess 1000 / =
+
+  i count guess:: =
+  i.value guess:: defined not {
+    i.value guess:: var
+    i.value bulls:: var
+    i.value cows:: var
+  } ifthen
+  i.value guess:: guess =
 } =
 
 getAnswer dup var {
@@ -92,6 +101,7 @@ getScore dup var {
   haveBulls dup var false =
   haveCows dup var false =
   ans var
+  i var
 
   { haveBulls not } {
     "Bulls: " print
@@ -114,6 +124,11 @@ getScore dup var {
       haveCows true =
     } if
   } while
+
+  i count guess:: =
+  i.value bulls:: bulls =
+  i.value cows:: cows =
+  count guess::++
 } =
 
 check dup var {
@@ -241,6 +256,7 @@ solve dup var {
 
   count lista->:: 0 =
   count listb->:: 0 =
+  count guess:: 0 =
   fillA()
 
   n 1 =
@@ -276,7 +292,18 @@ solve dup var {
   } while
 
   count lista->:: 0 == {
+    i var
+
+
+    "" println
     "I've run out of numbers to choose from." println
+    "" println
+    "Guess   Bulls Cows" println
+    i 0 =
+    { i count guess:: < } {
+      i.value cows:: i.value bulls:: i.value guess:: 10 % i.value guess:: 10 / 10 % i.value guess:: 100 / 10 % i.value guess:: 1000 / "%d %d %d %d %5d %4d\n" printf
+      i++
+    } while
   } ifthen
 } =
 
