@@ -237,7 +237,8 @@ setPlayerPit dup var {
   } {
     gameInProgress false =
     { haveAnswer not } {
-      ans "Pit room: " getAnswer() =
+      ans "Pit room (zero to cancel): " getAnswer() =
+      ans 0 == { break } ifthen
       ans 1 >= ans 20 <= and {
         haveAnswer true =
         ans playerPit1Room != ans playerPit2Room != and {
@@ -267,7 +268,8 @@ setPlayerBat dup var {
   } {
     gameInProgress false =
     { haveAnswer not } {
-      ans "Bat room: " getAnswer() =
+      ans "Bat room (zero to cancel): " getAnswer() =
+      ans 0 == { break } ifthen
       ans 1 >= ans 20 <= and {
         haveAnswer true =
         ans playerBat1Room != ans playerBat2Room != and {
