@@ -266,7 +266,7 @@ solve dup var {
     "" println
     showStats { count lista->:: 0 > } and {
       count lista->:: 1 == { "y" } { "ies" } if count lista->:: "%d entr%s to choose from\n" printf
-      showList {
+      showList count lista->:: 3024 != and {
         i dup var 0 =
         { i count lista->:: < } {
           i.value lista->:: " %d" printf
@@ -292,18 +292,54 @@ solve dup var {
   } while
 
   count lista->:: 0 == {
+    d0 var
+    d1 var
+    d2 var
+    d3 var
     i var
+    g var
+    b var
+    c var
+    f dup var true =
 
 
     "" println
     "I've run out of numbers to choose from." println
-    "" println
-    "Guess   Bulls Cows" println
-    i 0 =
-    { i count guess:: < } {
-      i.value cows:: i.value bulls:: i.value guess:: 10 % i.value guess:: 10 / 10 % i.value guess:: 100 / 10 % i.value guess:: 1000 / "%d %d %d %d %5d %4d\n" printf
-      i++
-    } while
+    ""
+    "What number were you thinking of (no spaces): " print
+    i getAnswer() =
+    i 0 > {
+      d0 i 10 % =
+      d1 i 10 / 10 % =
+      d2 i 100 / 10 % =
+      d3 i 1000 / =
+
+      "" println
+      "Guess   Bulls Cows" println
+      i 0 =
+      { i count guess:: < } {
+        i.value cows:: i.value bulls:: i.value guess:: 10 % i.value guess:: 10 / 10 % i.value guess:: 100 / 10 % i.value guess:: 1000 / "%d %d %d %d %5d %4d" printf
+
+        g i.value guess:: =
+        guess0 g 10 % =
+        guess1 g 10 / 10 % =
+        guess2 g 100 / 10 % =
+        guess3 g 1000 / =
+        b 0 =
+        c 0 =
+        d0 guess0 == { b++ } { d0 guess1 == { d0 guess2 == { d0 guess3 == } or } or { c++ } ifthen } if
+        d1 guess1 == { b++ } { d1 guess0 == { d1 guess2 == { d1 guess3 == } or } or { c++ } ifthen } if
+        d2 guess2 == { b++ } { d2 guess0 == { d2 guess1 == { d2 guess3 == } or } or { c++ } ifthen } if
+        d3 guess3 == { b++ } { d3 guess0 == { d3 guess1 == { d3 guess2 == } or } or { c++ } ifthen } if
+        f { b i.value bulls:: != { c i.value cows:: != } or } and {
+          c b " <-- should be %d / %d" printf
+          f false =
+        } ifthen
+
+        "" println
+        i++
+      } while
+    } ifthen
   } ifthen
 } =
 
