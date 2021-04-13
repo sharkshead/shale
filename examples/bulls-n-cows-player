@@ -315,7 +315,7 @@ solve dup var {
       d3 i 1000 / =
 
       "" println
-      "Guess   Bulls Cows" println
+      "Guess   Bulls Cows First error" println
       i 0 =
       { i count guess:: < } {
         i.value cows:: i.value bulls:: i.value guess:: 10 % i.value guess:: 10 / 10 % i.value guess:: 100 / 10 % i.value guess:: 1000 / "%d %d %d %d %5d %4d" printf
