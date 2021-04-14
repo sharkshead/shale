@@ -111,10 +111,10 @@ game dup var {
         i.value bull:: guess:: b =
         c guess::++
 
-        "Go  Guess Cows Bulls" println
+        "Go  Guess Bulls Cows" println
         i 0 =
         { i c guess:: < } {
-          i.value bull:: guess:: i.value cow:: guess:: i.value guess:: guess:: i 1 + "%2d  %d  %4d %5d\n" printf
+          i.value cow:: guess:: i.value bull:: guess:: i.value guess:: guess:: i 1 + "%2d  %d  %5d %4d\n" printf
           i++
         } while
 
