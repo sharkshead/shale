@@ -189,41 +189,44 @@ highlight dup var {
 showMaze dup var {
   "" println
   20 highlight()
-  "      ------%s-------\n" printf
-  "     /       |       \\\n" printf
+  "     ------%s-------\n" printf
+  "    /       |       \\\n" printf
   13 highlight()
-  "    /     --%s--      \\\n" printf
+  "   /     --%s--      \\\n" printf
   16 highlight() 19 highlight()
-  "   %s    /      \\     %s\n" printf
+  "  %s    /      \\     %s\n" printf
   14 highlight() 12 highlight()
-  "   |\\   %s      %s   / |\n" printf
-  "   | \\ /  \\    /  \\ /  |\n" printf
+  "  |\\   %s      %s   / |\n" printf
+  "  | \\ /  \\    /  \\ /  |\n" printf
   15 highlight() 4 highlight() 3 highlight() 11 highlight()
-  "   |  %s   %s--%s   %s   |\n" printf
-  "   |   |   /   \\   |   |\n" printf
+  "  |  %s   %s--%s   %s   |\n" printf
+  "  |   |   /   \\   |   |\n" printf
   6 highlight() 5 highlight() 2 highlight() 10 highlight()
-  "   |  %s--%s     %s--%s   |\n" printf
-  "   |    \\  \\   /  /    |\n" printf
+  "  |  %s--%s     %s--%s   |\n" printf
+  "  |    \\  \\   /  /    |\n" printf
   7 highlight() 1 highlight() 9 highlight()
-  "   |     %s  -%s-  %s     |\n" printf
-  "   \\    / \\  |  / \\    /\n" printf
+  "  |     %s  -%s-  %s     |\n" printf
+  "  \\    / \\  |  / \\    /\n" printf
   8 highlight()
-  "    \\  /   --%s--   \\  /\n" printf
-  "     \\/             \\/\n" printf
+  "   \\  /   --%s--   \\  /\n" printf
+  "    \\/             \\/\n" printf
   17 highlight() 18 highlight()
-  "     %s-------------%s\n" printf
+  "    %s-------------%s\n" printf
   "" println
 
   playerPit1Room 0 > playerBat1Room 0 > or {
-    playerPit1Room 0 > { playerPit1Room "  Pit %2d" printf } ifthen
-    playerPit2Room 0 > { playerPit2Room " %2d" printf } ifthen
-    playerPit1Room 0 > { "" println } ifthen
-    playerBat1Room 0 > { playerBat1Room "  Bat %2d" printf } ifthen
-    playerBat2Room 0 > { playerBat2Room " %2d" printf } ifthen
-    playerBat1Room 0 > { "" println } ifthen
+    playerPit1Room 0 > {
+      playerPit1Room "  Pit %2d" printf
+      playerPit2Room 0 > { playerPit2Room " %2d" printf } ifthen
+      "" println
+    } ifthen
+    playerBat1Room 0 > {
+      playerBat1Room "  Bat %2d" printf
+      playerBat2Room 0 > { playerBat2Room " %2d" printf } ifthen
+      "" println
+    } ifthen
     "" println
   } ifthen
-  // "" println
 } =
 
 setPlayerPit dup var {
