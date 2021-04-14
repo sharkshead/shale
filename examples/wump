@@ -49,7 +49,6 @@ playerBat1Room var
 playerBat2Room var
 arrows var
 wumpusIsAwake var
-showStats var
 statPlayer var
 statWumpus var
 statPit var
@@ -92,7 +91,6 @@ init dup var {
   0 19:: room:: 11 =    1 19:: room:: 18 =    2 19:: room:: 20 =
   0 20:: room:: 13 =    1 20:: room:: 16 =    2 20:: room:: 19 =
 
-  showStats false =
   statPlayer 0 =
   statWumpus 0 =
   statPit 0 =
@@ -301,10 +299,6 @@ getAnswer dup var {
     prompt printf
     stdin file:: fgets file::() {
       ans swap =
-      ans "xyzzy" equals string::() {
-        showStats showStats not =
-        doDefault false =
-      } ifthen
       ans "m" equals string::() {
         showMaze()
         doDefault false =
@@ -555,7 +549,7 @@ toplevel dup var {
   { true } {
     haveAnswer false =
     { haveAnswer not } {
-      showStats {
+      statPlayer statWumpus statPit statArrow statQuiver + + + + 0 > {
         statQuiver statArrow statPit statWumpus statPlayer "\nPlayer %d, Wumpus %d, Pit %d, Darwin %d, Quiver %d\n" printf
       } ifthen
 
