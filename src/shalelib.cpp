@@ -1609,6 +1609,12 @@ OperatorReturn Value::action(ExecutionEnvironment *ee) {
   } catch (Exception *e) { }
 
   try {
+    ee->stack.push(o->getPointer(getLexInfo(), ee));
+    o->release(getLexInfo());
+    return or_continue;
+  } catch (Exception *e) { }
+
+  try {
     ee->stack.push(o->getCode(getLexInfo(), ee));
     o->release(getLexInfo());
     return or_continue;
