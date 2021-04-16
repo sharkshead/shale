@@ -2063,6 +2063,7 @@ OperatorReturn PrintStack::action(ExecutionEnvironment *ee) {
   Name *na;
   String *s;
   Code *c;
+  Pointer *p;
   Number *no;
   int i;
   bool found;
@@ -2094,6 +2095,15 @@ OperatorReturn PrintStack::action(ExecutionEnvironment *ee) {
         c = o->getCode(getLexInfo(), ee);
         printf("{ ...code... }\n");
         c->release(getLexInfo());
+        found = true;
+      } catch(Exception *e) { }
+    }
+
+    if(! found) {
+      try {
+        p = o->getPointer(getLexInfo(), ee);
+        printf("... pointer ...\n");
+        p->release(getLexInfo());
         found = true;
       } catch(Exception *e) { }
     }
