@@ -5,11 +5,11 @@ time library
 // This solves a sudoku with:
 //  row/column/3x3box constraints (standard sudoku)
 //  row/column/irregular, or jigsaw, region constraints
-// optionally with a Chess Knight's move constraint.
+// optionally with a Chess Knight's move constraint or an arrow constraint, or both.
 // It is based on the python code from the Computerphile video
 //  https://www.youtube.com/watch?v=G_UYXzGuqvM
 // The sudoku example from this video is used below, along with
-// a couple of Cracking The Cryptic examples and one from Andrew Stuart.
+// a couple of Cracking the Cryptic examples and one from Andrew Stuart.
 
 // The sudoku grid is stored in a multi-dimensional array under the grid:: namespace.
 // The row and column of each cell is represented by:
@@ -32,11 +32,13 @@ s initialised {
   "You can choose to solve one of several sudokus by adding s=n to the command line," println
   "where n is" println
   "  1: standard sudoku from Computerphile (the default)" println
-  "  2: standard sudoku from Cracking The Cryptic" println
-  "  3: standard sudoku from Cracking The Cryptic, with Knight's move constraint" println
-  "  4: standard sudoku from Cracking The Cryptic" println
-  "  5: irregular sudoku from Cracking The Cryptic" println
+  "  2: standard sudoku from Cracking the Cryptic" println
+  "  3: standard sudoku from Cracking the Cryptic, with Knight's move constraint" println
+  "  4: standard sudoku from Cracking the Cryptic" println
+  "  5: irregular sudoku from Cracking the Cryptic" println
   "  6: irregular sudoku from Andrew Stuart" println
+  "  7: irregular sudoku with an arrow constraint, and no given digits, from Cracking the Cryptic" println
+  "  8: regular sudoku with Knight's Move and Arrow constraints, and no given digits, from Cracking the Cryptic." println
   "" println
   "You can also enable colour output by adding colour=true or color=true to the command line." println
   "" println
@@ -322,6 +324,136 @@ knightsMoveConstraint dup var { function
   true
 } =
 
+// Start a new arrow (circle) at the given row and column.
+// If several arrows start from the same circle then add them as seperate
+// arrows from that same circle cell.
+newArrow dup var {
+  0$ dup var swap =  // column
+  1$ dup var swap =  // row
+  arrow var
+  i var
+
+  // Allocate a new arrow number.
+  count arrows:: initialised not {
+    count arrows:: dup var 0 =
+  } {
+    count arrows::++
+  } if
+  arrow count arrows:: =
+
+  // Every cell can have multiple arrows eminating from it.
+  circleCount 1$.value:: 0$.value:: arrows:: initialised not {
+    circleCount 1$.value:: 0$.value:: arrows:: dup var 0 =
+  } {
+    circleCount 1$.value:: 0$.value:: arrows::++
+  } if
+  i circleCount 1$.value:: 0$.value:: arrows:: =
+
+  arrow i.value:: 1$.value:: 0$.value:: arrows:: dup var arrow =    // Tag this cell with the arrow number.
+  cells arrow.value:: arrows:: dup var 0 =                          // Number of cells this arrow contains.
+  row arrow.value:: arrows:: dup var 1$ =                           // Save the location of this circle.
+  column arrow.value:: arrows:: dup var 0$ =
+} =
+
+// Add a cell to the current arrow. Each cell can be part of multiple arrows.
+arrowCell dup var {
+  0$ dup var swap =  // column
+  1$ dup var swap =  // row
+  arrow var
+  cell var
+  i var
+
+  arrow count arrows:: =                // Current arrow number.
+  cell cells arrow.value:: arrows:: =   // Number of cells in this arrow so far.
+  cells arrow.value:: arrows::++        // Increment the number of cells.
+
+  cellCount 1$.value:: 0$.value:: arrows:: initialised not {
+    cellCount 1$.value:: 0$.value:: arrows:: dup var 0 =
+  } {
+    cellCount 1$.value:: 0$.value:: arrows::++
+  } if
+  i cellCount 1$.value:: 0$.value:: arrows:: =
+
+  arrow i.value:: 1$.value:: 0$.value:: arrows:: dup var arrow =
+  row cell.value:: arrow.value:: arrows:: dup var 1$ =
+  column cell.value:: arrow.value:: arrows:: dup var 0$ =
+} =
+
+// This is an arrow constraint.
+arrowConstraint dup var { function
+  0$ dup var swap =  // n
+  1$ dup var swap =  // column
+  2$ dup var swap =  // row
+  arrow var
+  i var
+  grid var
+  sum var
+
+  // Is this an arrow circle?
+  circleCount 2$.value:: 1$.value:: arrows:: initialised {
+    // Yes.
+    i 0 =
+    { i circleCount 2$.value:: 1$.value:: arrows:: <= } {
+      sum arrow i.value:: 2$.value:: 1$.value:: arrows:: sumArrow() =
+      sum 0 > sum n != and { false return } ifthen    // If we have a sum and it is wrong, return false.
+      i++
+    } while
+  } {
+    // No.
+    // Is this cell part of an arrow?
+    cellCount 2$.value:: 1$.value:: arrows:: initialised {
+      // Yes.
+      i 0 =
+      { i cellCount 2$.value:: 1$.value:: arrows:: <= } {
+        // Does the circle have a value?
+        arrow arrow i.value:: 2$.value:: 1$.value:: arrows:: =
+        r row arrow.value:: arrows:: =
+        c column arrow.value:: arrows:: =
+        r.value c.value:: grid:: 0 != {
+          // Yes.
+          grid r.value c.value:: grid:: =
+          2$.value 1$.value:: grid:: 0$ =   // Temporatrily put the number in the grid.
+          sum arrow.value sumArrow() =
+          2$.value 1$.value:: grid:: 0 =    // Take if out again.
+          sum 0 > sum grid != and { false return } ifthen    // If we have a sum and it is wrong, return false.
+        } ifthen
+        i++
+      } while
+    } ifthen
+  } if
+
+  true
+} =
+
+sumArrow dup var {
+  arrow dup var swap =
+  i var
+  r var
+  c var
+  sum var
+
+  sum 0 =
+  i 0 =
+  { i cells arrow.value:: arrows:: < } {
+    r row i.value:: arrow.value:: arrows:: =
+    c column i.value:: arrow.value:: arrows:: =
+    r.value c.value:: grid:: 0 == { sum -1 = break } ifthen
+    sum sum r.value c.value:: grid:: + =
+    i++
+  } while
+
+  sum.value
+} =
+
+// Both a knights move and arrow constraint
+knightsMoveAndArrowConstraint dup var {
+  0$ dup var swap =  // n
+  1$ dup var swap =  // column
+  2$ dup var swap =  // row
+
+  2$.value 1$.value 0$.value knightsMoveConstraint() { 2$.value 1$.value 0$.value arrowConstraint() } and
+} =
+
 // Set this to standardRegions for the usual 3x3 boxes,
 // or irregularRegions to handle irregular, or jigsaw, regions.
 regionChecker var
@@ -386,11 +518,11 @@ whichSudoku 1 == {
 } ifthen
 
 // From https://www.youtube.com/watch?v=MXUgYxHmKq4&t=0s
-// This sudoku was featured on Cracking The Cryptic, and takes considerably longer than the one above.
+// This sudoku was featured on Cracking the Cryptic, and takes considerably longer than the one above.
 // Pi3 Model A time: 3m 23s to the solution, 15m 11s to finish.
 whichSudoku 2 == {
   found true =
-  "From Cracking The Cryptic: https://www.youtube.com/watch?v=MXUgYxHmKq4&t=0s" println
+  "From Cracking the Cryptic: https://www.youtube.com/watch?v=MXUgYxHmKq4&t=0s" println
   regionChecker standardRegions =
   grid 0 0 6 8 0 0 0 0 1 3 setRow()
   grid 1 0 0 0 9 0 1 0 0 0 setRow()
@@ -404,11 +536,11 @@ whichSudoku 2 == {
 } ifthen
 
 // From https://www.youtube.com/watch?v=rQHV-gIAG_0
-// Another Cracking The Cryptic video, this one with a Knight's move constraint.
+// Another Cracking the Cryptic video, this one with a Knight's move constraint.
 // Pi3 Model A time: 48s to the solution, 6m 10s to finish.
 whichSudoku 3 == {
   found true =
-  "From Cracking The Cryptic: https://www.youtube.com/watch?v=rQHV-gIAG_0" println
+  "From Cracking the Cryptic: https://www.youtube.com/watch?v=rQHV-gIAG_0" println
   "This includes a Chess Knight's move constraint." println
   regionChecker standardRegions =
   constraint knightsMoveConstraint =
@@ -427,7 +559,7 @@ whichSudoku 3 == {
 // Pi3 Model A time: 1m 6s to the solution, 48m 35s to finish.
 whichSudoku 4 == {
   found true =
-  "From Cracking The Cryptic: https://www.youtube.com/watch?v=vH-JooV8RA4&t=0s" println
+  "From Cracking the Cryptic: https://www.youtube.com/watch?v=vH-JooV8RA4&t=0s" println
   regionChecker standardRegions =
   grid 0 0 0 0 0 0 0 0 0 0 setRow()
   grid 1 0 0 9 8 0 0 0 0 7 setRow()
@@ -440,12 +572,12 @@ whichSudoku 4 == {
   grid 8 3 0 0 0 0 6 2 0 0 setRow()
 } ifthen
 
-// Another Cracking The Cryptic sudoku: https://www.youtube.com/watch?v=eJIu8w3ZXo8
+// Another Cracking the Cryptic sudoku: https://www.youtube.com/watch?v=eJIu8w3ZXo8
 // This is an irregular (jigsaw) sudoku.
 // Pi3 Model A time: 2m 5s to the solution, 7m 5s to finish.
 whichSudoku 5 == {
   found true =
-  "From Cracking The Cryptic: https://www.youtube.com/watch?v=eJIu8w3ZXo8" println
+  "From Cracking the Cryptic: https://www.youtube.com/watch?v=eJIu8w3ZXo8" println
   "An irregular sudoku." println
   regionChecker irregularRegions =
   regions 0 1 1 1 1 1 2 2 2 2 setRow()
@@ -501,13 +633,86 @@ whichSudoku 6 == {
   grid 8 0 9 0 0 0 0 0 0 0 setRow()
 } ifthen
 
-// If you want to add your own sudoku, add it here.
+// Aother CTC sudoku: https://www.youtube.com/watch?v=8TGsvxfGLNw
+// An irregular region sudoku with an arrow constraint.
 whichSudoku 7 == {
   found true =
+  "From Cracking the Cryptic: https://www.youtube.com/watch?v=8TGsvxfGLNw" println
+  "Constructed by tenaliraman." println
+  "Irregular regions with an arrow constraint, and no given digits." println
+  "The arrows are not shown, unfortunately." println
+  regionChecker irregularRegions =
+  constraint arrowConstraint =
+  grid 0 0 0 0 0 0 0 0 0 0 setRow()
+  grid 1 0 0 0 0 0 0 0 0 0 setRow()
+  grid 2 0 0 0 0 0 0 0 0 0 setRow()
+  grid 3 0 0 0 0 0 0 0 0 0 setRow()
+  grid 4 0 0 0 0 0 0 0 0 0 setRow()
+  grid 5 0 0 0 0 0 0 0 0 0 setRow()
+  grid 6 0 0 0 0 0 0 0 0 0 setRow()
+  grid 7 0 0 0 0 0 0 0 0 0 setRow()
+  grid 8 0 0 0 0 0 0 0 0 0 setRow()
+  regions 0 1 1 1 2 2 3 3 3 3 setRow()
+  regions 1 1 1 1 2 2 3 3 3 3 setRow()
+  regions 2 1 1 1 2 2 3 4 4 4 setRow()
+  regions 3 5 5 5 2 2 2 4 4 4 setRow()
+  regions 4 5 5 5 5 5 6 4 4 4 setRow()
+  regions 5 7 7 7 5 6 6 6 6 6 setRow()
+  regions 6 7 7 8 8 8 6 9 9 9 setRow()
+  regions 7 7 7 8 8 8 6 9 9 9 setRow()
+  regions 8 7 7 8 8 8 6 9 9 9 setRow()
+  0 0 newArrow()    0 1 arrowCell()   0 2 arrowCell()
+  0 8 newArrow()    0 7 arrowCell()   0 6 arrowCell()   0 5 arrowCell()
+  1 6 newArrow()    2 5 arrowCell()   3 6 arrowCell()
+  3 1 newArrow()    2 2 arrowCell()   1 3 arrowCell()
+  3 5 newArrow()    3 4 arrowCell()   2 4 arrowCell()   2 4 arrowCell()
+  4 5 newArrow()    4 6 arrowCell()   4 7 arrowCell()
+  4 8 newArrow()    5 7 arrowCell()
+  5 0 newArrow()    6 0 arrowCell()   7 0 arrowCell()
+  5 3 newArrow()    4 3 arrowCell()   4 2 arrowCell()   4 1 arrowCell()
+  5 4 newArrow()    6 4 arrowCell()   7 4 arrowCell()
+  6 8 newArrow()    7 8 arrowCell()   7 7 arrowCell()
+  7 3 newArrow()    6 2 arrowCell()   5 1 arrowCell()
+  8 4 newArrow()    7 5 arrowCell()   6 6 arrowCell()   5 7 arrowCell()
+} ifthen
+
+// Another CTC sudoku: https://www.youtube.com/watch?v=yy5Lo6O99CE
+// This includes Arrow and Knight's move constraints.
+// My Pi 3 Model A takes ages to complete. Don't wait up for it.
+whichSudoku 8 == {
+  found true =
+  "Another Cracking the Cryptic sudoku: https://www.youtube.com/watch?v=yy5Lo6O99CE" println
+  "Constructed by SudokuExplorer." println
+  "Knight's move and arrow constraints, and no given digits." println
+  "The arrows are not shown, unfortunately." println
+  regionChecker standardRegions =
+  constraint knightsMoveAndArrowConstraint =
+  grid 0 0 0 0 0 0 0 0 0 0 setRow()
+  grid 1 0 0 0 0 0 0 0 0 0 setRow()
+  grid 2 0 0 0 0 0 0 0 0 0 setRow()
+  grid 3 0 0 0 0 0 0 0 0 0 setRow()
+  grid 4 0 0 0 0 0 0 0 0 0 setRow()
+  grid 5 0 0 0 0 0 0 0 0 0 setRow()
+  grid 6 0 0 0 0 0 0 0 0 0 setRow()
+  grid 7 0 0 0 0 0 0 0 0 0 setRow()
+  grid 8 0 0 0 0 0 0 0 0 0 setRow()
+  2 1 newArrow()    3 0 arrowCell()   4 0 arrowCell()   5 0 arrowCell()
+  2 4 newArrow()    3 5 arrowCell()   4 5 arrowCell()   5 5 arrowCell()
+  3 7 newArrow()    4 7 arrowCell()   3 8 arrowCell()
+  5 2 newArrow()    4 3 arrowCell()   3 3 arrowCell()   2 3 arrowCell()
+  5 3 newArrow()    4 2 arrowCell()   3 2 arrowCell()   2 2 arrowCell()
+  8 5 newArrow()    7 4 arrowCell()   6 3 arrowCell()
+} ifthen
+
+// If you want to add your own sudoku, add it here.
+whichSudoku 9 == {
+  found true =
   // add it here
-  // regionChecker standardRegions =          // Include a region checker
+  // regionChecker standardRegions =            // Include a region checker
   // regionChecker irregularRegions =
-  // constraint knightsMoveConstraint =       // Include any extra contraints, as appropriate
+  // constraint knightsMoveConstraint =         // Include any extra contraints, as appropriate
+  // constraint arrowConstraint =
+  // constraint knightsMoveAndArrowConstraint =
 } ifthen
 
 // Don't change anything from here to the end.
