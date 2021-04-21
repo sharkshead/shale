@@ -37,7 +37,7 @@ s initialised {
   "  4: standard sudoku from Cracking the Cryptic" println
   "  5: irregular sudoku from Cracking the Cryptic" println
   "  6: irregular sudoku from Andrew Stuart" println
-  "  7: irregular sudoku with an arrow constraint, and no given digits, from Cracking the Cryptic" println
+  "  7: regular sudoku with arrow constraints, from Cracking the Cryptic." println
   "  8: regular sudoku with Knight's Move and Arrow constraints, and no given digits, from Cracking the Cryptic." println
   "" println
   "You can also enable colour output by adding colour=true or color=true to the command line." println
@@ -633,52 +633,42 @@ whichSudoku 6 == {
   grid 8 0 9 0 0 0 0 0 0 0 setRow()
 } ifthen
 
-// Aother CTC sudoku: https://www.youtube.com/watch?v=8TGsvxfGLNw
-// An irregular region sudoku with an arrow constraint.
+// Aother CTC sudoku: https://www.youtube.com/watch?v=tTGXIa2IUrg
+// Regular sudoku with an arrow constraint.
+// 18m 34s to the solution on a Pi 3 Model A.
+// Pi3 Model A time: 18m 34s to the solution, 34m 33s to finish.
 whichSudoku 7 == {
   found true =
-  "From Cracking the Cryptic: https://www.youtube.com/watch?v=8TGsvxfGLNw" println
-  "Constructed by tenaliraman." println
-  "Irregular regions with an arrow constraint, and no given digits." println
-  "The arrows are not shown, unfortunately." println
-  regionChecker irregularRegions =
+  "From Cracking the Cryptic: https://www.youtube.com/watch?v=tTGXIa2IUrg" println
+  "Arrow sudoku. The arrows are not shown, unfortunately." println
+  regionChecker standardRegions =
   constraint arrowConstraint =
-  grid 0 0 0 0 0 0 0 0 0 0 setRow()
+  grid 0 0 0 0 5 0 4 0 0 0 setRow()
   grid 1 0 0 0 0 0 0 0 0 0 setRow()
-  grid 2 0 0 0 0 0 0 0 0 0 setRow()
-  grid 3 0 0 0 0 0 0 0 0 0 setRow()
+  grid 2 0 7 0 0 0 0 0 0 0 setRow()
+  grid 3 1 0 0 0 0 0 0 0 6 setRow()
   grid 4 0 0 0 0 0 0 0 0 0 setRow()
-  grid 5 0 0 0 0 0 0 0 0 0 setRow()
-  grid 6 0 0 0 0 0 0 0 0 0 setRow()
+  grid 5 4 0 0 0 0 0 0 0 1 setRow()
+  grid 6 0 0 0 0 0 0 0 5 0 setRow()
   grid 7 0 0 0 0 0 0 0 0 0 setRow()
-  grid 8 0 0 0 0 0 0 0 0 0 setRow()
-  regions 0 1 1 1 2 2 3 3 3 3 setRow()
-  regions 1 1 1 1 2 2 3 3 3 3 setRow()
-  regions 2 1 1 1 2 2 3 4 4 4 setRow()
-  regions 3 5 5 5 2 2 2 4 4 4 setRow()
-  regions 4 5 5 5 5 5 6 4 4 4 setRow()
-  regions 5 7 7 7 5 6 6 6 6 6 setRow()
-  regions 6 7 7 8 8 8 6 9 9 9 setRow()
-  regions 7 7 7 8 8 8 6 9 9 9 setRow()
-  regions 8 7 7 8 8 8 6 9 9 9 setRow()
+  grid 8 0 0 0 3 0 8 0 0 0 setRow()
   0 0 newArrow()    0 1 arrowCell()   0 2 arrowCell()
-  0 8 newArrow()    0 7 arrowCell()   0 6 arrowCell()   0 5 arrowCell()
-  1 6 newArrow()    2 5 arrowCell()   3 6 arrowCell()
-  3 1 newArrow()    2 2 arrowCell()   1 3 arrowCell()
-  3 5 newArrow()    3 4 arrowCell()   2 4 arrowCell()   2 4 arrowCell()
-  4 5 newArrow()    4 6 arrowCell()   4 7 arrowCell()
-  4 8 newArrow()    5 7 arrowCell()
-  5 0 newArrow()    6 0 arrowCell()   7 0 arrowCell()
-  5 3 newArrow()    4 3 arrowCell()   4 2 arrowCell()   4 1 arrowCell()
-  5 4 newArrow()    6 4 arrowCell()   7 4 arrowCell()
-  6 8 newArrow()    7 8 arrowCell()   7 7 arrowCell()
-  7 3 newArrow()    6 2 arrowCell()   5 1 arrowCell()
-  8 4 newArrow()    7 5 arrowCell()   6 6 arrowCell()   5 7 arrowCell()
+  0 8 newArrow()    0 7 arrowCell()   0 6 arrowCell()
+  1 3 newArrow()    1 4 arrowCell()   1 5 arrowCell()
+  2 4 newArrow()    2 5 arrowCell()   2 6 arrowCell()
+  3 3 newArrow()    3 2 arrowCell()   3 1 arrowCell()
+  3 7 newArrow()    3 6 arrowCell()   3 5 arrowCell()
+  5 1 newArrow()    5 2 arrowCell()   5 3 arrowCell()
+  5 5 newArrow()    5 6 arrowCell()   5 7 arrowCell()
+  6 2 newArrow()    6 3 arrowCell()   6 4 arrowCell()
+  7 5 newArrow()    7 4 arrowCell()   7 3 arrowCell()
+  8 0 newArrow()    8 1 arrowCell()   8 2 arrowCell()
+  8 8 newArrow()    8 7 arrowCell()   8 6 arrowCell()
 } ifthen
 
 // Another CTC sudoku: https://www.youtube.com/watch?v=yy5Lo6O99CE
 // This includes Arrow and Knight's move constraints.
-// My Pi 3 Model A takes ages to complete. Don't wait up for it.
+// No given digits ensures this will take a very long time.
 whichSudoku 8 == {
   found true =
   "Another Cracking the Cryptic sudoku: https://www.youtube.com/watch?v=yy5Lo6O99CE" println
@@ -713,6 +703,14 @@ whichSudoku 9 == {
   // constraint knightsMoveConstraint =         // Include any extra contraints, as appropriate
   // constraint arrowConstraint =
   // constraint knightsMoveAndArrowConstraint =
+  //
+  // Note on arrows:
+  // You can have multiple arrows starting from the same cell by creating
+  // each arrow from the same cell, eg
+  //    4 5 newArrow()    4 6 arrowCell()   4 7 arrowCell()
+  //    4 5 newArrow()    5 5 arrowCell()   6 5 arrowCell()     <-- start new arrow from same cell
+  // and each cell may have multiple arrows pass through it.
+  // Only single cell circles are supported. No pills, sorry.
 } ifthen
 
 // Don't change anything from here to the end.
