@@ -55,6 +55,10 @@ statPit var
 statArrow var
 statQuiver var
 
+feltAWumpus dup var 0x01 =
+feltAPit dup var 0x02 =
+feltABat dup var 0x04 =
+
 haveWon var
 haveDied var
 
@@ -67,6 +71,7 @@ init dup var {
     1 i.value:: room:: var
     2 i.value:: room:: var
     visited i.value:: room:: var
+    felt i.value:: room:: dup var 0 =
     i++
   } while
 
@@ -142,10 +147,12 @@ chooseStartingRooms dup var {
 showPlayerRoom dup var {
   pitNearby dup var false =
   batsNearby dup var false =
+  felt dup var 0 =
 
   2 playerRoom.value:: room:: 1 playerRoom.value:: room:: 0 playerRoom.value:: room:: playerRoom "You are in room %d, with connections to rooms %d, %d and %d\n" printf
   0 playerRoom.value:: room:: wumpusRoom == { 1 playerRoom.value:: room:: wumpusRoom == { 2 playerRoom.value:: room:: wumpusRoom == } or } or {
     "You smell a dreadful stench!" println
+    felt felt feltAWumpus | =
   } ifthen
   0 playerRoom.value:: room:: pit1Room == { 1 playerRoom.value:: room:: pit1Room == { 2 playerRoom.value:: room:: pit1Room == } or } or {
     pitNearby true =
@@ -157,6 +164,7 @@ showPlayerRoom dup var {
   } ifthen
   pitNearby {
     "You feel a draft." println
+    felt felt feltAPit | =
   } ifthen
   0 playerRoom.value:: room:: bat1Room == { 1 playerRoom.value:: room:: bat1Room == { 2 playerRoom.value:: room:: bat1Room == } or } or {
     batsNearby true =
@@ -168,8 +176,11 @@ showPlayerRoom dup var {
   } ifthen
   batsNearby {
     "There are bats nearby." println
+    felt felt feltABat | =
   } ifthen
   "" println
+
+  felt playerRoom.value:: room:: felt =
 } =
 
 highlight dup var {
@@ -291,6 +302,29 @@ setPlayerBat dup var {
   } if
 } =
 
+showFelt dup var {
+  i var
+  f var
+  flag dup var true =
+
+  "" println
+  i 1 =
+  { i 20 <= } {
+    f felt i.value:: room:: =
+    f {
+      flag false =
+      i "%2d:" printf
+      f feltAWumpus & { " Wumpus" print } ifthen
+      f feltAPit & { " Pit" print } ifthen
+      f feltABat & { " Bat" print } ifthen
+      "" println
+    } ifthen
+    i++
+  } while
+  flag { "You've felt nothing so far." println } ifthen
+  "" println
+} =
+
 getAnswer dup var {
   prompt dup var swap =
   haveAnswer dup var false =
@@ -304,6 +338,10 @@ getAnswer dup var {
       ans swap =
       ans "m" equals string::() {
         showMaze()
+        doDefault false =
+      } ifthen
+      ans "f" equals string::() {
+        showFelt()
         doDefault false =
       } ifthen
       gameInProgress ans "p" equals string::() and {
@@ -536,6 +574,7 @@ reset dup var {
   i 1 =
   { i 20 <= } {
     visited i.value:: room:: false =
+    felt i.value:: room:: 0 =
     i++
   } while
   playerPit1Room 0 =
@@ -558,9 +597,10 @@ toplevel dup var {
 
       reset()
       "" println
-      "Enter m to see the maze layout" println
-      "      p to set a note about a pit room" println
-      "      b to set a note about a bat room" println
+      "Enter m to see the maze layout highlighting the room you're in and those you've visited" println
+      "      f to see the rooms where you've felt something" println
+      "      p to set a note about a room with a pit" println
+      "      b to set a note about a room with a bat" println
       "" println
       req "1 - play game\n2 - quit\n> " getAnswer() =
       req 2 == {
