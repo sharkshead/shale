@@ -313,7 +313,7 @@ showFelt dup var {
     f felt i.value:: room:: =
     f {
       flag false =
-      i "%2d:" printf
+      i "  %2d" printf
       f feltAWumpus & { " Wumpus" print } ifthen
       f feltAPit & { " Pit" print } ifthen
       f feltABat & { " Bat" print } ifthen
