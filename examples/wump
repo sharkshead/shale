@@ -29,7 +29,8 @@
 // You can see an ASCII rendition of the maze by entering m at any time.
 // This rendition highlights in red the room you are in, and blue for the
 // rooms you have visited. You can also make a note of which rooms you believe
-// contain either a pit or a bat by entering p or b as appropriate. These notes
+// contain either a pit or a bat by entering p or b as appropriate.
+// These notes, along with the list of rooms where you sensed something,
 // are shown along with the maze.
 
 maths library
@@ -198,6 +199,10 @@ highlight dup var {
 } =
 
 showMaze dup var {
+  i var
+  f var
+  flag var
+
   "" println
   20 highlight()
   "     ------%s-------\n" printf
@@ -225,14 +230,35 @@ showMaze dup var {
   "    %s-------------%s\n" printf
   "" println
 
+  flag true =
+  i 1 =
+  { i 20 <= } {
+    f felt i.value:: room:: =
+    f {
+      flag { "  Felt" println } ifthen
+      flag false =
+      i "    %2d" printf
+      f feltAWumpus & { " Wumpus" print } ifthen
+      f feltAPit & { " Pit" print } ifthen
+      f feltABat & { " Bat" print } ifthen
+      "" println
+    } ifthen
+    i++
+  } while
+  flag not { "" println } ifthen
+
+  flag true =
   playerPit1Room 0 > playerBat1Room 0 > or {
     playerPit1Room 0 > {
-      playerPit1Room "  Pit %2d" printf
+      "  Notes" println
+      flag false =
+      playerPit1Room "    Pit %2d" printf
       playerPit2Room 0 > { playerPit2Room " %2d" printf } ifthen
       "" println
     } ifthen
     playerBat1Room 0 > {
-      playerBat1Room "  Bat %2d" printf
+      flag { "  Notes" println } ifthen
+      playerBat1Room "    Bat %2d" printf
       playerBat2Room 0 > { playerBat2Room " %2d" printf } ifthen
       "" println
     } ifthen
@@ -302,29 +328,6 @@ setPlayerBat dup var {
   } if
 } =
 
-showFelt dup var {
-  i var
-  f var
-  flag dup var true =
-
-  "" println
-  i 1 =
-  { i 20 <= } {
-    f felt i.value:: room:: =
-    f {
-      flag false =
-      i "  %2d" printf
-      f feltAWumpus & { " Wumpus" print } ifthen
-      f feltAPit & { " Pit" print } ifthen
-      f feltABat & { " Bat" print } ifthen
-      "" println
-    } ifthen
-    i++
-  } while
-  flag { "You've felt nothing so far." println } ifthen
-  "" println
-} =
-
 getAnswer dup var {
   prompt dup var swap =
   haveAnswer dup var false =
@@ -338,10 +341,6 @@ getAnswer dup var {
       ans swap =
       ans "m" equals string::() {
         showMaze()
-        doDefault false =
-      } ifthen
-      ans "f" equals string::() {
-        showFelt()
         doDefault false =
       } ifthen
       gameInProgress ans "p" equals string::() and {
@@ -598,7 +597,6 @@ toplevel dup var {
       reset()
       "" println
       "Enter m to see the maze layout highlighting the room you're in and those you've visited" println
-      "      f to see the rooms where you've felt something" println
       "      p to set a note about a room with a pit" println
       "      b to set a note about a room with a bat" println
       "" println
