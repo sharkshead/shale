@@ -462,6 +462,20 @@ regionChecker var
 // to constraint code such as knightsMoveConstraint defined above.
 constraint var
 
+// Helper funtion to print seconds as days, hours, minutes and seconds.
+dhms dup var {
+  n dup var swap =
+  ds dup var n int 86400 / =
+  hs dup var n int 3600 / 24 % =
+  ms dup var n int 60 / 60 % =
+  ss dup var n ds 86400 * hs 3600 * ms 60 * + + - =
+
+  ds { ds "%dd" printf } ifthen
+  hs { ds { " " print } ifthen hs "%dh" printf } ifthen
+  ms { ds hs or { " " print } ifthen ms "%dm" printf } ifthen
+  ss { ds hs or ms or { " " print } ifthen ss "%0.3fs" printf } ifthen
+} =
+
 solve dup var { function
   r var
   c var
@@ -492,7 +506,7 @@ solve dup var { function
 
   "" println
   printGrid()
-  now time::() startTime - 1000.0 / "Solution in %0.3f seconds\n" printf
+  "Solution in " print now time::() startTime - 1000.0 / dhms() "" println
 } =
 
 found var
@@ -724,7 +738,7 @@ found {
 
   solve()
 
-  now time::() startTime - 1000.0 / "Total runtime was %0.3f seconds\n" printf
+  "Total runtime was " print now time::() startTime - 1000.0 / dhms() "" println
 } {
   whichSudoku "Sudoku %d not found\n" printf
 } if
