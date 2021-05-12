@@ -19,8 +19,8 @@ time library
 // A 0 value represents an empty cell, and a 1 to 9 value represents a cell value.
 
 // You can specify which of the sudokus to solve by specifying s={n} on the command line.
-// If it is not specified then you get a text explaining how to specify an option
-// and what the options are and the default (s=1) option is solved.
+// If it is not specified then you get text explaining how to specify an option
+// and what the options are, and the default (s=1) option is solved.
 
 startTime dup var now time::() =
 
@@ -326,7 +326,7 @@ knightsMoveConstraint dup var { function
 
 // Start a new arrow (circle) at the given row and column.
 // If several arrows start from the same circle then add them as seperate
-// arrows from that same circle cell.
+// new arrows from that same circle cell.
 newArrow dup var {
   0$ dup var swap =  // column
   1$ dup var swap =  // row
@@ -515,7 +515,7 @@ found false =
 // As mentioned above, this is the example taken from the Computerphile video.
 // Raspberry Pi3 Model A time: 17s to the solution, 19s to finish.
 // The time spent between the solution and the finish is the script searching
-// of other, non-existant, soultion.
+// of other, non-existant, soultions.
 whichSudoku 1 == {
   found true =
   "From Computerphile: https://www.youtube.com/watch?v=G_UYXzGuqvM" println
@@ -647,9 +647,8 @@ whichSudoku 6 == {
   grid 8 0 9 0 0 0 0 0 0 0 setRow()
 } ifthen
 
-// Aother CTC sudoku: https://www.youtube.com/watch?v=tTGXIa2IUrg
+// Another CTC sudoku: https://www.youtube.com/watch?v=tTGXIa2IUrg
 // Regular sudoku with an arrow constraint.
-// 18m 34s to the solution on a Pi 3 Model A.
 // Pi3 Model A time: 18m 34s to the solution, 34m 33s to finish.
 whichSudoku 7 == {
   found true =
@@ -708,10 +707,9 @@ whichSudoku 8 == {
   8 5 newArrow()    7 4 arrowCell()   6 3 arrowCell()
 } ifthen
 
-// If you want to add your own sudoku, add it here.
 whichSudoku 9 == {
   found true =
-  // add it here
+  // If you want to add your own sudoku, add it here.
   // regionChecker standardRegions =            // Include a region checker
   // regionChecker irregularRegions =
   // constraint knightsMoveConstraint =         // Include any extra contraints, as appropriate
