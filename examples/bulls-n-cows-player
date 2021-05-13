@@ -29,7 +29,6 @@
 // to the command line. If you want to see the list of numbers that it has
 // to choose from, add this
 //  stats=true list=true
-// Be prepared, the starting list contains 3024 numbers.
 
 maths library
 file library
