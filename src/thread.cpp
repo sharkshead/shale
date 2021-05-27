@@ -28,7 +28,7 @@ SOFTWARE.
 
 #define MAJOR   (INT) 1
 #define MINOR   (INT) 0
-#define MICRO   (INT) 2
+#define MICRO   (INT) 3
 
 class ThreadPack {
   public:
