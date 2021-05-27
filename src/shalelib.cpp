@@ -2548,7 +2548,9 @@ void BTree::setThreadSafe() {
   mutex = new pthread_rwlock_t;
   pthread_rwlockattr_init(&attr);
   pthread_rwlockattr_setpshared(&attr, PTHREAD_PROCESS_SHARED);
+#ifdef PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP
   pthread_rwlockattr_setkind_np(&attr, PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP);
+#endif /* PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP */
   pthread_rwlock_init(mutex, &attr);
 }
 
