@@ -15,6 +15,10 @@ thread library
 //  wait thread::()         wait on a semaphore
 //  post thread::()         post to (wake up) a semaphore
 
+// This file gives a simple example of threading. To see a real example
+// of threading, check out the sudoku-solver. It can solve sudokus either
+// non-threaded or threaded.
+
 
 
 // Mutexes.
