@@ -102,8 +102,6 @@ const char *threadHelp[] = {
 extern "C" void slmain() {
   OperationList *ol;
   Variable *v;
-  pthread_mutex_t *btreeMutex;
-  pthread_mutex_t *cacheMutex;
 
   // Are we already loaded?
   if(btree.findVariable("/help/thread") != (Variable *) 0) return;
@@ -169,14 +167,8 @@ extern "C" void slmain() {
   btree.addVariable(v);
 
   useMutex = true;
-
-  cacheMutex = new pthread_mutex_t;
-  pthread_mutex_init(cacheMutex, NULL);
-  cache.setMutex(cacheMutex);
-
-  btreeMutex = new pthread_mutex_t;
-  pthread_mutex_init(btreeMutex, NULL);
-  btree.setMutex(btreeMutex);
+  btree.setThreadSafe();
+  cache.setThreadSafe();
 }
 
 ThreadHelp::ThreadHelp(LexInfo *li) : Operation(li) { }

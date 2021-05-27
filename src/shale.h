@@ -34,7 +34,7 @@ SOFTWARE.
 
 #define MAJOR ((INT)  1)
 #define MINOR ((INT)  3)
-#define MICRO ((INT)  6)
+#define MICRO ((INT)  7)
 
 // Lexical analyser stuff.
 

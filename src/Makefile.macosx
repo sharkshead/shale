@@ -6,7 +6,7 @@ clean:
 	rm -f shale *.o *.so
 
 shale: shale.h shale.o shalelib.h shalelib.o
-	g++ -o shale -rdynamic shale.o shalelib.o -ldl
+	g++ -o shale -rdynamic shale.o shalelib.o -ldl -pthread
 
 shale.o: shale.h shale.cpp shalelib.h
 	g++ -c -o shale.o shale.cpp

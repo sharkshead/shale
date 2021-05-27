@@ -238,7 +238,7 @@ class Cache {
     ObjectBag *unusedBags;
     void incUnused();
     void decUnused();
-    void setMutex(pthread_mutex_t *);
+    void setThreadSafe();
     void debug();
 
   private:
@@ -740,14 +740,14 @@ class BTree {
     Variable *findVariable(const char *);
     void debug();
     void print();
-    void setMutex(pthread_mutex_t *);
+    void setThreadSafe();
 
   private:
     BTreeNode *tree;
     int depth;
     int nodes;
     int entries;
-    pthread_mutex_t *mutex;
+    pthread_rwlock_t *mutex;
     void printTree(BTreeNode *);
     void printDetail(BTreeNode *, int);
 };
