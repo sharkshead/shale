@@ -20,6 +20,9 @@ time library
 
 // To use threads add threads=n to the command line, where n (must be >= 2) is the maximum number
 // of threads. Add progress=true to the command line to get a view of the threads in use.
+// Using threads won't always lead to a faster solve, in this current implementation.
+// For example, the s=3 sudoku produces the solution faster single-threaded than threaded,
+// whereas s=6 produces the solution much faster when threaded.
 
 // You can also add your own sudoku to solve by skipping down to the end of this file
 // and adding it where indicated. There are instructions on what and how to add a sudoku,
@@ -51,8 +54,8 @@ s initialised {
   "You can also enable colour output by adding colour=true or color=true to the command line." println
   "" println
   "For example," println
-  file arg:: shale:: "  %s s=3 colour=true threads=4 progress=true\n" printf
-  "will solve the CTC sudoku with the Knight's move constraint using 4 threads" println
+  file arg:: shale:: "  %s s=6 colour=true threads=4 progress=true\n" printf
+  "will solve Andrew Stuart's irregular sudoku using 4 threads" println
   "" println
   whichSudoku 1 =
 } if
@@ -907,7 +910,7 @@ whichSudoku 5 == {
 whichSudoku 6 == {
   found true =
   "From Andrew Stuart's web page: https://www.sudokuwiki.org/Daily_Jigsaw_Sudoku" println
-  "No. 4294, dated 13 Nov 2020" println
+  "Irregular sudoku, No. 4294, dated 13 Nov 2020" println
   regionChecker fn:: irregularRegions fn:: =
   grid 0 0 0 0 0 0 0 0 9 0 setRow()
   grid 1 5 0 0 0 8 1 0 0 0 setRow()
