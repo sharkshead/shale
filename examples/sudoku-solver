@@ -18,7 +18,8 @@ time library
 // If it is not specified then you get text explaining how to specify an option
 // and what the options are, and the default (s=1) option is solved.
 
-// To use threads add threads=n to the command line, where n is the maximum number of threadss to use.
+// To use threads add threads=n to the command line, where n (must be >= 2) is the maximum number
+// of threads. Add progress=true to the command line to get a view of the threads in use.
 
 // You can also add your own sudoku to solve by skipping down to the end of this file
 // and adding it where indicated. There are instructions on what and how to add a sudoku,
@@ -45,12 +46,12 @@ s initialised {
   " 10: empty and waiting for you to fill it in with an unsolved sudoku. Check towards the end of this file for details." println
   "" println
   "You can enable the use of threads by adding threads=n to the command line," println
-  "where n is the maximum number of threads to use." println
+  "where n is the maximum number of threads to use. Add progress=true to see thread details." println
   "" println
   "You can also enable colour output by adding colour=true or color=true to the command line." println
   "" println
   "For example," println
-  file arg:: shale:: "  %s s=3 colour=true threads=4\n" printf
+  file arg:: shale:: "  %s s=3 colour=true threads=4 progress=true\n" printf
   "will solve the CTC sudoku with the Knight's move constraint using 4 threads" println
   "" println
   whichSudoku 1 =
@@ -787,7 +788,7 @@ solve fn:: dup var { function
     r++
   } while
 
-  threads initialised {
+  threads initialised { threads 1 > } and {
     mutex lock thread::()
   } ifthen
 
@@ -795,7 +796,7 @@ solve fn:: dup var { function
   thgrid-> printGrid fn::()
   "Solution in " print now time::() startTime fn:: - 1000.0 / dhms fn::() "" println
 
-  threads initialised {
+  threads initialised { threads 1 > } and {
     mutex unlock thread::()
   } ifthen
 } =
@@ -1093,12 +1094,14 @@ createThreadGrids dup var {
 } =
 
 found {
-  tn var
-  done var
-
   optimiseRegions()
 
-  threads initialised {
+  threads initialised { threads 1 > } and {
+    tn var
+    running var
+    waiting var
+    finished var
+    list var
     i var
 
     thread library
@@ -1111,15 +1114,29 @@ found {
     "Initial grid" println
     1 grid:: printGrid fn::()
 
+    list 0 =
     tn 1 =
     { tn threads <= } {
       tn.value th:: 1 =   // Running.
       tn.value solveThread create thread::()
       tn++
+      list list 10 * 1 + =
     } while
 
-    done false =
-    { done not } {
+    i tn =
+    { i 10 < } {
+      list list 10 * =
+      i++
+    } while
+    running tn 1 - =
+    waiting 9 running - =
+    finished 0 =
+
+    { finished 9 != } {
+      progress initialised { progress } and {
+        list finished waiting running now time::() dup timems time::() swap date time::() "%s %s running %d, waiting %d, finished %d (%09d)\n" printf
+      } ifthen
+
       main wait thread::()
 
       tn 10 < {   // Start new thread if some grids are unprocessed.
@@ -1129,16 +1146,17 @@ found {
       } ifthen
 
       // Check to see if all the threads have finished.
-      tn 10 == {
-        mutex lock thread::()
-        done true =
-        i 1 =
-        { i 10 < } {
-          i.value th:: 2 != { done false = } ifthen
-          i++
-        } while
-        mutex unlock thread::()
-      } ifthen
+      running 0 =
+      waiting 0 =
+      finished 0 =
+      list 0 =
+      i 1 =
+      mutex lock thread::()
+      { i 10 < } {
+        i.value th:: value dup dup list 10 * + list swap = 0 == { waiting++ pop } { 1 == { running++ } { finished++ } if } if
+        i++
+      } while
+      mutex unlock thread::()
     } while
   } {
     createOneGrid()
