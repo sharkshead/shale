@@ -28,7 +28,7 @@ SOFTWARE.
 
 #define MAJOR   (INT) 1
 #define MINOR   (INT) 0
-#define MICRO   (INT) 1
+#define MICRO   (INT) 2
 
 const char *arrayHelp[] = {
   "Array library:",
@@ -77,6 +77,8 @@ class ArraySet : public Operation {
     ArraySet(LexInfo *);
     OperatorReturn action(ExecutionEnvironment *);
 };
+
+char arrayMessage[2014];
 
 extern "C" void slmain() {
   OperationList *ol;
@@ -156,11 +158,11 @@ OperatorReturn ArrayCreate::action(ExecutionEnvironment *ee) {
   String *string;
   Number *s;
   Variable *v;
-  char buf[1024];
+  char buf[512];
   char *p;
   int i;
   INT j;
-  static char element[1024];
+  char element[1024];
   bool found;
   char fmt[32];
 
@@ -197,21 +199,29 @@ OperatorReturn ArrayCreate::action(ExecutionEnvironment *ee) {
     } catch(Exception *e) { }
   }
 
-  if(! found) slexception.chuck("unrecognised name", getLexInfo());
+  if(! found) slexception.chuck("Unrecognised name", getLexInfo());
 
   j = s->getInt();
   if(j > 0) {
     sprintf(element, "/_$/%s", buf);
+    if(strlen(element) > 63) {
+      sprintf(arrayMessage, "Name %s too long", buf);
+      slexception.chuck(arrayMessage, getLexInfo());
+    }
     v = new Variable(element);
     v->setObject(cache.newNumber(j));
     btree.addVariable(v);
     for(i = 0; i < j; i++) {
       sprintf(element, "/%d/%s", i, buf);
+      if(strlen(element) > 63) {
+        sprintf(arrayMessage, "Name %s too long", buf);
+        slexception.chuck(arrayMessage, getLexInfo());
+      }
       v = new Variable(element);
       v->setObject(value);
       if(! btree.addVariable(v)) {
-        sprintf(element, "Name /%d/%s already exists", i, buf);
-        slexception.chuck(element, getLexInfo());
+        sprintf(arrayMessage, "Name /%d/%s already exists", i, buf);
+        slexception.chuck(arrayMessage, getLexInfo());
       }
     }
   }
@@ -247,7 +257,14 @@ OperatorReturn ArrayScooch::action(ExecutionEnvironment *ee) {
   n = arrayName->getValue();
 
   sprintf(element, "/_$/%s", n);
-  if((vc = btree.findVariable(element)) == (Variable *) 0) slexception.chuck("Internal count variable not found", getLexInfo());
+  if(strlen(element) > 63) {
+    sprintf(arrayMessage, "Name %s too long", n);
+    slexception.chuck(arrayMessage, getLexInfo());
+  }
+  if((vc = btree.findVariable(element)) == (Variable *) 0) {
+    sprintf(arrayMessage, "Internal count variable for %s not found", n);
+    slexception.chuck(arrayMessage, getLexInfo());
+  }
   c = vc->getObject()->getNumber(getLexInfo(), ee);
   count = c->getInt();
   c->release(getLexInfo());
@@ -256,11 +273,29 @@ OperatorReturn ArrayScooch::action(ExecutionEnvironment *ee) {
     j = count - 1;
     sprintf(fmt, "/%%%sd/%%s", PCTD);
     sprintf(element, fmt, j, n);
-    if((dst = btree.findVariable(element)) == (Variable *) 0) slexception.chuck(element, getLexInfo());
+    if(strlen(element) > 63) {
+      sprintf(arrayMessage, "Name %s too long", n);
+      slexception.chuck(arrayMessage, getLexInfo());
+    }
+    if((dst = btree.findVariable(element)) == (Variable *) 0) {
+      sprintf(fmt, "%%%sd", PCTD);
+      sprintf(element, fmt, j);
+      sprintf(arrayMessage, "Element %s of array %s not found", element, n);
+      slexception.chuck(arrayMessage, getLexInfo());
+    }
     if(j > 0) {
       for(i = j; i > 0; i--) {
         sprintf(element, fmt, i - 1, n);
-        if((src = btree.findVariable(element)) == (Variable *) 0) slexception.chuck(element, getLexInfo());
+        if(strlen(element) > 63) {
+          sprintf(arrayMessage, "Name %s too long", n);
+          slexception.chuck(arrayMessage, getLexInfo());
+        }
+        if((src = btree.findVariable(element)) == (Variable *) 0) {
+          sprintf(fmt, "%%%sd", PCTD);
+          sprintf(element, fmt, j);
+          sprintf(arrayMessage, "Element %s of array %s not found", element, n);
+          slexception.chuck(arrayMessage, getLexInfo());
+        }
         dst->setObject(src->getObject());
         dst = src;
       }
@@ -284,7 +319,7 @@ OperatorReturn ArrayGet::action(ExecutionEnvironment *ee) {
   String *indexString;
   Variable *v;
   Object *val;
-  char buf[1024];
+  char buf[512];
   char element[1024];
   bool found;
   char fmt[32];
@@ -317,9 +352,13 @@ OperatorReturn ArrayGet::action(ExecutionEnvironment *ee) {
     } catch(Exception *e) { }
   }
 
-  if(! found) slexception.chuck("unknown index type", getLexInfo());
+  if(! found) slexception.chuck("Unknown index type", getLexInfo());
 
   sprintf(element, "/%s/%s", buf, arrayName->getValue());
+  if(strlen(element) > 63) {
+    sprintf(arrayMessage, "Name %s too long", element);
+    slexception.chuck(arrayMessage, getLexInfo());
+  }
   v = btree.findVariable(element);
   if(v != (Variable *) 0) {
     val = v->getObject();
@@ -349,7 +388,7 @@ OperatorReturn ArraySet::action(ExecutionEnvironment *ee) {
   Number *indexNumber;
   String *indexString;
   Variable *v;
-  char buf[1024];
+  char buf[512];
   char element[1024];
   bool found;
   char fmt[32];
@@ -383,9 +422,13 @@ OperatorReturn ArraySet::action(ExecutionEnvironment *ee) {
     } catch(Exception *e) { }
   }
 
-  if(! found) slexception.chuck("unknown index type", getLexInfo());
+  if(! found) slexception.chuck("Unknown index type", getLexInfo());
 
   sprintf(element, "/%s/%s", buf, arrayName->getValue());
+  if(strlen(element) > 63) {
+    sprintf(arrayMessage, "Name %s too long", element);
+    slexception.chuck(arrayMessage, getLexInfo());
+  }
   v = btree.findVariable(element);
   if(v == (Variable *) 0) {
     v = new Variable(element);

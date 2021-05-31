@@ -1,5 +1,9 @@
 shale:
 
+  1.3.8 - 31 May 2021
+    - Removed several compiler warnings
+    - Improved array and thread library error message
+
   1.3.7 - 28 May 2021
     - improved thread performance
 
@@ -25,11 +29,11 @@ shale:
   1.3.0 - 22 Feb 2021
     - shalelib is now thread-safe
     - use "Error" rather than "Internal error" for exceptions raised
-      where no lexical information is available.
+      where no lexical information is available
 
   1.2.6 - 21 Jan 2021
     - use the cache to allocate some static numbers (version nubmers)
-      and strings at startup.
+      and strings at startup
 
   1.2.5 - 17 Jan 2021
     - addition of the ++ and -- operators
@@ -38,14 +42,14 @@ shale:
     - addition of language option:: shale::
 
   1.2.3 - 10 Jan 2021
-    - addition of left shift (<<) and right shift (>>) operators.
+    - addition of left shift (<<) and right shift (>>) operators
 
 
 
 string library:
 
   1.0.1 - 25 Mar 2021
-    - initial release of atoi and atof functions.
+    - initial release of atoi and atof functions
     - shale version 1.3.2
 
   1.0.0 - 05 Mar 2021
@@ -56,8 +60,13 @@ string library:
 
 thread library:
 
+  1.0.4 - 31 May 2021
+    - Removed some compiler warnings
+    - Improves error messages
+    - shale version 1.3.8
+
   1.0.3 - 28 May 2021
-    - changed support for the BTree and Cache classes.
+    - changed support for the BTree and Cache classes
 
   1.0.2 - 23 Feb 2021
     - support improved performance of threaded scripts
@@ -85,11 +94,11 @@ primes library:
     - shale version 1.2.6
 
   1.1.0 - 31 Jan 2021
-    - Initial release of a sieve layout type.
+    - Initial release of a sieve layout type
     - shale version 1.2.6
 
   1.0.0 - 10 Jan 2021
-    - initial release.
+    - initial release
     - shale version 1.2.2
 
  
@@ -97,7 +106,7 @@ primes library:
 time library:
   1.1.1 - 22 Feb 2021
     - add sleep time::()
-    = shale version 1.3.0
+    - shale version 1.3.0
 
   1.1.0 - 17 Jan 2021
     - add dateformat time:: variable to control output format
@@ -131,12 +140,12 @@ maths library:
     - shale release 1.3.2
 
   - 1.0.2 - 1 Feb 2021
-    - initial release of a GCD (HCF) function.
+    - initial release of a GCD (HCF) function
     - shale version 1.2.6
 
   - 1.0.1 - 21 Jan 2021
     - use the cache to allocate some static numbers (version nubmers)
-      and strings at startup.
+      and strings at startup
     - shale version 1.2.6
 
 
@@ -145,14 +154,18 @@ file library:
 
   1.0.2 - 21 Jan 2021
     - use the cache to allocate some static numbers (version nubmers)
-      and strings at startup.
+      and strings at startup
     - shale version 1.2.6
 
 
 
 array library:
 
+  1.0.2 - 31 May 2021
+    - Removed some compiler warnings
+    - Improved error messages
+
   1.0.1 - 21 Jan 2021
     - use the cache to allocate some static numbers (version nubmers)
-      and strings at startup.
+      and strings at startup
     - shale version 1.2.6

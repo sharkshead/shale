@@ -28,7 +28,7 @@ SOFTWARE.
 
 #define MAJOR   (INT) 1
 #define MINOR   (INT) 0
-#define MICRO   (INT) 3
+#define MICRO   (INT) 4
 
 class ThreadPack {
   public:
@@ -98,6 +98,8 @@ const char *threadHelp[] = {
   "  micro version:: number::        - micro version number",
   (const char *) 0
 };
+
+char threadMessage[2014];
 
 extern "C" void slmain() {
   OperationList *ol;
@@ -230,8 +232,8 @@ OperatorReturn ThreadMutex::action(ExecutionEnvironment *ee) {
   Variable *v;
   char *str;
   char fmt[16];
-  char name[64];
-  char mutexName[64];
+  char name[512];
+  char mutexName[1024];
   pthread_mutex_t *mutex;
 
   o = ee->stack.pop(getLexInfo());
@@ -263,11 +265,18 @@ OperatorReturn ThreadMutex::action(ExecutionEnvironment *ee) {
 
   if(name[0] == 0) slexception.chuck("Unknown argument type", getLexInfo());
 
+  sprintf(mutexName, "/%s/mutex/thread", name);
+  if(strlen(mutexName) > 63) {
+    sprintf(threadMessage, "Mutex name %s too long", name);
+    slexception.chuck(threadMessage, getLexInfo());
+  }
   mutex = new pthread_mutex_t;
   pthread_mutex_init(mutex, NULL);
-  sprintf(mutexName, "/%s/mutex/thread", name);
   v = btree.findVariable(mutexName);
-  if(v != (Variable *) 0) slexception.chuck("Name already exists", getLexInfo());
+  if(v != (Variable *) 0) {
+    sprintf(threadMessage, "Mutex %s already exists", name);
+    slexception.chuck("Name already exists", getLexInfo());
+  }
   v = new Variable(mutexName);
   v->setObject(cache.newNumber((INT) mutex));
   btree.addVariable(v);
@@ -287,8 +296,8 @@ OperatorReturn ThreadLock::action(ExecutionEnvironment *ee) {
   Variable *v;
   char *str;
   char fmt[16];
-  char name[64];
-  char mutexName[64];
+  char name[512];
+  char mutexName[1024];
   pthread_mutex_t *mutex;
 
   o = ee->stack.pop(getLexInfo());
@@ -321,8 +330,15 @@ OperatorReturn ThreadLock::action(ExecutionEnvironment *ee) {
   if(name[0] == 0) slexception.chuck("Unknown argument type", getLexInfo());
 
   sprintf(mutexName, "/%s/mutex/thread", name);
+  if(strlen(mutexName) > 63) {
+    sprintf(threadMessage, "Mutex name %s too long", name);
+    slexception.chuck(threadMessage, getLexInfo());
+  }
   v = btree.findVariable(mutexName);
-  if(v == (Variable *) 0) slexception.chuck("Mutex not found", getLexInfo());
+  if(v == (Variable *) 0) {
+    sprintf(threadMessage, "Mutex %s not found", name);
+    slexception.chuck(threadMessage, getLexInfo());
+  }
   no = v->getObject()->getNumber(getLexInfo(), ee);
   pthread_mutex_lock((pthread_mutex_t *) no->getInt());
   no->release(getLexInfo());
@@ -342,8 +358,8 @@ OperatorReturn ThreadUnlock::action(ExecutionEnvironment *ee) {
   Variable *v;
   char *str;
   char fmt[16];
-  char name[64];
-  char mutexName[64];
+  char name[512];
+  char mutexName[1024];
   pthread_mutex_t *mutex;
 
   o = ee->stack.pop(getLexInfo());
@@ -376,8 +392,15 @@ OperatorReturn ThreadUnlock::action(ExecutionEnvironment *ee) {
   if(name[0] == 0) slexception.chuck("Unknown argument type", getLexInfo());
 
   sprintf(mutexName, "/%s/mutex/thread", name);
+  if(strlen(mutexName) > 63) {
+    sprintf(threadMessage, "Mutex name %s too long", name);
+    slexception.chuck(threadMessage, getLexInfo());
+  }
   v = btree.findVariable(mutexName);
-  if(v == (Variable *) 0) slexception.chuck("Mutex not found", getLexInfo());
+  if(v == (Variable *) 0) {
+    sprintf(threadMessage, "Mutex %s not found", name);
+    slexception.chuck(threadMessage, getLexInfo());
+  }
   no = v->getObject()->getNumber(getLexInfo(), ee);
   pthread_mutex_unlock((pthread_mutex_t *) no->getInt());
   no->release(getLexInfo());
@@ -397,9 +420,9 @@ OperatorReturn ThreadSemaphore::action(ExecutionEnvironment *ee) {
   Variable *v;
   char *str;
   char fmt[16];
-  char name[64];
-  char semName[64];
-  char externalName[64];
+  char name[512];
+  char semName[1024];
+  char externalName[1024];
   sem_t *sem;
   char *p;
 
@@ -433,12 +456,19 @@ OperatorReturn ThreadSemaphore::action(ExecutionEnvironment *ee) {
   if(name[0] == 0) slexception.chuck("Unknown argument type", getLexInfo());
 
   sprintf(semName, "/%s/semaphore/thread", name);
+  if(strlen(semName) > 63) {
+    sprintf(threadMessage, "Semaphore name %s too long", name);
+    slexception.chuck(threadMessage, getLexInfo());
+  }
   sprintf(externalName, "/shale.%s", name);
   for(p = externalName; *p != 0; p++) {
     if(*p == '/') *p = '_';
   }
   v = btree.findVariable(semName);
-  if(v != (Variable *) 0) slexception.chuck("Name already exists", getLexInfo());
+  if(v != (Variable *) 0) {
+    sprintf(threadMessage, "Semaphore %s already exists", name);
+    slexception.chuck(threadMessage, getLexInfo());
+  }
   sem_unlink(externalName);
   if((sem = sem_open(externalName, O_CREAT | O_EXCL, 0666, 0)) == SEM_FAILED) slexception.chuck("Can't create semaphore", getLexInfo());
   v = new Variable(semName);
@@ -460,8 +490,8 @@ OperatorReturn ThreadWait::action(ExecutionEnvironment *ee) {
   Variable *v;
   char *str;
   char fmt[16];
-  char name[64];
-  char semName[64];
+  char name[512];
+  char semName[1024];
   sem_t *sem;
 
   o = ee->stack.pop(getLexInfo());
@@ -494,8 +524,15 @@ OperatorReturn ThreadWait::action(ExecutionEnvironment *ee) {
   if(name[0] == 0) slexception.chuck("Unknown argument type", getLexInfo());
 
   sprintf(semName, "/%s/semaphore/thread", name);
+  if(strlen(semName) > 63) {
+    sprintf(threadMessage, "Semaphore name %s too long", name);
+    slexception.chuck(threadMessage, getLexInfo());
+  }
   v = btree.findVariable(semName);
-  if(v == (Variable *) 0) slexception.chuck("Semaphore not found", getLexInfo());
+  if(v == (Variable *) 0) {
+    sprintf(threadMessage, "Semaphore %s not found", name);
+    slexception.chuck(threadMessage, getLexInfo());
+  }
   no = v->getObject()->getNumber(getLexInfo(), ee);
   sem_wait((sem_t *) no->getInt());
   no->release(getLexInfo());
@@ -515,8 +552,8 @@ OperatorReturn ThreadPost::action(ExecutionEnvironment *ee) {
   Variable *v;
   char *str;
   char fmt[16];
-  char name[64];
-  char semName[64];
+  char name[512];
+  char semName[1024];
   sem_t *sem;
 
   o = ee->stack.pop(getLexInfo());
@@ -549,8 +586,15 @@ OperatorReturn ThreadPost::action(ExecutionEnvironment *ee) {
   if(name[0] == 0) slexception.chuck("Unknown argument type", getLexInfo());
 
   sprintf(semName, "/%s/semaphore/thread", name);
+  if(strlen(semName) > 63) {
+    sprintf(threadMessage, "Semaphore name %s too long", name);
+    slexception.chuck(threadMessage, getLexInfo());
+  }
   v = btree.findVariable(semName);
-  if(v == (Variable *) 0) slexception.chuck("Semaphore not found", getLexInfo());
+  if(v == (Variable *) 0) {
+    sprintf(threadMessage, "Semaphore %s not found", name);
+    slexception.chuck(threadMessage, getLexInfo());
+  }
   no = v->getObject()->getNumber(getLexInfo(), ee);
   sem_post((sem_t *) no->getInt());
   no->release(getLexInfo());

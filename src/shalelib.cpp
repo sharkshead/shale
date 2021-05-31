@@ -51,7 +51,7 @@ void Exception::printError() {
     for(i = 0; i < lexInfo->getIndex(); i++) printf(" ");
     printf("^ %s\n", message != (const char *) 0 ? message : "(no message)");
   } else {
-    printf("Internal error: %s\n", message != (const char *) 0 ? message : "(no message)");
+    printf("Error: %s\n", message != (const char *) 0 ? message : "(no message)");
   }
 }
 
