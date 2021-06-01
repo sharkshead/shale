@@ -1137,7 +1137,7 @@ found {
 
     { finished 9 != } {
       progress initialised { progress } and {
-        list finished waiting running now time::() dup timems time::() swap date time::() "%s %s running %d, waiting %d, finished %d (%09d)\n" printf
+        list finished waiting running now time::() dup timems time::() swap date time::() "%s %s running %d, waiting %d, finished %d, grid (thread) states %09d (0 = waiting, 1 = running, 2 = finished)\n" printf
       } ifthen
 
       main wait thread::()
