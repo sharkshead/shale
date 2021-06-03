@@ -21,10 +21,11 @@ time library
 // To use threads add threads=n to the command line, where n (must be >= 2) is the maximum number
 // of threads. Add progress=true to the command line to get a view of the threads in use.
 // Using threads won't always lead to a faster solve, in this current implementation.
-// For example, the s=3 sudoku produces the solution faster single-threaded than threaded,
-// whereas s=6 produces the solution much faster when threaded.
+// For example, the s=3 sudoku produces the solution faster when single-threaded than threaded,
+// whereas s=6 produces the solution much faster when threaded. In all cases, threading will
+// lead to a shorter completion time compared to non-threading.
 
-// You can also add your own sudoku to solve by skipping down to the end of this file
+// You can also add your own sudoku to solve by skipping down towards the end of this file
 // and adding it where indicated. There are instructions on what and how to add a sudoku,
 // and you can check the examples I've included that immediately precede that section.
 
@@ -1017,11 +1018,11 @@ whichSudoku 10 == {
 
   // If you want to add your own sudoku, add it here.
 
-  // Include a region checker
+  // Include a region checker.
   // regionChecker fn:: standardRegions fn:: =
   // regionChecker fn:: irregularRegions fn:: =
 
-  // Include any extra contraints, as appropriate
+  // Include any extra contraints, as appropriate.
   // constraint fn:: knightsMoveConstraint fn:: =
   // constraint fn:: kingsMoveConstraint fn:: =
   // constraint fn:: nonconsecutiveConstraint fn:: =
@@ -1032,12 +1033,12 @@ whichSudoku 10 == {
 
   // Add the grid. Each grid line looks like
   //  grid {r} {c1} {c2} ... {c9} setRow()
-  // wheren {r} is the row number, starting at 0 for the top row and 8 for the last,
+  // where {r} is the row number, starting at 0 for the top row and 8 for the last,
   // and {c1} {c2} etc are the cell values going from column 1 through to column 9 of that row.
   // A zero value indicates an empty cell.
 
   // For irregular sudokus you enter the regions in a similar fashion to the grid.
-  // You assign each region a unique number from 1 to 9, and then use the setRow()
+  // First, assign each region a unique number from 1 to 9. Then use the setRow()
   // function to add each row, like
   //  regions {r} {R1} {R2} ... {R9} setRow()
   // {r} is the same as for the grid, the row number starting from 0, and {R1} {R2} etc
@@ -1055,7 +1056,8 @@ whichSudoku 10 == {
 
   // Adding thermos are similar to arrows, where you start a new thermo from a given cell,
   // row first then column then call newThermo(). After that add each cell of the thermo with
-  // row column thermoCell(). Row and column both start at 0 and go to 8.
+  // row column thermoCell(). Row and column both start at 0 and go to 8. You must add each thermoCell()
+  // in order, starting from the cell nearest the bulb, with the last being the cell at the tip.
 } ifthen
 
 // Don't change anything from here to the end.
