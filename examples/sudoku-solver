@@ -509,25 +509,26 @@ arrowConstraint fn:: dup var { function
   i var
   grid var
   sum var
+  p dup var 2$.value 1$.value:: arrows:: &=
 
   // Is this an arrow circle?
-  circleCount 2$.value:: 1$.value:: arrows:: initialised {
+  circleCount p->:: initialised {
     // Yes.
     i 0 =
-    { i circleCount 2$.value:: 1$.value:: arrows:: <= } {
-      sum arrow i.value:: 2$.value:: 1$.value:: arrows:: thgrid.value sumArrow fn::() =
+    { i circleCount p->:: <= } {
+      sum arrow i.value:: p->:: thgrid.value sumArrow fn::() =
       sum 0 > sum n != and { false return } ifthen    // If we have a sum and it is wrong, return false.
       i++
     } while
   } {
     // No.
     // Is this cell part of an arrow?
-    cellCount 2$.value:: 1$.value:: arrows:: initialised {
+    cellCount p->:: initialised {
       // Yes.
       i 0 =
-      { i cellCount 2$.value:: 1$.value:: arrows:: <= } {
+      { i cellCount p->:: <= } {
         // Does the circle have a value?
-        arrow arrow i.value:: 2$.value:: 1$.value:: arrows:: =
+        arrow arrow i.value:: p->:: =
         r row arrow.value:: arrows:: =
         c column arrow.value:: arrows:: =
         r.value c.value:: thgrid->:: 0 != {
@@ -630,26 +631,27 @@ thermoConstraint fn:: dup var { function
   2$ dup var swap =  // row
   i var
   grid var
+  p dup var 2$.value 1$.value:: thermos:: &=
 
   // Is this a thermo bulb?
-  thermoCount 2$.value:: 1$.value:: thermos:: initialised {
+  thermoCount p->:: initialised {
     // Yes.
     2$.value 1$.value:: thgrid->:: 0$ =   // Temporarily put the number in the grid.
     i 0 =
-    { i thermoCount 2$.value:: 1$.value:: thermos:: <= } {
-      thermo i.value:: 2$.value:: 1$.value:: thermos:: thgrid.value thermoIsBad fn::() { 2$.value 1$.value:: thgrid->:: 0 = false return } ifthen
+    { i thermoCount p->:: <= } {
+      thermo i.value:: p->:: thgrid.value thermoIsBad fn::() { 2$.value 1$.value:: thgrid->:: 0 = false return } ifthen
       i++
     } while
     2$.value 1$.value:: thgrid->:: 0 =    // Take it out again.
   } {
     // No.
     // Is this cell part of a thermo?
-    cellCount 2$.value:: 1$.value:: thermos:: initialised {
+    cellCount p->:: initialised {
       // Yes.
       2$.value 1$.value:: thgrid->:: 0$ =   // Temporarily put the number in the grid.
       i 0 =
-      { i cellCount 2$.value:: 1$.value:: thermos:: <= } {
-        thermo i.value:: 2$.value:: 1$.value:: thermos:: thgrid.value thermoIsBad fn::() { 2$.value 1$.value:: thgrid->:: 0 = false return } ifthen
+      { i cellCount p->:: <= } {
+        thermo i.value:: p->:: thgrid.value thermoIsBad fn::() { 2$.value 1$.value:: thgrid->:: 0 = false return } ifthen
         i++
       } while
       2$.value 1$.value:: thgrid->:: 0 =    // Take it out again.
