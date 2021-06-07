@@ -6,7 +6,7 @@ time library
 //  row/column/3x3box constraints (standard sudoku)
 //  row/column/irregular, or jigsaw, region constraints
 // optionally with Chess King's or Knight's move constraints,
-// non-consecutive, arrow or thermo constraints, with some combintions of these.
+// non-consecutive, arrow or thermo constraints, with any combintions of these.
 // Threads are also supported.
 
 // It is based on the python code from the Computerphile video
@@ -14,22 +14,21 @@ time library
 // The sudoku example from this video is used below, along with
 // several Cracking the Cryptic examples and one from Andrew Stuart.
 
-// You can specify which of the sudokus to solve by specifying s={n} on the command line.
+// You can specify which of the sudokus to solve by specifying s=n on the command line.
 // If it is not specified then you get text explaining how to specify an option
 // and what the options are, and the default (s=1) option is solved.
 
 // To use threads add threads=n to the command line, where n (must be >= 2) is the maximum number
 // of threads. Add progress=true to the command line to get a view of the threads in use.
 // Using threads won't always lead to a faster solve, in this current implementation.
-// For example, the s=3 sudoku produces the solution faster when single-threaded than threaded,
-// whereas s=6 produces the solution much faster when threaded. In all cases, threading will
-// lead to a shorter completion time compared to non-threading.
+// For example, the s=3 sudoku produces the solution faster single-threaded than threaded,
+// whereas s=6 produces the solution much faster when threaded.
 
 // You can also add your own sudoku to solve by skipping down towards the end of this file
 // and adding it where indicated. There are instructions on what and how to add a sudoku,
 // and you can check the examples I've included that immediately precede that section.
 
-startTime fn:: dup var now time::() =
+startTime vars:: dup var now time::() =
 
 whichSudoku var
 
@@ -61,9 +60,33 @@ s initialised {
   whichSudoku 1 =
 } if
 
+// This sets up the colour map for irregular sudokus.
+1 colour:: dup var 30 =
+2 colour:: dup var 31 =
+3 colour:: dup var 32 =
+4 colour:: dup var 33 =
+5 colour:: dup var 34 =
+6 colour:: dup var 35 =
+7 colour:: dup var 36 =
+8 colour:: dup var 30 =   // skip 37 (too light) and reuse 30 and 31 (with luck they won't be close to regions 1 and 2).
+9 colour:: dup var 31 =
+
+// Helper function to print seconds as days, hours, minutes and seconds.
+dhms fn:: dup var {
+  n dup var swap =
+  ds dup var n int 86400 / =
+  hs dup var n int 3600 / 24 % =
+  ms dup var n int 60 / 60 % =
+  ss dup var n ds 86400 * hs 3600 * ms 60 * + + - =
+
+  ds { ds "%dd" printf } ifthen
+  hs { ds { " " print } ifthen hs "%dh" printf } ifthen
+  ms { ds hs or { " " print } ifthen ms "%dm" printf } ifthen
+  ss { ds hs or ms or { " " print } ifthen ss "%0.3fs" printf } ifthen
+} =
+
 // Prints the sudoku grid.
-printGrid fn:: dup var {
-  thgrid dup var swap &=
+printGrid dup var {
   r var
   c var
   doColour var
@@ -81,6 +104,8 @@ printGrid fn:: dup var {
   } if
   irregular 0 0:: regions:: initialised =
 
+  "" println
+
   r 0 =
   { r 9 < } {
     c 0 =
@@ -93,7 +118,7 @@ printGrid fn:: dup var {
           r 3 / c 3 / + 1 + 2 % 3 * 31 + 0x1b "%c[1;%dm" printf
         } if
       } ifthen
-      r.value c.value:: thgrid->:: dup 0 == { pop " ." } { " %d" } if printf
+      r.value c.value:: grid:: dup 0 == { pop " ." } { " %d" } if printf
       doColour {
         0x1b "%c[0m" printf
       } ifthen
@@ -104,16 +129,53 @@ printGrid fn:: dup var {
   } while
 } =
 
-// This sets up the colour map for irregular sudokus.
-1 colour:: dup var 30 =
-2 colour:: dup var 31 =
-3 colour:: dup var 32 =
-4 colour:: dup var 33 =
-5 colour:: dup var 34 =
-6 colour:: dup var 35 =
-7 colour:: dup var 36 =
-8 colour:: dup var 30 =   // skip 37 (too light) and reuse 30 and 31 (with luck they won't be close to regions 1 and 2).
-9 colour:: dup var 31 =
+printSolution fn:: dup var {
+  r var
+  c var
+  f var
+  doColour var
+  irregular var
+  region var
+
+  colour initialised {
+    doColour colour =
+  } {
+    color initialised {
+      doColour color =
+    } {
+      doColour false =
+    } if
+  } if
+  irregular 0 0:: regions:: initialised =
+
+  "" println
+
+  r 0 =
+  { r 9 < } {
+    f 1 =
+    c 0 =
+    { c 9 < } {
+      doColour {
+        irregular {
+          region r.value c.value:: regions:: =
+          region.value colour:: 0x1b "%c[1;%dm" printf
+        } {
+          r 3 / c 3 / + 1 + 2 % 3 * 31 + 0x1b "%c[1;%dm" printf
+        } if
+      } ifthen
+      r.value$ f / 10 % dup 0 == { pop " ." } { " %d" } if printf
+      doColour {
+        0x1b "%c[0m" printf
+      } ifthen
+      f f 10 * =
+      c++
+    } while
+    "" println
+    r++
+  } while
+
+  "Solution in " print now time::() startTime vars:: - 1000.0 / dhms fn::() "" println
+} =
 
 // Assign the cell values to one row of the grid.
 setRow dup var {
@@ -149,44 +211,47 @@ setRow dup var {
   } while
 } =
 
-// Standard 3x3 box region checker.
-// This only works when called from within possible().
-standardRegions fn:: dup var {
-  thgrid dup var swap =
-  r0 var
-  c0 var
+regionChecker fn:: var
 
-  r0 r 3 / 3 * =
-  c0 c 3 / 3 * =
+// Standard 3x3 box region checker.
+standardRegions fn:: dup var { function
+  r var
+  c var
+  i var
+  j var
+
+  r row row 3 % - =
+  c col col 3 % - =
   i 0 =
   { i 3 < } {
     j 0 =
     { j 3 < } {
-      r0 i + c0 j +:: thgrid->:: n == {
-        false return
-      } ifthen
+      f c j + 10 + $ =
+      r i + $ f / 10 % num == { false return } ifthen
       j++
     } while
     i++
   } while
+
+  true
 } =
 
 // Irregular region checker.
-// This only works when called from within possible().
-irregularRegions fn:: dup var {
-  thgrid dup var swap =
+irregularRegions fn:: dup var { function
   region var
   i var
 
-  region r.value c.value:: regions:: =   // The region we are in.
+  region row.value col.value:: regions:: =   // The region we are in.
 
   i 0 =
   { i 9 < } {
-    i.value r:: region.value:: region:: value i.value c:: region.value:: region:: value:: thgrid->:: n == {
+    i.value r:: region.value:: region:: value$ i.value c:: region.value:: region:: 10 + $ / 10 % num == {
       false return
     } ifthen
     i++
   } while
+
+  true
 } =
 
 // Convert the regions:: namespace into something a little more cpu-time friendly.
@@ -221,227 +286,6 @@ optimiseRegions dup var {
       region++
     } while
   } ifthen
-} =
-
-// Is it possible to place a digit in a given cell?
-possible fn:: dup var { function
-  thgrid dup var swap =
-  n dup var swap =
-  c dup var swap =
-  r dup var swap =
-  i var
-  j var
-
-  // Check the column doesn't already contain this value.
-  i 0 =
-  { i 9 < } {
-    r.value i.value:: thgrid->:: n == {
-      false return
-    } ifthen
-    i++
-  } while
-
-  // Check the row doesn't already contain this value.
-  i 0 =
-  { i 9 < } {
-    i.value c.value:: thgrid->:: n == {
-      false return
-    } ifthen
-    i++
-  } while
-
-  // Check that the region doesn't already contain this value.
-  thgrid.value regionChecker fn::()
-
-  // Check for any other constraint.
-  constraint fn:: initialised { r c n thgrid.value constraint fn::() not } and {
-    false return
-  } ifthen
-
-  true
-} =
-
-// This is a Knight's move constraint.
-knightsMoveConstraint fn:: dup var { function
-  thgrid dup var swap =
-  0$ dup var swap =  // n
-  1$ dup var swap =  // column
-  2$ dup var swap =  // row
-  nr var
-  nc var
-
-  // Check Knight's move 2 left and 1 up and down.
-  nc 1$ 2 - =
-  nc 0 >= {
-    nr 2$ 1 - =
-    nr 0 >= {
-      nr.value nc.value:: thgrid->:: 0$ == {
-        false return
-      } ifthen
-    } ifthen
-    nr 2$ 1 + =
-    nr 9 < {
-      nr.value nc.value:: thgrid->:: 0$ == {
-        false return
-      } ifthen
-    } ifthen
-  } ifthen
-
-  // Check Knight's move 1 left and 2 up and down.
-  nc 1$ 1 - =
-  nc 0 >= {
-    nr 2$ 2 - =
-    nr 0 >= {
-      nr.value nc.value:: thgrid->:: 0$ == {
-        false return
-      } ifthen
-    } ifthen
-    nr 2$ 2 + =
-    nr 9 < {
-      nr.value nc.value:: thgrid->:: 0$ == {
-        false return
-      } ifthen
-    } ifthen
-  } ifthen
-
-  // Check Knight's move 1 right and 2 up and down.
-  nc 1$ 1 + =
-  nc 9 < {
-    nr 2$ 2 - =
-    nr 0 >= {
-      nr.value nc.value:: thgrid->:: 0$ == {
-        false return
-      } ifthen
-    } ifthen
-    nr 2$ 2 + =
-    nr 9 < {
-      nr.value nc.value:: thgrid->:: 0$ == {
-        false return
-      } ifthen
-    } ifthen
-  } ifthen
-
-  // Check Knight's move 2 right and 1 up and down.
-  nc 1$ 2 + =
-  nc 9 < {
-    nr 2$ 1 - =
-    nr 0 >= {
-      nr.value nc.value:: thgrid->:: 0$ == {
-        false return
-      } ifthen
-    } ifthen
-    nr 2$ 1 + =
-    nr 9 < {
-      nr.value nc.value:: thgrid->:: 0$ == {
-        false return
-      } ifthen
-    } ifthen
-  } ifthen
-
-  true
-} =
-
-// This is a King's move constraint.
-kingsMoveConstraint fn:: dup var { function
-  thgrid dup var swap =
-  0$ dup var swap =  // n
-  1$ dup var swap =  // column
-  2$ dup var swap =  // row
-  nr var
-  nc var
-
-  // Check Kings's move 1 left and 1 up and down.
-  nc 1$ 1 - =
-  nc 0 >= {
-    nr 2$ 1 - =
-    nr 0 >= {
-      nr.value nc.value:: thgrid->:: 0$ == {
-        false return
-      } ifthen
-    } ifthen
-    nr 2$ 1 + =
-    nr 9 < {
-      nr.value nc.value:: thgrid->:: 0$ == {
-        false return
-      } ifthen
-    } ifthen
-  } ifthen
-
-  // Check Kings's move 1 right and 1 up and down.
-  nc 1$ 1 + =
-  nc 9 < {
-    nr 2$ 1 - =
-    nr 0 >= {
-      nr.value nc.value:: thgrid->:: 0$ == {
-        false return
-      } ifthen
-    } ifthen
-    nr 2$ 1 + =
-    nr 9 < {
-      nr.value nc.value:: thgrid->:: 0$ == {
-        false return
-      } ifthen
-    } ifthen
-  } ifthen
-
-  true
-} =
-
-// This is a non-consecuvite constraint.
-nonconsecutiveConstraint fn:: dup var { function
-  thgrid dup var swap =
-  0$ dup var swap =  // n
-  1$ dup var swap =  // column
-  2$ dup var swap =  // row
-  nr var
-  nc var
-  cell var
-
-  // Check left.
-  nc 1$ 1 - =
-  nc 0 >= {
-    cell 2$.value nc.value:: thgrid->:: =
-    cell 0 != {
-      0$ cell 1 - == { 0$ cell 1 + == } or {
-        false return
-      } ifthen
-    } ifthen
-  } ifthen
-
-  // Check right.
-  nc 1$ 1 + =
-  nc 9 < {
-    cell 2$.value nc.value:: thgrid->:: =
-    cell 0 != {
-      0$ cell 1 - == { 0$ cell 1 + == } or {
-        false return
-      } ifthen
-    } ifthen
-  } ifthen
-
-  // Check up.
-  nr 2$ 1 - =
-  nr 0 >= {
-    cell nr.value 1$.value:: thgrid->:: =
-    cell 0 != {
-      0$ cell 1 - == { 0$ cell 1 + == } or {
-        false return
-      } ifthen
-    } ifthen
-  } ifthen
-
-  // Check down.
-  nr 2$ 1 + =
-  nr 9 < {
-    cell nr.value 1$.value:: thgrid->:: =
-    cell 0 != {
-      0$ cell 1 - == { 0$ cell 1 + == } or {
-        false return
-      } ifthen
-    } ifthen
-  } ifthen
-
-  true
 } =
 
 // Start a new arrow (circle) at the given row and column.
@@ -499,75 +343,6 @@ arrowCell dup var {
   column cell.value:: arrow.value:: arrows:: dup var 0$ =
 } =
 
-// This is an arrow constraint.
-arrowConstraint fn:: dup var { function
-  thgrid dup var swap =
-  0$ dup var swap =  // n
-  1$ dup var swap =  // column
-  2$ dup var swap =  // row
-  arrow var
-  i var
-  grid var
-  sum var
-  p dup var 2$.value 1$.value:: arrows:: &=
-
-  // Is this an arrow circle?
-  circleCount p->:: initialised {
-    // Yes.
-    i 0 =
-    { i circleCount p->:: <= } {
-      sum arrow i.value:: p->:: thgrid.value sumArrow fn::() =
-      sum 0 > sum n != and { false return } ifthen    // If we have a sum and it is wrong, return false.
-      i++
-    } while
-  } {
-    // No.
-    // Is this cell part of an arrow?
-    cellCount p->:: initialised {
-      // Yes.
-      i 0 =
-      { i cellCount p->:: <= } {
-        // Does the circle have a value?
-        arrow arrow i.value:: p->:: =
-        r row arrow.value:: arrows:: =
-        c column arrow.value:: arrows:: =
-        r.value c.value:: thgrid->:: 0 != {
-          // Yes.
-          grid r.value c.value:: thgrid->:: =
-          2$.value 1$.value:: thgrid->:: 0$ =   // Temporarily put the number in the grid.
-          sum arrow.value thgrid.value sumArrow fn::() =
-          2$.value 1$.value:: thgrid->:: 0 =    // Take if out again.
-          sum 0 > sum grid != and { false return } ifthen    // If we have a sum and it is wrong, return false.
-        } ifthen
-        i++
-      } while
-    } ifthen
-  } if
-
-  true
-} =
-
-sumArrow fn:: dup var {
-  thgrid dup var swap =
-  arrow dup var swap =
-  i var
-  r var
-  c var
-  sum var
-
-  sum 0 =
-  i 0 =
-  { i cells arrow.value:: arrows:: < } {
-    r row i.value:: arrow.value:: arrows:: =
-    c column i.value:: arrow.value:: arrows:: =
-    r.value c.value:: thgrid->:: 0 == { sum -1 = break } ifthen
-    sum sum r.value c.value:: thgrid->:: + =
-    i++
-  } while
-
-  sum.value
-} =
-
 // Start a new thermo (bulb) at the given row and column.
 // If several thermos start from the same bulb then add them as seperate
 // new thermos from that same bulb cell.
@@ -623,38 +398,274 @@ thermoCell dup var {
   column cell.value:: thermo.value:: thermos:: dup var 0$ =
 } =
 
-// This is a thermo constraint.
-thermoConstraint fn:: dup var { function
-  thgrid dup var swap =
-  0$ dup var swap =  // n
-  1$ dup var swap =  // column
-  2$ dup var swap =  // row
-  i var
-  grid var
-  p dup var 2$.value 1$.value:: thermos:: &=
+constraint fn:: dup var { function true } =
 
-  // Is this a thermo bulb?
-  thermoCount p->:: initialised {
+kingsMoveConstraint fn:: dup var { function
+  nr var
+  nc var
+
+  // Check Kings's move 1 left and 1 up and down.
+  nc col 1 - =
+  nc 0 >= {
+    nr row 1 - =
+    nr 0 >= {
+      nr.value$ nc 10 + $ / 10 % num == {
+        false return
+      } ifthen
+    } ifthen
+    nr row 1 + =
+    nr 9 < {
+      nr.value$ nc 10 + $ / 10 % num == {
+        false return
+      } ifthen
+    } ifthen
+  } ifthen
+
+  // Check Kings's move 1 right and 1 up and down.
+  nc col 1 + =
+  nc 9 < {
+    nr r 1 - =
+    nr 0 >= {
+      nr.value$ nc 10 + $ / 10 % num == {
+        false return
+      } ifthen
+    } ifthen
+    nr row 1 + =
+    nr 9 < {
+      nr.value$ nc 10 + $ / 10 % num == {
+        false return
+      } ifthen
+    } ifthen
+  } ifthen
+
+  true
+} =
+
+knightsMoveConstraint fn:: dup var { function
+  nr var
+  nc var
+
+  // Check Knight's move 2 left and 1 up and down.
+  nc col 2 - =
+  nc 0 >= {
+    nr row 1 - =
+    nr 0 >= {
+      nr.value$ nc 10 + $ / 10 % num == {
+        false return
+      } ifthen
+    } ifthen
+    nr row 1 + =
+    nr 9 < {
+      nr.value$ nc 10 + $ / 10 % num == {
+        false return
+      } ifthen
+    } ifthen
+  } ifthen
+
+  // Check Knight's move 1 left and 2 up and down.
+  nc col 1 - =
+  nc 0 >= {
+    nr row 2 - =
+    nr 0 >= {
+      nr.value$ nc 10 + $ / 10 % num == {
+        false return
+      } ifthen
+    } ifthen
+    nr row 2 + =
+    nr 9 < {
+      nr.value$ nc 10 + $ / 10 % num == {
+        false return
+      } ifthen
+    } ifthen
+  } ifthen
+
+  // Check Knight's move 1 right and 2 up and down.
+  nc col 1 + =
+  nc 9 < {
+    nr row 2 - =
+    nr 0 >= {
+      nr.value$ nc 10 + $ / 10 % num == {
+        false return
+      } ifthen
+    } ifthen
+    nr row 2 + =
+    nr 9 < {
+      nr.value$ nc 10 + $ / 10 % num == {
+        false return
+      } ifthen
+    } ifthen
+  } ifthen
+
+  // Check Knight's move 2 right and 1 up and down.
+  nc col 2 + =
+  nc 9 < {
+    nr row 1 - =
+    nr 0 >= {
+      nr.value$ nc 10 + $ / 10 % num == {
+        false return
+      } ifthen
+    } ifthen
+    nr row 1 + =
+    nr 9 < {
+      nr.value$ nc 10 + $ / 10 % num == {
+        false return
+      } ifthen
+    } ifthen
+  } ifthen
+
+  true
+} =
+
+nonconsecutiveConstraint fn:: dup var { function
+  nr var
+  nc var
+  cell var
+
+  // Check left.
+  nc col 1 - =
+  nc 0 >= {
+    cell row.value$ nc 10 + $ / 10 % =
+    cell 0 != {
+      num cell 1 - == { num cell 1 + == } or {
+        false return
+      } ifthen
+    } ifthen
+  } ifthen
+
+  // Check right.
+  nc col 1 + =
+  nc 9 < {
+    cell row.value$ nc 10 + $ / 10 % =
+    cell 0 != {
+      num cell 1 - == { num cell 1 + == } or {
+        false return
+      } ifthen
+    } ifthen
+  } ifthen
+
+  // Check up.
+  nr col 1 - =
+  nr 0 >= {
+    cell nr.value$ col 10 + $ / 10 % =
+    cell 0 != {
+      num cell 1 - == { num cell 1 + == } or {
+        false return
+      } ifthen
+    } ifthen
+  } ifthen
+
+  // Check down.
+  nr col 1 + =
+  nr 9 < {
+    cell nr.value$ col 10 + $ / 10 % =
+    cell 0 != {
+      num cell 1 - == { num cell 1 + == } or {
+        false return
+      } ifthen
+    } ifthen
+  } ifthen
+
+  true
+} =
+
+arrowConstraint fn:: dup var { function
+  arrow var
+  r var
+  c var
+  v var
+  i var
+  circle var
+  sum var
+
+  // Is this an arrow circle?
+  circleCount row.value:: col.value:: arrows:: initialised {
     // Yes.
-    2$.value 1$.value:: thgrid->:: 0$ =   // Temporarily put the number in the grid.
     i 0 =
-    { i thermoCount p->:: <= } {
-      thermo i.value:: p->:: thgrid.value thermoIsBad fn::() { 2$.value 1$.value:: thgrid->:: 0 = false return } ifthen
+    { i circleCount row.value:: col.value:: arrows:: <= } {
+      sum arrow i.value:: row.value:: col.value:: arrows:: sumArrow fn::() =
+      sum 0 > sum num != and { false return } ifthen    // If we have a sum and it is wrong, return false.
       i++
     } while
-    2$.value 1$.value:: thgrid->:: 0 =    // Take it out again.
+  } {
+    // No.
+    // Is this cell part of an arrow?
+    cellCount row.value:: col.value:: arrows:: initialised {
+      // Yes.
+      i 0 =
+      { i cellCount row.value:: col.value:: arrows:: <= } {
+        // Does the circle have a value?
+        arrow arrow i.value:: row.value:: col.value:: arrows:: =
+        r row arrow.value:: arrows:: =
+        c column arrow.value:: arrows:: =
+        circle r.value$ c 10 + $ / 10 % =
+        circle 0 != {
+          // Yes.
+          v row.value$ =
+          row.value$ v num col 10 + $ * + =                       // Temporarily put the number in the grid.
+          sum arrow.value sumArrow fn::() =
+          row.value$ v =                                        // Take if out again.
+          sum 0 > sum circle != and { false return } ifthen   // If we have a sum and it is wrong, return false.
+        } ifthen
+        i++
+      } while
+    } ifthen
+  } if
+
+  true
+} =
+
+sumArrow fn:: dup var {
+  arrow dup var swap =
+  i var
+  r var
+  c var
+  cell var
+  sum var
+
+  sum 0 =
+  i 0 =
+  { i cells arrow.value:: arrows:: < } {
+    r row i.value:: arrow.value:: arrows:: =
+    c column i.value:: arrow.value:: arrows:: =
+    cell r.value$ c 10 + $ / 10 % =
+    cell 0 == { sum -1 = break } ifthen
+    sum sum cell + =
+    i++
+  } while
+
+  sum.value
+} =
+
+// This is a thermo constraint.
+thermoConstraint fn:: dup var { function
+  i var
+  v var
+  cell var
+
+  // Is this a thermo bulb?
+  thermoCount row.value:: col.value:: thermos:: initialised {
+    // Yes.
+    v row.value$ =
+    row.value$ v num col 10 + $ * + =   // Temporarily put the number in the grid.
+    i 0 =
+    { i thermoCount row.value:: col.value:: thermos:: <= } {
+      thermo i.value:: row.value:: col.value:: thermos:: thermoIsBad fn::() { row.value$ v = false return } ifthen
+      i++
+    } while
+    row.value$ v =                      // Take it out again.
   } {
     // No.
     // Is this cell part of a thermo?
-    cellCount p->:: initialised {
+    cellCount row.value:: col.value:: thermos:: initialised {
       // Yes.
-      2$.value 1$.value:: thgrid->:: 0$ =   // Temporarily put the number in the grid.
+      v row.value$ =
+      row.value$ v num col 10 + $ * + = // Temporarily put the number in the grid.
       i 0 =
-      { i cellCount p->:: <= } {
-        thermo i.value:: p->:: thgrid.value thermoIsBad fn::() { 2$.value 1$.value:: thgrid->:: 0 = false return } ifthen
+      { i cellCount row.value:: col.value:: thermos:: <= } {
+        thermo i.value:: row.value:: col.value:: thermos:: thermoIsBad fn::() { row.value$ v = false return } ifthen
         i++
       } while
-      2$.value 1$.value:: thgrid->:: 0 =    // Take it out again.
+      row.value$ v =                      // Take it out again.
     } ifthen
   } if
 
@@ -663,7 +674,6 @@ thermoConstraint fn:: dup var { function
 
 // Returns true if the given thermo is incorrect, false otherwise.
 thermoIsBad fn:: dup var { function
-  thgrid dup var swap =
   thermo dup var swap =
   r var
   c var
@@ -673,7 +683,7 @@ thermoIsBad fn:: dup var { function
 
   r row thermo.value:: thermos:: =
   c column thermo.value:: thermos:: =
-  lastValue r.value c.value:: thgrid->:: =
+  lastValue r.value$ c 10 + $ / 10 % =
   lastValue 0 == { false return } ifthen  // When any cell is 0 we return false.
   lastValue 9 == { true return } ifthen   // Cant put a 9 in the bulb.
 
@@ -681,7 +691,7 @@ thermoIsBad fn:: dup var { function
   { i cells thermo.value:: thermos:: < } {
     r row i.value:: thermo.value:: thermos:: =
     c column i.value:: thermo.value:: thermos:: =
-    n r.value c.value:: thgrid->:: =
+    n r.value$ c 10 + $ / 10 % =
     n 0 == { false return } ifthen
     n lastValue <= { true return } ifthen
     lastValue n =
@@ -691,120 +701,165 @@ thermoIsBad fn:: dup var { function
   false
 } =
 
-// King's move, Knight's move and non-consecutive constraint.
-kingsKnightsNonconsecutiveConstraint fn:: dup var {
-  thgrid dup var swap =
-  0$ dup var swap =  // n
-  1$ dup var swap =  // column
-  2$ dup var swap =  // row
-
-  2$.value 1$.value 0$.value thgrid.value kingsMoveConstraint fn::() { 2$.value 1$.value 0$.value thgrid.value knightsMoveConstraint fn::() { 2$.value 1$.value 0$.value thgrid.value nonconsecutiveConstraint fn::() } and } and
-} =
-
-// Knights move and arrow constraint
-knightsMoveAndArrowConstraint fn:: dup var {
-  thgrid dup var swap =
-  0$ dup var swap =  // n
-  1$ dup var swap =  // column
-  2$ dup var swap =  // row
-
-  2$.value 1$.value 0$.value thgrid.value knightsMoveConstraint fn::() { 2$.value 1$.value 0$.value thgrid.value arrowConstraint fn::() } and
-} =
-
-// Set this to standardRegions for the usual 3x3 boxes,
-// or irregularRegions to handle irregular, or jigsaw, regions.
-regionChecker fn:: var
-
-// Leave this undefined to get the standard sudoku rules, or set this
-// to constraint code such as knightsMoveConstraint defined above.
-constraint fn:: var
-
-// Helper function to print seconds as days, hours, minutes and seconds.
-dhms fn:: dup var {
-  n dup var swap =
-  ds dup var n int 86400 / =
-  hs dup var n int 3600 / 24 % =
-  ms dup var n int 60 / 60 % =
-  ss dup var n ds 86400 * hs 3600 * ms 60 * + + - =
-
-  ds { ds "%dd" printf } ifthen
-  hs { ds { " " print } ifthen hs "%dh" printf } ifthen
-  ms { ds hs or { " " print } ifthen ms "%dm" printf } ifthen
-  ss { ds hs or ms or { " " print } ifthen ss "%0.3fs" printf } ifthen
-} =
-
-solveThread dup var {
-  tn dup var swap =
-  thgrid dup var tn.value grid:: &=
+startSingle dup var {
   r var
   c var
+  f var
 
-  // Can we place our tn in the first available empty cell?
+  // The grid.
+  0$ var 1$ var 2$ var 3$ var 4$ var 5$ var 6$ var 7$ var 8$ var
+
+  // Conversion from column number to factor. Add 10 to the column number.
+  10$ dup var         1 =
+  11$ dup var        10 =
+  12$ dup var       100 =
+  13$ dup var      1000 =
+  14$ dup var     10000 =
+  15$ dup var    100000 =
+  16$ dup var   1000000 =
+  17$ dup var  10000000 =
+  18$ dup var 100000000 =
+
   r 0 =
   { r 9 < } {
+    r.value$ 0 =
+    f 1 =
     c 0 =
     { c 9 < } {
-      r.value c.value:: thgrid->:: 0 == {
-        r.value c.value tn.value thgrid.value possible fn::() {
-          r.value c.value:: thgrid->:: tn =   // Put out tn there and try to solve.
-          tn.value solve fn::()
-        } ifthen
-        c 8 =   // Easy way to terminate the inner and outer loops.
-        r 8 =
-      } ifthen
+      r.value$ r.value$ r.value c.value:: grid:: f * + =
+      f f 10 * =
       c++
     } while
     r++
   } while
 
+  solve fn::()
+} =
+
+startThread dup var {
+  tn dup var swap =
+  r var
+  c var
+  f var
+  cell var
+  fr var
+  fc var
+  firstFlag dup var true =
+
+  // The grid.
+  0$ var 1$ var 2$ var 3$ var 4$ var 5$ var 6$ var 7$ var 8$ var
+
+  // Conversion from column number to factor. Add 10 to the column number.
+  10$ dup var         1 =
+  11$ dup var        10 =
+  12$ dup var       100 =
+  13$ dup var      1000 =
+  14$ dup var     10000 =
+  15$ dup var    100000 =
+  16$ dup var   1000000 =
+  17$ dup var  10000000 =
+  18$ dup var 100000000 =
+
+  r 0 =
+  { r 9 < } {
+    r.value$ 0 =
+    f 1 =
+    c 0 =
+    { c 9 < } {
+      cell r.value c.value:: grid:: =
+      r.value$ r.value$ cell f * + =
+      firstFlag { cell 0 == } and {
+        fr r =
+        fc c =
+        firstFlag false =
+      } ifthen
+      f f 10 * =
+      c++
+    } while
+    r++
+  } while
+
+  // Can we put our thread number in the grid?
+  firstFlag not {
+    fr.value fc.value tn.value possible fn::() {
+      fr.value$ fr.value$ tn fc 10 + $ * + =   // Put our thread number in and start the solve.
+      solve fn::()
+    } ifthen
+  } ifthen
+
   mutex lock thread::()
-  tn.value th:: 2 =   // Done.
+  tn.value th:: 2 =
   mutex unlock thread::()
 
   main post thread::()
 } =
 
-solve fn:: dup var { function
-  tn dup var swap =
-  thgrid dup var tn.value grid:: &=
+possible fn:: dup var { function
+  num dup var swap =
+  col dup var swap =
+  row dup var swap =
   r var
   c var
+  f var
+  v var
+
+  // Check the row.
+  v row.value$ =
+  f 1 =
+  c 0 =
+  { c 9 < } {
+    v f / 10 % num == { false return } ifthen
+    f f 10 * =
+    c++
+  } while
+
+  // Check the column.
+  f col 10 + $ =
+  r 0 =
+  { r 9 < } {
+    r.value$ f / 10 % num == { false return } ifthen
+    r++
+  } while
+
+  // Check the region.
+  regionChecker fn::() not { false return } ifthen
+
+  // Check the constraints
+  constraint fn::()
+} =
+
+solve fn:: dup var { function
+  r var
+  c var
+  f var
+  v var
   n var
 
   r 0 =
   { r 9 < } {
+    v r.value$ =
+    f 1 =
     c 0 =
     { c 9 < } {
-      r.value c.value:: thgrid->:: dup 0 == {   // dup r.value c.value:: tn.value:: thgrid:: so we don't have to recalculate it in the inner loop.
+      v f / 10 % 0 == {
         n 1 =
         { n 10 < } {
-          r.value c.value n.value thgrid.value possible fn::() {
-            dup n =   // picking up r.value c.value:: thgrid->:: again.
-            tn.value solve fn::()
-            dup 0 =   // picking up r.value c.value:: thgrid->:: again.
+          r.value c.value n.value possible fn::() {
+            r.value$ v n f * + =
+            solve fn::()
+            r.value$ v =
           } ifthen
           n++
         } while
-        pop   // get rid of r.value c.value:: thgrid->::
         return
       } ifthen
-      pop   // get rid of r.value c.value:: thgrid->::
+      f f 10 * =
       c++
     } while
     r++
   } while
 
-  threads initialised { threads 1 > } and {
-    mutex lock thread::()
-  } ifthen
-
-  "" println
-  thgrid-> printGrid fn::()
-  "Solution in " print now time::() startTime fn:: - 1000.0 / dhms fn::() "" println
-
-  threads initialised { threads 1 > } and {
-    mutex unlock thread::()
-  } ifthen
+  printSolution fn::()
 } =
 
 found dup var false =
@@ -849,7 +904,7 @@ whichSudoku 3 == {
   "From Cracking the Cryptic: https://www.youtube.com/watch?v=rQHV-gIAG_0" println
   "This includes a Chess Knight's move constraint." println
   regionChecker fn:: standardRegions fn:: =
-  constraint fn:: knightsMoveConstraint fn:: =
+  constraint fn:: { knightsMoveConstraint fn::() not { false return } ifthen } constraint fn:: + =
   grid 0 0 0 0 0 0 6 0 0 0 setRow()
   grid 1 0 0 3 0 0 0 0 0 7 setRow()
   grid 2 2 0 0 3 0 0 4 9 0 setRow()
@@ -936,13 +991,13 @@ whichSudoku 6 == {
 } ifthen
 
 // Another CTC sudoku: https://www.youtube.com/watch?v=tTGXIa2IUrg
-// Regular sudoku with an arrow constraint fn::.
+// Regular sudoku with an arrow constraint.
 whichSudoku 7 == {
   found true =
   "From Cracking the Cryptic: https://www.youtube.com/watch?v=tTGXIa2IUrg" println
   "Arrow sudoku. The arrows are not shown, unfortunately." println
   regionChecker fn:: standardRegions fn:: =
-  constraint fn:: arrowConstraint fn:: =
+  constraint fn:: { arrowConstraint fn::() not { false return } ifthen } constraint fn:: + =
   grid 0 0 0 0 5 0 4 0 0 0 setRow()
   grid 1 0 0 0 0 0 0 0 0 0 setRow()
   grid 2 0 7 0 0 0 0 0 0 0 setRow()
@@ -975,7 +1030,7 @@ whichSudoku 8 == {
   "Standard sudoku with a thermo constraint." println
   "The thermos aren't shown, unfortunately." println
   regionChecker fn:: standardRegions fn:: =
-  constraint fn:: thermoConstraint fn:: =
+  constraint fn:: { thermoConstraint fn::() not { false return } ifthen } constraint fn:: + =
   grid 0 1 0 0 7 0 0 0 0 0 setRow()
   grid 1 0 5 0 0 4 0 0 0 0 setRow()
   grid 2 0 0 0 0 0 1 0 0 0 setRow()
@@ -1003,7 +1058,9 @@ whichSudoku 9 == {
   "This is called Miracle Sudoku, and includes King's and Knight's move constraints" println
   "and a non-consecutive constraint." println
   regionChecker fn:: standardRegions fn:: =
-  constraint fn:: kingsKnightsNonconsecutiveConstraint fn:: =
+  constraint fn:: { kingsMoveConstraint      fn::() not { false return } ifthen } constraint fn:: + =
+  constraint fn:: { knightsMoveConstraint    fn::() not { false return } ifthen } constraint fn:: + =
+  constraint fn:: { nonconsecutiveConstraint fn::() not { false return } ifthen } constraint fn:: + =
   grid 0 0 0 0 0 0 0 0 0 0 setRow()
   grid 1 0 0 0 0 0 0 0 0 0 setRow()
   grid 2 0 0 0 0 0 0 0 0 0 setRow()
@@ -1020,33 +1077,31 @@ whichSudoku 10 == {
 
   // If you want to add your own sudoku, add it here.
 
-  // Include a region checker.
-  // regionChecker fn:: standardRegions fn:: =
+  // You must include a region checker.
+  // regionChecker fn:: standardRegions  fn:: =
   // regionChecker fn:: irregularRegions fn:: =
 
-  // Include any extra contraints, as appropriate.
-  // constraint fn:: knightsMoveConstraint fn:: =
-  // constraint fn:: kingsMoveConstraint fn:: =
-  // constraint fn:: nonconsecutiveConstraint fn:: =
-  // constraint fn:: kingsKnightsNonconsecutiveConstraint fn:: =
-  // constraint fn:: arrowConstraint fn:: =
-  // constraint fn:: knightsMoveAndArrowConstraint fn:: =
-  // constraint fn:: thermoConstraint fn:: =
+  // Include additional extra contraints, as appropriate.
+  // constraint fn:: { kingsMoveConstraint      fn::() not { false return } ifthen } constraint fn:: + =
+  // constraint fn:: { knightsMoveConstraint    fn::() not { false return } ifthen } constraint fn:: + =
+  // constraint fn:: { nonconsecutiveConstraint fn::() not { false return } ifthen } constraint fn:: + =
+  // constraint fn:: { arrowConstraint          fn::() not { false return } ifthen } constraint fn:: + =
+  // constraint fn:: { thermoConstraint         fn::() not { false return } ifthen } constraint fn:: + =
 
   // Add the grid. Each grid line looks like
   //  grid {r} {c1} {c2} ... {c9} setRow()
-  // where {r} is the row number, starting at 0 for the top row and 8 for the last,
+  // wheren {r} is the row number, starting at 0 for the top row and 8 for the last,
   // and {c1} {c2} etc are the cell values going from column 1 through to column 9 of that row.
   // A zero value indicates an empty cell.
 
   // For irregular sudokus you enter the regions in a similar fashion to the grid.
-  // First, assign each region a unique number from 1 to 9. Then use the setRow()
+  // You assign each region a unique number from 1 to 9, and then use the setRow()
   // function to add each row, like
   //  regions {r} {R1} {R2} ... {R9} setRow()
   // {r} is the same as for the grid, the row number starting from 0, and {R1} {R2} etc
   // are the region numbers you've assigned for each cell of the row.
 
-  // To create an arrow you use newArrow() followed by arrowCell() for each cell in the arrow.
+  // To create an arrow you use newArrow() (the circle) followed by arrowCell() for each cell in the arrow.
   // You give the row number first then the column number for both functions.
   // Row and column numbers start from 0 and go to 8.
   // You can have multiple arrows starting from the same cell by creating
@@ -1056,52 +1111,17 @@ whichSudoku 10 == {
   // and each cell may have multiple arrows pass through it.
   // Only single cell circles are supported. No pills.
 
-  // Adding thermos are similar to arrows, where you start a new thermo from a given cell,
-  // row first then column then call newThermo(). After that add each cell of the thermo with
-  // row column thermoCell(). Row and column both start at 0 and go to 8. You must add each thermoCell()
-  // in order, starting from the cell nearest the bulb, with the last being the cell at the tip.
+  // Adding thermos is similar to arrows, where you start a new thermo (the bulb) from a given cell,
+  // row first then column then call newThermo(). After that, add each cell of the thermo with
+  // row column thermoCell(). Row and column both start at 0 and go to 8.
+  // The thermo cells must be added in sequence, starting from the cell next to the bulb with the
+  // last being the tip.
+
 } ifthen
-
-// Don't change anything from here to the end.
-
-createOneGrid dup var {
-  r var
-  c var
-
-  r 0 =
-  { r 9 < } {
-    c 0 =
-    { c 9 < } {
-      r.value c.value:: 1:: grid:: dup var r.value c.value:: grid:: =
-      c++
-    } while
-    r++
-  } while
-} =
-
-createThreadGrids dup var {
-  tn var
-  r var
-  c var
-
-  tn 1 =
-  { tn 10 < } {
-    tn.value th:: dup var 0 =
-    r 0 =
-    { r 9 < } {
-      c 0 =
-      { c 9 < } {
-        r.value c.value:: tn.value:: grid:: dup var r.value c.value:: grid:: =
-        c++
-      } while
-      r++
-    } while
-    tn++
-  } while
-} =
 
 found {
   optimiseRegions()
+  printGrid()
 
   threads initialised { threads 1 > } and {
     tn var
@@ -1115,17 +1135,18 @@ found {
 
     main semaphore thread::()
     mutex mutex thread::()
-    createThreadGrids()
 
-    "" println
-    "Initial grid" println
-    1 grid:: printGrid fn::()
+    i 1 =
+    { i 10 < } {
+      i.value th:: dup var 0 =
+      i++
+    } while
 
     list 0 =
     tn 1 =
     { tn threads <= } {
       tn.value th:: 1 =   // Running.
-      tn.value solveThread create thread::()
+      tn.value startThread create thread::()
       tn++
       list list 10 * 1 + =
     } while
@@ -1148,11 +1169,11 @@ found {
 
       tn 10 < {   // Start new thread if some grids are unprocessed.
         tn.value th:: 1 =   // Running.
-        tn.value solveThread create thread::()
+        tn.value startThread create thread::()
         tn++
       } ifthen
 
-      // Check to see if all the threads have finished.
+      // Check the status of all the threads.
       running 0 =
       waiting 0 =
       finished 0 =
@@ -1166,18 +1187,10 @@ found {
       mutex unlock thread::()
     } while
   } {
-    createOneGrid()
-
-    "" println
-    "Initial grid" println
-    1 grid:: printGrid fn::()
-
-    1 solve fn::()
+    startSingle()
   } if
+} ifthen
 
-  "Total runtime was " print now time::() startTime fn:: - 1000.0 / dhms fn::() "" println
-} {
-  whichSudoku "Sudoku %d not found\n" printf
-} if
+endTime dup var now time::() =
 
-// I'd like to see an irregular sudoku with a knight's move constraint. Any takers...
+"Total runtime was " print now time::() startTime vars:: - 1000.0 / dhms fn::() "" println
