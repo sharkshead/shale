@@ -544,7 +544,7 @@ nonconsecutiveConstraint fn:: dup var { function
   } ifthen
 
   // Check up.
-  nr col 1 - =
+  nr row 1 - =
   nr 0 >= {
     cell nr.value$ col 10 + $ / 10 % =
     cell 0 != {
@@ -555,7 +555,7 @@ nonconsecutiveConstraint fn:: dup var { function
   } ifthen
 
   // Check down.
-  nr col 1 + =
+  nr row 1 + =
   nr 9 < {
     cell nr.value$ col 10 + $ / 10 % =
     cell 0 != {
