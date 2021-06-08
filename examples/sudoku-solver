@@ -424,7 +424,7 @@ kingsMoveConstraint fn:: dup var { function
   // Check Kings's move 1 right and 1 up and down.
   nc col 1 + =
   nc 9 < {
-    nr r 1 - =
+    nr row 1 - =
     nr 0 >= {
       nr.value$ nc 10 + $ / 10 % num == {
         false return
