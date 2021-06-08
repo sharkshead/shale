@@ -77,8 +77,8 @@
 //
 // Yeah, I know you're saying all programming languages give you these features.
 //
-// Do these other programming languages allow you to create new code
-// on-the-fly within the script? Probably not. But I digress. Lets move on.
+// Do these other programming languages allow you to create new code on-the-fly
+// within the script? Probably not. There's an example of this in sudoku-solver.
 
 
 
