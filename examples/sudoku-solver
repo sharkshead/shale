@@ -701,6 +701,50 @@ thermoIsBad fn:: dup var { function
   false
 } =
 
+// Very simple naked singles detector. Seems to improve the speed more often than not.
+// When it does improve the solve speed, the improvement can be anyhere from seconds
+// to 5 or more times faster.
+// Solving s=1 is done entirely by this function, and s=8 enjoys a 4x speed improvement.
+// Can only be used before calling solve().
+nakedSingles fn:: dup var {
+  r var
+  c var
+  f var
+  v var
+  n var
+  ns var
+  count var
+  changes dup var 0 =
+
+  r 0 =
+  { r 9 < } {
+    v r.value$ =
+    f 1 =
+    c 0 =
+    { c 9 < } {
+      count 0 =
+      n 1 =
+      { n 10 < } {
+        v f / 10 % 0 == { r.value c.value n.value possible fn::() } and {
+          ns n =
+          count++
+        } ifthen
+        n++
+      } while
+      count 1 == {
+        r.value$ r.value$ ns f * + =
+        changes++
+        c 9 =
+        r -1 =
+      } {
+        f f 10 * =
+        c++
+      } if
+    } while
+    r++
+  } while
+} =
+
 startSingle dup var {
   r var
   c var
@@ -733,6 +777,7 @@ startSingle dup var {
     r++
   } while
 
+  nakedSingles fn::()
   solve fn::()
 } =
 
@@ -783,6 +828,7 @@ startThread dup var {
   firstFlag not {
     fr.value fc.value tn.value possible fn::() {
       fr.value$ fr.value$ tn fc 10 + $ * + =   // Put our thread number in and start the solve.
+      nakedSingles fn::()
       solve fn::()
     } ifthen
   } ifthen
