@@ -1242,6 +1242,12 @@ found {
       } while
       mutex unlock thread::()
     } while
+
+    progress initialised { progress } and {
+      mutex lock thread::()
+      list finished waiting running now time::() dup timems time::() swap date time::() "%s %s running %d, waiting %d, finished %d, grid (thread) states %09d (0 = waiting, 1 = running, 2 = finished)\n" printf
+      mutex unlock thread::()
+    } ifthen
   } {
     startSingle()
   } if
