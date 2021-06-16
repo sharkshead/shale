@@ -6,7 +6,7 @@ time library
 //  row/column/3x3box constraints (standard sudoku)
 //  row/column/irregular, or jigsaw, region constraints
 // optionally with Chess King's or Knight's move constraints,
-// non-consecutive, arrow or thermo constraints, with any combintions of these.
+// non-consecutive, arrow, thermo or kropki dot constraints, with any combintions of these.
 // Threads are also supported.
 
 // It is based on the python code from the Computerphile video
@@ -46,7 +46,8 @@ s initialised {
   "  7: regular sudoku with arrow constraints, from Cracking the Cryptic." println
   "  8: regular sudoku with a thermo constraint, from Cracking the Cryptic." println
   "  9: regular sudoku with King's and Knight's move and non-consecutive constraints. Cracking the Cryptic's Miracle sudoku." println
-  " 10: empty and waiting for you to fill it in with an unsolved sudoku. Check towards the end of this file for details." println
+  " 10: irregular sudoku with a kropki dot constraint, from Cracking the Cryptic." println
+  " 11: empty and waiting for you to fill it in with an unsolved sudoku. Check towards the end of this file for details." println
   "" println
   "You can enable the use of threads by adding threads=n to the command line," println
   "where n is the maximum number of threads to use. Add progress=true to see thread details." println
@@ -398,6 +399,56 @@ thermoCell dup var {
   column cell.value:: thermo.value:: thermos:: dup var 0$ =
 } =
 
+// Join two cells with a black kropki dot.
+blackDot dup var {
+  c2 dup var swap =
+  r2 dup var swap =
+  c1 dup var swap =
+  r1 dup var swap =
+  p var
+
+  p count r1.value:: c1.value:: blackDot:: &=
+  p-> initialised not {
+    p-> dup var 0 =
+  } ifthen
+  row p->value:: r1.value:: c1.value:: blackDot:: dup var r2 =
+  col p->value:: r1.value:: c1.value:: blackDot:: dup var c2 =
+  p->++
+
+  p count r2.value:: c2.value:: blackDot:: &=
+  p-> initialised not {
+    p-> dup var 0 =
+  } ifthen
+  row p->value:: r2.value:: c2.value:: blackDot:: dup var r1 =
+  col p->value:: r2.value:: c2.value:: blackDot:: dup var c1 =
+  p->++
+} =
+
+// Join two cells with a white kropki dot.
+whiteDot dup var {
+  c2 dup var swap =
+  r2 dup var swap =
+  c1 dup var swap =
+  r1 dup var swap =
+  p var
+
+  p count r1.value:: c1.value:: whiteDot:: &=
+  p-> initialised not {
+    p-> dup var 0 =
+  } ifthen
+  row p->value:: r1.value:: c1.value:: whiteDot:: dup var r2 =
+  col p->value:: r1.value:: c1.value:: whiteDot:: dup var c2 =
+  p->++
+
+  p count r2.value:: c2.value:: whiteDot:: &=
+  p-> initialised not {
+    p-> dup var 0 =
+  } ifthen
+  row p->value:: r2.value:: c2.value:: whiteDot:: dup var r1 =
+  col p->value:: r2.value:: c2.value:: whiteDot:: dup var c1 =
+  p->++
+} =
+
 constraint fn:: dup var { function true } =
 
 kingsMoveConstraint fn:: dup var { function
@@ -699,6 +750,55 @@ thermoIsBad fn:: dup var { function
   } while
 
   false
+} =
+
+// Kropi constraint.
+kropkiConstraint fn:: dup var { function
+  i var
+  n var
+  r var
+  c var
+  p var
+  cell var
+
+  // Does this cell have any black dots?
+  count row.value:: col.value:: blackDot:: initialised {
+    // Yes. Can we reject this value immediately?
+    num 5 == { num 7 == { num 9 == } or } or { false return } ifthen
+
+    // Go through the related cells and check the 1:2 ratio.
+    n count row.value:: col.value:: blackDot:: =
+    i 0 =
+    { i n < } {
+      p i.value row.value:: col.value:: blackDot:: &=
+      r row p->:: =
+      c col p->:: =
+      cell r.value$ c 10 + $ / 10 % =
+      cell 0 != {
+        num cell 2 * != { cell num 2 * != } and { false return } ifthen
+      } ifthen
+      i++
+    } while
+  } ifthen
+
+  // Does this cell have any white dots?
+  count row.value:: col.value:: whiteDot:: initialised {
+    // Yes. Go through the related cells and check they are consecutive.
+    n count row.value:: col.value:: whiteDot:: =
+    i 0 =
+    { i n < } {
+      p i.value row.value:: col.value:: whiteDot:: &=
+      r row p->:: =
+      c col p->:: =
+      cell r.value$ c 10 + $ / 10 % =
+      cell 0 != {
+        num cell 1 + != { cell num 1 + != } and { false return } ifthen
+      } ifthen
+      i++
+    } while
+  } ifthen
+
+  true
 } =
 
 // Very simple naked singles detector. Seems to improve the speed more often than not.
@@ -1126,7 +1226,51 @@ whichSudoku 9 == {
   grid 8 0 0 0 0 0 0 0 0 0 setRow()
 } ifthen
 
+// Another CTC sudoku. Tis one has irregular regions and a fropki dot constraint.
+// https://www.youtube.com/watch?v=ToC39GUmg5g
 whichSudoku 10 == {
+  found true =
+  "Another Cracking the Cryptic sudoku: https://www.youtube.com/watch?v=ToC39GUmg5g" println
+  "This is an irregular sudoku with kropki dot constraints." println
+  regionChecker fn:: irregularRegions fn:: =
+  constraint fn:: { kropkiConstraint fn::() not { false return } ifthen } constraint fn:: + =
+  grid 0 0 0 0 4 0 6 0 0 0 setRow()
+  grid 1 0 0 0 0 0 0 0 0 0 setRow()
+  grid 2 0 0 0 0 0 0 0 0 0 setRow()
+  grid 3 0 0 0 0 0 0 0 0 0 setRow()
+  grid 4 0 0 0 0 0 0 0 0 0 setRow()
+  grid 5 0 0 0 0 0 0 0 0 0 setRow()
+  grid 6 0 0 0 0 2 0 0 0 0 setRow()
+  grid 7 0 0 6 0 0 0 8 0 0 setRow()
+  grid 8 0 0 0 0 1 0 0 0 0 setRow()
+  regions 0 1 1 1 1 2 3 3 3 3 setRow()
+  regions 1 4 1 1 2 2 2 3 3 5 setRow()
+  regions 2 4 4 1 1 2 3 3 5 5 setRow()
+  regions 3 4 4 4 1 2 3 5 5 5 setRow()
+  regions 4 4 4 6 2 2 2 6 5 5 setRow()
+  regions 5 4 7 6 6 6 6 6 8 5 setRow()
+  regions 6 7 7 7 6 9 6 8 8 8 setRow()
+  regions 7 7 7 9 9 9 9 9 8 8 setRow()
+  regions 8 7 7 7 9 9 9 8 8 8 setRow()
+  5 0 5 1 blackDot()
+  5 7 5 8 blackDot()
+  0 0 0 1 whiteDot()
+  0 7 0 8 whiteDot()
+  1 1 1 2 whiteDot()
+  1 6 1 7 whiteDot()
+  2 2 2 3 whiteDot()
+  2 3 3 3 whiteDot()
+  2 4 3 4 whiteDot()
+  2 5 2 6 whiteDot()
+  2 5 3 5 whiteDot()
+  3 6 3 7 whiteDot()
+  4 2 5 2 whiteDot()
+  4 6 5 6 whiteDot()
+  5 5 6 5 whiteDot()
+  6 6 6 7 whiteDot()
+} ifthen
+
+whichSudoku 11 == {
   found true =
 
   // If you want to add your own sudoku, add it here.
@@ -1141,6 +1285,7 @@ whichSudoku 10 == {
   // constraint fn:: { nonconsecutiveConstraint fn::() not { false return } ifthen } constraint fn:: + =
   // constraint fn:: { arrowConstraint          fn::() not { false return } ifthen } constraint fn:: + =
   // constraint fn:: { thermoConstraint         fn::() not { false return } ifthen } constraint fn:: + =
+  // constraint fn:: { kropkiConstraint         fn::() not { false return } ifthen } constraint fn:: + =
 
   // Add the grid. Each grid line looks like
   //  grid {r} {c1} {c2} ... {c9} setRow()
@@ -1170,6 +1315,12 @@ whichSudoku 10 == {
   // row column thermoCell(). Row and column both start at 0 and go to 8.
   // The thermo cells must be added in sequence, starting from the cell next to the bulb with the
   // last being the tip.
+
+  // Adding kropki dots is done by giving the row and column of one cell and the row and column
+  // of the other cell and calling blackDot() or whiteDot() as appropriate. Rows and columns star
+  // from 0 and go to 8. Here's an example, or check the sudoku above
+  //  3 1 3 2 blackDot()
+  //  8 0 8 1 whiteDot()
 
 } ifthen
 
