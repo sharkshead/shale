@@ -14,19 +14,21 @@ time library
 // The sudoku example from this video is used below, along with
 // several Cracking the Cryptic examples and one from Andrew Stuart.
 
-// You can specify which of the sudokus to solve by specifying s=n on the command line.
-// If it is not specified then you get text explaining how to specify an option
+// You can specify which of the sudokus to solve by adding s=n on the command line.
+// If it is not specified then you get text explaining how to choose an option
 // and what the options are, and the default (s=1) option is solved.
 
-// To use threads add threads=n to the command line, where n (must be >= 2) is the maximum number
+// To use, threads add threads=n to the command line, where n (must be >= 2) is the maximum number
 // of threads. Add progress=true to the command line to get a view of the threads in use.
-// Using threads won't always lead to a faster solve, in this current implementation.
+// Using threads won't always lead to a faster solve in this current implementation.
 // For example, the s=3 sudoku produces the solution faster single-threaded than threaded,
-// whereas s=6 produces the solution much faster when threaded.
+// whereas s=6 produces the solution much faster when threaded. The overall time to complete is
+// always faster when threads are used.
 
 // You can also add your own sudoku to solve by skipping down towards the end of this file
-// and adding it where indicated. There are instructions on what and how to add a sudoku,
-// and you can check the examples I've included that immediately precede that section.
+// and adding it where indicated, and add s=11 to the command line. There are instructions
+// on what and how to add a sudoku, and you can check the examples I've included
+// that immediately precede that section.
 
 startTime vars:: dup var now time::() =
 
@@ -43,7 +45,7 @@ s initialised {
   "  4: standard sudoku from Cracking the Cryptic" println
   "  5: irregular sudoku from Cracking the Cryptic" println
   "  6: irregular sudoku from Andrew Stuart" println
-  "  7: regular sudoku with arrow constraints, from Cracking the Cryptic." println
+  "  7: regular sudoku with an arrow constraint, from Cracking the Cryptic." println
   "  8: regular sudoku with a thermo constraint, from Cracking the Cryptic." println
   "  9: regular sudoku with King's and Knight's move and non-consecutive constraints. Cracking the Cryptic's Miracle sudoku." println
   " 10: irregular sudoku with a kropki dot constraint, from Cracking the Cryptic." println
@@ -460,15 +462,11 @@ kingsMoveConstraint fn:: dup var { function
   nc 0 >= {
     nr row 1 - =
     nr 0 >= {
-      nr.value$ nc 10 + $ / 10 % num == {
-        false return
-      } ifthen
+      nr.value$ nc 10 + $ / 10 % num == { false return } ifthen
     } ifthen
     nr row 1 + =
     nr 9 < {
-      nr.value$ nc 10 + $ / 10 % num == {
-        false return
-      } ifthen
+      nr.value$ nc 10 + $ / 10 % num == { false return } ifthen
     } ifthen
   } ifthen
 
@@ -477,15 +475,11 @@ kingsMoveConstraint fn:: dup var { function
   nc 9 < {
     nr row 1 - =
     nr 0 >= {
-      nr.value$ nc 10 + $ / 10 % num == {
-        false return
-      } ifthen
+      nr.value$ nc 10 + $ / 10 % num == { false return } ifthen
     } ifthen
     nr row 1 + =
     nr 9 < {
-      nr.value$ nc 10 + $ / 10 % num == {
-        false return
-      } ifthen
+      nr.value$ nc 10 + $ / 10 % num == { false return } ifthen
     } ifthen
   } ifthen
 
@@ -501,15 +495,11 @@ knightsMoveConstraint fn:: dup var { function
   nc 0 >= {
     nr row 1 - =
     nr 0 >= {
-      nr.value$ nc 10 + $ / 10 % num == {
-        false return
-      } ifthen
+      nr.value$ nc 10 + $ / 10 % num == { false return } ifthen
     } ifthen
     nr row 1 + =
     nr 9 < {
-      nr.value$ nc 10 + $ / 10 % num == {
-        false return
-      } ifthen
+      nr.value$ nc 10 + $ / 10 % num == { false return } ifthen
     } ifthen
   } ifthen
 
@@ -518,15 +508,11 @@ knightsMoveConstraint fn:: dup var { function
   nc 0 >= {
     nr row 2 - =
     nr 0 >= {
-      nr.value$ nc 10 + $ / 10 % num == {
-        false return
-      } ifthen
+      nr.value$ nc 10 + $ / 10 % num == { false return } ifthen
     } ifthen
     nr row 2 + =
     nr 9 < {
-      nr.value$ nc 10 + $ / 10 % num == {
-        false return
-      } ifthen
+      nr.value$ nc 10 + $ / 10 % num == { false return } ifthen
     } ifthen
   } ifthen
 
@@ -535,15 +521,11 @@ knightsMoveConstraint fn:: dup var { function
   nc 9 < {
     nr row 2 - =
     nr 0 >= {
-      nr.value$ nc 10 + $ / 10 % num == {
-        false return
-      } ifthen
+      nr.value$ nc 10 + $ / 10 % num == { false return } ifthen
     } ifthen
     nr row 2 + =
     nr 9 < {
-      nr.value$ nc 10 + $ / 10 % num == {
-        false return
-      } ifthen
+      nr.value$ nc 10 + $ / 10 % num == { false return } ifthen
     } ifthen
   } ifthen
 
@@ -552,15 +534,11 @@ knightsMoveConstraint fn:: dup var { function
   nc 9 < {
     nr row 1 - =
     nr 0 >= {
-      nr.value$ nc 10 + $ / 10 % num == {
-        false return
-      } ifthen
+      nr.value$ nc 10 + $ / 10 % num == { false return } ifthen
     } ifthen
     nr row 1 + =
     nr 9 < {
-      nr.value$ nc 10 + $ / 10 % num == {
-        false return
-      } ifthen
+      nr.value$ nc 10 + $ / 10 % num == { false return } ifthen
     } ifthen
   } ifthen
 
@@ -577,9 +555,7 @@ nonconsecutiveConstraint fn:: dup var { function
   nc 0 >= {
     cell row.value$ nc 10 + $ / 10 % =
     cell 0 != {
-      num cell 1 - == { num cell 1 + == } or {
-        false return
-      } ifthen
+      num cell 1 - == { num cell 1 + == } or { false return } ifthen
     } ifthen
   } ifthen
 
@@ -588,9 +564,7 @@ nonconsecutiveConstraint fn:: dup var { function
   nc 9 < {
     cell row.value$ nc 10 + $ / 10 % =
     cell 0 != {
-      num cell 1 - == { num cell 1 + == } or {
-        false return
-      } ifthen
+      num cell 1 - == { num cell 1 + == } or { false return } ifthen
     } ifthen
   } ifthen
 
@@ -599,9 +573,7 @@ nonconsecutiveConstraint fn:: dup var { function
   nr 0 >= {
     cell nr.value$ col 10 + $ / 10 % =
     cell 0 != {
-      num cell 1 - == { num cell 1 + == } or {
-        false return
-      } ifthen
+      num cell 1 - == { num cell 1 + == } or { false return } ifthen
     } ifthen
   } ifthen
 
@@ -610,9 +582,7 @@ nonconsecutiveConstraint fn:: dup var { function
   nr 9 < {
     cell nr.value$ col 10 + $ / 10 % =
     cell 0 != {
-      num cell 1 - == { num cell 1 + == } or {
-        false return
-      } ifthen
+      num cell 1 - == { num cell 1 + == } or { false return } ifthen
     } ifthen
   } ifthen
 
@@ -652,9 +622,9 @@ arrowConstraint fn:: dup var { function
         circle 0 != {
           // Yes.
           v row.value$ =
-          row.value$ v num col 10 + $ * + =                       // Temporarily put the number in the grid.
+          row.value$ v num col 10 + $ * + =                   // Temporarily put the number in the grid.
           sum arrow.value sumArrow fn::() =
-          row.value$ v =                                        // Take if out again.
+          row.value$ v =                                      // Take if out again.
           sum 0 > sum circle != and { false return } ifthen   // If we have a sum and it is wrong, return false.
         } ifthen
         i++
@@ -716,7 +686,7 @@ thermoConstraint fn:: dup var { function
         thermo i.value:: row.value:: col.value:: thermos:: thermoIsBad fn::() { row.value$ v = false return } ifthen
         i++
       } while
-      row.value$ v =                      // Take it out again.
+      row.value$ v =                    // Take it out again.
     } ifthen
   } if
 
@@ -1226,7 +1196,7 @@ whichSudoku 9 == {
   grid 8 0 0 0 0 0 0 0 0 0 setRow()
 } ifthen
 
-// Another CTC sudoku. Tis one has irregular regions and a fropki dot constraint.
+// Another CTC sudoku. This one has irregular regions and a kropki dot constraint.
 // https://www.youtube.com/watch?v=ToC39GUmg5g
 whichSudoku 10 == {
   found true =
@@ -1317,14 +1287,19 @@ whichSudoku 11 == {
   // last being the tip.
 
   // Adding kropki dots is done by giving the row and column of one cell and the row and column
-  // of the other cell and calling blackDot() or whiteDot() as appropriate. Rows and columns star
-  // from 0 and go to 8. Here's an example, or check the sudoku above
+  // of the other cell and calling blackDot() or whiteDot() as appropriate. Rows and columns start
+  // from 0 and go to 8. Here's an example, or check the sudoku example above.
   //  3 1 3 2 blackDot()
   //  8 0 8 1 whiteDot()
 
 } ifthen
 
 found {
+  regionChecker fn:: initialised not {
+    "You must select a region checker, either standardRegions or irregularRegions." println
+    1 exit
+  } ifthen
+
   optimiseRegions()
   printGrid()
 
