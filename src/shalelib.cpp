@@ -254,8 +254,9 @@ Cache cache;
 
 // Object class
 
-Object::Object() : referenceCount(0) { pthread_mutex_init(&mutex, NULL); }
-Object::~Object() { pthread_mutex_destroy(&mutex); }
+Object::Object() : referenceCount(0), mutex((pthread_mutex_t *) 0) { }
+Object::Object(ObjectMutex om) : referenceCount(0) { if(om == ALLOCATE_MUTEX) { allocateMutex(); } else { mutex = (pthread_mutex_t *) 0; } }
+Object::~Object() { deallocateMutex(); }
 Number *Object::getNumber(LexInfo *li, ExecutionEnvironment *ee) { slexception.chuck("number not found", li); return (Number *) 0; }
 String *Object::getString(LexInfo *li, ExecutionEnvironment *ee) { slexception.chuck("string not found", li); return (String *) 0; }
 bool Object::isName() { return false; }
@@ -263,25 +264,39 @@ Name *Object::getName(LexInfo *li, ExecutionEnvironment *ee) { slexception.chuck
 Code *Object::getCode(LexInfo *li, ExecutionEnvironment *ee) { slexception.chuck("code not found", li); return (Code *) 0; }
 Pointer *Object::getPointer(LexInfo *li, ExecutionEnvironment *ee) { slexception.chuck("pointer not found", li); return (Pointer *) 0; }
 void Object::hold() {
-  if(useMutex) pthread_mutex_lock(&mutex);
+  if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_lock(mutex);
   referenceCount++;
-  if(useMutex) pthread_mutex_unlock(&mutex);
+  if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_unlock(mutex);
 }
 void Object::release(LexInfo *li) {
-  if(useMutex) pthread_mutex_lock(&mutex);
+  if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_lock(mutex);
   if(referenceCount < 0) slexception.chuck("reference error", li);
   if(referenceCount == 0) {
     delete(this);
   } else {
     referenceCount--;
-    if(useMutex) pthread_mutex_unlock(&mutex);
+    if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_unlock(mutex);
+  }
+}
+void Object::allocateMutex() {
+  if(mutex == (pthread_mutex_t *) 0) {
+    mutex = new pthread_mutex_t;
+    pthread_mutex_init(mutex, NULL);
+  }
+}
+void Object::deallocateMutex() {
+  if(mutex != (pthread_mutex_t *) 0) {
+    pthread_mutex_destroy(mutex);
+    mutex = (pthread_mutex_t *) 0;
   }
 }
 
 // Number class
 
 Number::Number(INT i) : Object(), intRep(true), valueInt(i) { }
+Number::Number(INT i, ObjectMutex om) : Object(om), intRep(true), valueInt(i) { }
 Number::Number(double d) : Object(), intRep(false), valueDouble(d) { }
+Number::Number(double d, ObjectMutex om) : Object(om), intRep(false), valueDouble(d) { }
 Number *Number::getNumber(LexInfo *li, ExecutionEnvironment *ee) { this->hold(); return this; }
 bool Number::isInt() { return intRep; }
 INT Number::getInt() { if(intRep) return valueInt; return valueDouble; }
@@ -289,16 +304,17 @@ void Number::setInt(INT i) { intRep = true; valueInt = i; }
 double Number::getDouble() { if(intRep) return valueInt; return valueDouble; }
 void Number::setDouble(double d) { intRep = false; valueDouble = d; }
 void Number::release(LexInfo *li) {
-  if(useMutex) pthread_mutex_lock(&mutex);
+  if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_lock(mutex);
   if(referenceCount < 0) slexception.chuck("reference error", li);
-  if(referenceCount == 0) cache.deleteNumber(this); else referenceCount--;
-  if(useMutex) pthread_mutex_unlock(&mutex);
+  if(referenceCount == 0) { this->deallocateMutex(); cache.deleteNumber(this); } else referenceCount--;
+  if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_unlock(mutex);
 }
 void Number::debug() { char fmt[32]; printf("Number: "); if(intRep) { sprintf(fmt, "%%%sd\n", PCTD); printf(fmt, valueInt); } else printf("%0.3f\n", valueDouble); }
 
 // String class
 
 String::String(const char *s) : Object(), str(s), removeStringFlag(false) { }
+String::String(const char *s, ObjectMutex om) : Object(om), str(s), removeStringFlag(false) { }
 String::String(const char *s, bool rsf) : Object(), str(s), removeStringFlag(rsf) { }
 String::~String() { if(removeStringFlag) free((void *) str); }
 String *String::getString(LexInfo *li, ExecutionEnvironment *ee) { this->hold(); return this; }
@@ -307,16 +323,25 @@ bool String::getRemoveStringFlag() { return removeStringFlag; }
 void String::setString(const char *s) { str = s; }
 void String::setRemoveStringFlag(bool rsf) { removeStringFlag = rsf; }
 void String::release(LexInfo *li) {
-  if(useMutex) pthread_mutex_lock(&mutex);
+  if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_lock(mutex);
   if(referenceCount < 0) slexception.chuck("reference error", li);
-  if(referenceCount == 0) cache.deleteString(this); else referenceCount--;
-  if(useMutex) pthread_mutex_unlock(&mutex);
+  if(referenceCount == 0) { this->deallocateMutex(); cache.deleteString(this); } else referenceCount--;
+  if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_unlock(mutex);
 }
 void String::debug() { printf("String: %s\n", str); }
 
 // Name class
 
 Name::Name(const char *n) : Object() {
+  int i;
+
+  for(i = 0; (i < (MAX_NAME_LENGTH - 1)) && (n[i] != 0); i++) {
+    name[i] = n[i];
+  }
+  name[i] = 0;
+}
+
+Name::Name(const char *n, ObjectMutex om) : Object(om) {
   int i;
 
   for(i = 0; (i < (MAX_NAME_LENGTH - 1)) && (n[i] != 0); i++) {
@@ -374,6 +399,7 @@ void Name::debug() { printf("Name: %s\n", name); }
 // Code class
 
 Code::Code(OperationList *ol) : Object(), operationList(ol) { }
+Code::Code(OperationList *ol, ObjectMutex om) : Object(om), operationList(ol) { }
 Code *Code::getCode(LexInfo *li, ExecutionEnvironment *ee) { this->hold(); return this; }
 OperationList *Code::getOperationList() { return operationList; }
 OperatorReturn Code::action(ExecutionEnvironment *ee) { return operationList->action(ee); }
@@ -387,11 +413,11 @@ void Pointer::setObject(Object *o) { object = o; object->hold(); }
 Object *Pointer::getObject() { return object; }
 void Pointer::hold() { Object::hold(); if(object != (Object *) 0) object->hold(); }
 void Pointer::release(LexInfo *li) {
-  if(useMutex) pthread_mutex_lock(&mutex);
+  if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_lock(mutex);
   if(referenceCount < 0) slexception.chuck("reference error", li);
   if(object != (Object *) 0) object->release(li);
-  if(referenceCount == 0) cache.deletePointer(this); else referenceCount--;
-  if(useMutex) pthread_mutex_unlock(&mutex);
+  if(referenceCount == 0) { this->deallocateMutex(); cache.deletePointer(this); } else referenceCount--;
+  if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_unlock(mutex);
 }
 void Pointer::debug() { printf("Pointer\n"); }
 
@@ -949,53 +975,72 @@ OperatorReturn Assign::action(ExecutionEnvironment *ee) {
   Pointer *pointer;
   Object *o;
   Variable *v;
-  bool found;
+  bool varfound;
+  bool valfound;
+  bool allocateMutex;
+  static char message[1024];
 
   val = ee->stack.pop(getLexInfo());
   var = ee->stack.pop(getLexInfo());
-  found = false;
+  varfound = false;
+  valfound = false;
 
   // Is this a variable we're assigning?
   try {
     v = ee->variableStack.findVariable(var->getName(getLexInfo(), ee)->getValue());
     if(v != (Variable *) 0) {
+      varfound = true;
+
+      // Not elegant, but if this is going into the BTree then allocate a mutex as this is potentially shared between threads.
+      allocateMutex = (v->getName()[0] == '/');
+        
       try {
         number = val->getNumber(getLexInfo(), ee);
+        if(allocateMutex) number->allocateMutex();
         v->setObject(number);
         number->release(getLexInfo());
-        found = true;
+        valfound = true;
       } catch(Exception *e) { }
 
-      if(! found) {
+      if(! valfound) {
         try {
           string = val->getString(getLexInfo(), ee);
+          if(allocateMutex) string->allocateMutex();
           v->setObject(string);
           string->release(getLexInfo());
-          found = true;
+          valfound = true;
         } catch(Exception *e) { }
       }
 
-      if(! found) {
+      if(! valfound) {
         try {
           code = val->getCode(getLexInfo(), ee);
+          if(allocateMutex) code->allocateMutex();
           v->setObject(code);
           code->release(getLexInfo());
-          found = true;
+          valfound = true;
         } catch(Exception *e) { }
       }
 
-      if(! found) {
+      if(! valfound) {
         try {
           pointer = val->getPointer(getLexInfo(), ee);
+          if(allocateMutex) pointer->allocateMutex();
           v->setObject(pointer);
           pointer->release(getLexInfo());
-          found = true;
+          valfound = true;
         } catch(Exception *e) { }
       }
     }
   } catch(Exception *e) { }
 
-  if(! found) slexception.chuck("assignment error", getLexInfo());
+  if(! valfound) {
+    if(varfound) {
+      slexception.chuck("assignment error, value not found", getLexInfo());
+    } else {
+      slexception.chuck("assignment error, variable not found", getLexInfo());
+    }
+  }
 
   val->release(getLexInfo());
   var->release(getLexInfo());
@@ -1022,6 +1067,7 @@ OperatorReturn PointerAssign::action(ExecutionEnvironment *ee) {
     v = ee->variableStack.findVariable(var->getName(getLexInfo(), ee)->getValue());
     if(v != (Variable *) 0) {
       p = cache.newPointer(val);
+      if(v->getName()[0] == '/') p->allocateMutex();
       v->setObject(p);
       p->release(getLexInfo());
       found = true;

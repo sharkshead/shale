@@ -95,9 +95,15 @@ enum OperatorReturn {
   or_return
 };
 
+enum ObjectMutex {
+  ALLOCATE_MUTEX,
+  NO_ALLOCATE_MUTEX
+};
+
 class Object {
   public:
     Object();
+    Object(ObjectMutex);
     virtual ~Object();
     virtual Number *getNumber(LexInfo *, ExecutionEnvironment *);
     virtual String *getString(LexInfo *, ExecutionEnvironment *);
@@ -109,15 +115,19 @@ class Object {
     virtual void release(LexInfo *);
     int referenceCount;
     virtual void debug() = 0;
+    void allocateMutex();
+    void deallocateMutex();
 
   protected:
-    pthread_mutex_t mutex;
+    pthread_mutex_t *mutex;
 };
 
 class Number : public Object {
   public:
     Number(INT);
+    Number(INT, ObjectMutex);
     Number(double);
+    Number(double, ObjectMutex);
     Number *getNumber(LexInfo *, ExecutionEnvironment *);
     bool isInt();
     INT getInt();
@@ -138,6 +148,7 @@ class Number : public Object {
 class String : public Object {
   public:
     String(const char *);
+    String(const char *, ObjectMutex);
     String(const char *, bool);
     ~String();
     String *getString(LexInfo *, ExecutionEnvironment *);
@@ -156,6 +167,7 @@ class String : public Object {
 class Name : public Object {
   public:
     Name(const char *);
+    Name(const char *, ObjectMutex);
     bool isName();
     Name *getName(LexInfo *, ExecutionEnvironment *);
     char *getValue();
@@ -174,6 +186,7 @@ class OperationList;
 class Code : public Object {
   public:
     Code(OperationList *);
+    Code(OperationList *, ObjectMutex);
     Code *getCode(LexInfo *, ExecutionEnvironment *);
     OperationList *getOperationList();
     OperatorReturn action(ExecutionEnvironment *);
