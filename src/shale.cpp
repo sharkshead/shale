@@ -600,11 +600,7 @@ void olBuild(Lex &lex) {
 
   switch(lex.token) {
     case LEX_TOKEN_UNKNOWN:
-      f = li->getFilename();
-      printf("\nWarning, line %d, file %s\n", li->getLineNumber(), f != (const char *) 0 ? f : "<stdin>");
-      printf("%s\n", li->getLine());
-      for(i = 0; i < li->getIndex(); i++) printf(" ");
-      printf("^ unknown token '%c' ignored\n", lex.unknownToken);
+      shaleException.chuck("unknown token", li);
       break;
 
     case LEX_TOKEN_MATHS_OP:
