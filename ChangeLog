@@ -2,6 +2,7 @@ shale:
 
   1.3.9 - 25 Jun 2021
     - improved thread performance
+    - improved error message for unknown characters
 
   1.3.8 - 31 May 2021
     - removed several compiler warnings

@@ -593,12 +593,18 @@ void olBuild(Lex &lex) {
   Operation *op;
   char *p;
   LexInfo *li;
+  const char *f;
+  int i;
 
   li = new LexInfo(shaleFileName, lexLineNumber, lexInfoLine, lexTokenIndex);
 
   switch(lex.token) {
     case LEX_TOKEN_UNKNOWN:
-      printf("Unknown token '%c' ignored\n", lex.unknownToken);
+      f = li->getFilename();
+      printf("\nWarning, line %d, file %s\n", li->getLineNumber(), f != (const char *) 0 ? f : "<stdin>");
+      printf("%s\n", li->getLine());
+      for(i = 0; i < li->getIndex(); i++) printf(" ");
+      printf("^ unknown token '%c' ignored\n", lex.unknownToken);
       break;
 
     case LEX_TOKEN_MATHS_OP:
