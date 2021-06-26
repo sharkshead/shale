@@ -287,6 +287,7 @@ void Object::allocateMutex() {
 void Object::deallocateMutex() {
   if(mutex != (pthread_mutex_t *) 0) {
     pthread_mutex_destroy(mutex);
+    delete(mutex);
     mutex = (pthread_mutex_t *) 0;
   }
 }
