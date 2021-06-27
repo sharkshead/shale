@@ -656,8 +656,8 @@ void olBuild(Lex &lex) {
         case LEX_TOKEN_KEYWORD_PRINTLN: op = new Print(true, li); break;
         case LEX_TOKEN_KEYWORD_PRINTF: op = new Printf(true, li); break;
         case LEX_TOKEN_KEYWORD_SPRINTF: op = new Printf(false, li); break;
-        case LEX_TOKEN_KEYWORD_TRUE: op = new True(li); break;
-        case LEX_TOKEN_KEYWORD_FALSE: op = new False(li); break;
+        case LEX_TOKEN_KEYWORD_TRUE: op = new Push(trueValue, li); break;       // new True(li); break;
+        case LEX_TOKEN_KEYWORD_FALSE: op = new Push(falseValue, li); break;     // new False(li); break;
         case LEX_TOKEN_KEYWORD_INT: op = new Int(li); break;
         case LEX_TOKEN_KEYWORD_DOUBLE: op = new Double(li); break;
         case LEX_TOKEN_KEYWORD_BREAK: op = new Break(li); break;
@@ -937,6 +937,9 @@ int main(int ac, char **av) {
   lexLine[0] = 0;
   lexLineIndex = 0;
   shaleFileName = (char *) 0;
+
+  trueValue = new Number((INT) 1, IS_STATIC);
+  falseValue = new Number((INT) 0, IS_STATIC);
 
   while((ac > 1) && (av[1][0] == '-')) {
     if((av[1][1] == 'h') || ((av[1][1] == '-') && (av[1][2] == 'h'))) {

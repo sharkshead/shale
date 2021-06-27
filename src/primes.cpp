@@ -28,7 +28,7 @@ SOFTWARE.
 
 #define MAJOR   (INT) 1
 #define MINOR   (INT) 2
-#define MICRO   (INT) 0
+#define MICRO   (INT) 1
 
 class PrimesHelp : public Operation {
   public:
@@ -666,7 +666,7 @@ OperatorReturn PrimesIsPrime::action(ExecutionEnvironment *ee) {
       num->release(getLexInfo());
     }
   }
-  ee->stack.push(cache.newNumber(isPrime ? (INT) 1 : (INT) 0));
+  ee->stack.push(isPrime ? trueValue : falseValue);      // cache.newNumber(isPrime ? (INT) 1 : (INT) 0));
 
   n->release(getLexInfo());
   ns->release(getLexInfo());

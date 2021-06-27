@@ -517,18 +517,6 @@ class LogicalNot : public Operation {
     OperatorReturn action(ExecutionEnvironment *);
 };
 
-class True : public Operation {
-  public:
-    True(LexInfo *);
-    OperatorReturn action(ExecutionEnvironment *);
-};
-
-class False : public Operation {
-  public:
-    False(LexInfo *);
-    OperatorReturn action(ExecutionEnvironment *);
-};
-
 class Stop : public Operation {
   public:
     Stop(LexInfo *);
@@ -825,5 +813,7 @@ extern BTree btree;
 extern Exception slexception;
 extern VariableStack variableStack;
 extern bool useMutex;
+extern Number *trueValue;
+extern Number *falseValue;
 
 #endif /* __SHALELIB */

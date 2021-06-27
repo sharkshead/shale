@@ -29,6 +29,8 @@ SOFTWARE.
 BTree btree;
 Exception slexception;
 bool useMutex;
+Number *trueValue;
+Number *falseValue;
 
 // LexInfo and Exception classes. These tie an execution error to the input.
 
@@ -1213,7 +1215,7 @@ OperatorReturn LessThan::action(ExecutionEnvironment *ee) {
     if(bn->isInt()) r = (an->getDouble() < bn->getInt());
     else r = (an->getDouble() < bn->getDouble());
   }
-  ee->stack.push(cache.newNumber(r ? (INT) 1 : (INT) 0));
+  ee->stack.push(r ? trueValue : falseValue);
 
   an->release(getLexInfo());
   bn->release(getLexInfo());
@@ -1244,7 +1246,7 @@ OperatorReturn LessThanOrEquals::action(ExecutionEnvironment *ee) {
     if(bn->isInt()) r = (an->getDouble() <= bn->getInt());
     else r = (an->getDouble() <= bn->getDouble());
   }
-  ee->stack.push(cache.newNumber(r ? (INT) 1 : (INT) 0));
+  ee->stack.push(r ? trueValue : falseValue);
 
   an->release(getLexInfo());
   bn->release(getLexInfo());
@@ -1275,7 +1277,7 @@ OperatorReturn Equals::action(ExecutionEnvironment *ee) {
     if(bn->isInt()) r = (an->getDouble() == bn->getInt());
     else r = (an->getDouble() == bn->getDouble());
   }
-  ee->stack.push(cache.newNumber(r ? (INT) 1 : (INT) 0));
+  ee->stack.push(r ? trueValue : falseValue);
 
   an->release(getLexInfo());
   bn->release(getLexInfo());
@@ -1306,7 +1308,7 @@ OperatorReturn NotEquals::action(ExecutionEnvironment *ee) {
     if(bn->isInt()) r = (an->getDouble() != bn->getInt());
     else r = (an->getDouble() != bn->getDouble());
   }
-  ee->stack.push(cache.newNumber(r ? (INT) 1 : (INT) 0));
+  ee->stack.push(r ? trueValue : falseValue);
 
   an->release(getLexInfo());
   bn->release(getLexInfo());
@@ -1337,7 +1339,7 @@ OperatorReturn GreaterThanOrEquals::action(ExecutionEnvironment *ee) {
     if(bn->isInt()) r = (an->getDouble() >= bn->getInt());
     else r = (an->getDouble() >= bn->getDouble());
   }
-  ee->stack.push(cache.newNumber(r ? (INT) 1 : (INT) 0));
+  ee->stack.push(r ? trueValue : falseValue);
 
   an->release(getLexInfo());
   bn->release(getLexInfo());
@@ -1368,7 +1370,7 @@ OperatorReturn GreaterThan::action(ExecutionEnvironment *ee) {
     if(bn->isInt()) r = (an->getDouble() > bn->getInt());
     else r = (an->getDouble() > bn->getDouble());
   }
-  ee->stack.push(cache.newNumber(r ? (INT) 1 : (INT) 0));
+  ee->stack.push(r ? trueValue : falseValue);
 
   an->release(getLexInfo());
   bn->release(getLexInfo());
@@ -1416,7 +1418,7 @@ OperatorReturn LogicalAnd::action(ExecutionEnvironment *ee) {
     bn->release(getLexInfo());
   }
 
-  ee->stack.push(cache.newNumber(r ? (INT) 1 : (INT) 0));
+  ee->stack.push(r ? trueValue : falseValue);
 
   an->release(getLexInfo());
   a->release(getLexInfo());
@@ -1461,7 +1463,7 @@ OperatorReturn LogicalOr::action(ExecutionEnvironment *ee) {
     bn->release(getLexInfo());
   }
 
-  ee->stack.push(cache.newNumber(r ? (INT) 1 : (INT) 0));
+  ee->stack.push(r ? trueValue : falseValue);
 
   an->release(getLexInfo());
   a->release(getLexInfo());
@@ -1482,26 +1484,10 @@ OperatorReturn LogicalNot::action(ExecutionEnvironment *ee) {
 
   if(an->isInt()) r = ! an->getInt();
   else r = ! an->getDouble();
-  ee->stack.push(cache.newNumber(r ? (INT) 1 : (INT) 0));
+  ee->stack.push(r ? trueValue : falseValue);
 
   an->release(getLexInfo());
   a->release(getLexInfo());
-
-  return or_continue;
-}
-
-True::True(LexInfo *li) : Operation(li) { }
-
-OperatorReturn True::action(ExecutionEnvironment *ee) {
-  ee->stack.push(cache.newNumber((INT) 1));
-
-  return or_continue;
-}
-
-False::False(LexInfo *li) : Operation(li) { }
-
-OperatorReturn False::action(ExecutionEnvironment *ee) {
-  ee->stack.push(cache.newNumber((INT) 0));
 
   return or_continue;
 }
