@@ -410,7 +410,7 @@ void Code::debug() { printf("Code\n"); }
 
 Pointer::Pointer(Object *o) : Object(), object(o) { object->hold(); }
 Pointer *Pointer::getPointer(LexInfo *li, ExecutionEnvironment *ee) { this->hold(); return this; }
-void Pointer::setObject(Object *o) { object = o; object->hold(); }
+void Pointer::setObject(Object *o) { if(object != (Object *) 0) object->release((LexInfo *) 0); object = o; object->hold(); }
 Object *Pointer::getObject() { return object; }
 void Pointer::hold() { Object::hold(); if(object != (Object *) 0) object->hold(); }
 void Pointer::release(LexInfo *li) {
