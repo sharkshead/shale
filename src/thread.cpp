@@ -28,7 +28,7 @@ SOFTWARE.
 
 #define MAJOR   (INT) 1
 #define MINOR   (INT) 0
-#define MICRO   (INT) 4
+#define MICRO   (INT) 5
 
 class ThreadPack {
   public:
@@ -203,6 +203,7 @@ ThreadCreate::ThreadCreate(LexInfo *li) : Operation(li) { }
 OperatorReturn ThreadCreate::action(ExecutionEnvironment *ee) {
   Object *o;
   Code *code;
+  Object *arg;
   ThreadPack *tp;
   pthread_t thread;
   pthread_attr_t attr;
@@ -210,8 +211,11 @@ OperatorReturn ThreadCreate::action(ExecutionEnvironment *ee) {
   o = ee->stack.pop(getLexInfo());
 
   tp = new ThreadPack;
+  o->allocateMutex();
   tp->code = o->getCode(getLexInfo(), ee);
-  tp->ee.stack.push(ee->stack.pop(getLexInfo()));
+  arg = ee->stack.pop(getLexInfo());
+  arg->allocateMutex();
+  tp->ee.stack.push(arg);
 
   if(pthread_attr_init(&attr) != 0) slexception.chuck("Can't initialise thread attributes", getLexInfo());
   if(pthread_attr_setstacksize(&attr, 1024*1024) != 0) slexception.chuck("Can't set thread stack size", getLexInfo());

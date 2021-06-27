@@ -64,9 +64,13 @@ string library:
 
 thread library:
 
+  1.0.5 - 27 Jun 2021
+    - improved thread safety
+    - shale version 1.3.9
+
   1.0.4 - 31 May 2021
-    - Removed some compiler warnings
-    - Improves error messages
+    - removed some compiler warnings
+    - improves error messages
     - shale version 1.3.8
 
   1.0.3 - 28 May 2021
