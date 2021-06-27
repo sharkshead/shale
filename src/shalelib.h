@@ -95,15 +95,15 @@ enum OperatorReturn {
   or_return
 };
 
-enum ObjectMutex {
+enum ObjectOption {
   ALLOCATE_MUTEX,
-  NO_ALLOCATE_MUTEX
+  IS_STATIC
 };
 
 class Object {
   public:
     Object();
-    Object(ObjectMutex);
+    Object(ObjectOption);
     virtual ~Object();
     virtual Number *getNumber(LexInfo *, ExecutionEnvironment *);
     virtual String *getString(LexInfo *, ExecutionEnvironment *);
@@ -117,17 +117,19 @@ class Object {
     virtual void debug() = 0;
     void allocateMutex();
     void deallocateMutex();
+    bool isDynamic();
 
   protected:
     pthread_mutex_t *mutex;
+    bool isStatic;
 };
 
 class Number : public Object {
   public:
     Number(INT);
-    Number(INT, ObjectMutex);
+    Number(INT, ObjectOption);
     Number(double);
-    Number(double, ObjectMutex);
+    Number(double, ObjectOption);
     Number *getNumber(LexInfo *, ExecutionEnvironment *);
     bool isInt();
     INT getInt();
@@ -148,7 +150,7 @@ class Number : public Object {
 class String : public Object {
   public:
     String(const char *);
-    String(const char *, ObjectMutex);
+    String(const char *, ObjectOption);
     String(const char *, bool);
     ~String();
     String *getString(LexInfo *, ExecutionEnvironment *);
@@ -167,7 +169,7 @@ class String : public Object {
 class Name : public Object {
   public:
     Name(const char *);
-    Name(const char *, ObjectMutex);
+    Name(const char *, ObjectOption);
     bool isName();
     Name *getName(LexInfo *, ExecutionEnvironment *);
     char *getValue();
@@ -186,7 +188,7 @@ class OperationList;
 class Code : public Object {
   public:
     Code(OperationList *);
-    Code(OperationList *, ObjectMutex);
+    Code(OperationList *, ObjectOption);
     Code *getCode(LexInfo *, ExecutionEnvironment *);
     OperationList *getOperationList();
     OperatorReturn action(ExecutionEnvironment *);

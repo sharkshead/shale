@@ -254,8 +254,8 @@ Cache cache;
 
 // Object class
 
-Object::Object() : referenceCount(0), mutex((pthread_mutex_t *) 0) { }
-Object::Object(ObjectMutex om) : referenceCount(0) { if(om == ALLOCATE_MUTEX) { allocateMutex(); } else { mutex = (pthread_mutex_t *) 0; } }
+Object::Object() : isStatic(false), referenceCount(0), mutex((pthread_mutex_t *) 0) { }
+Object::Object(ObjectOption oo) : referenceCount(0) { isStatic = (oo == IS_STATIC); mutex = (pthread_mutex_t *) 0; if(oo == ALLOCATE_MUTEX) { allocateMutex(); } }
 Object::~Object() { deallocateMutex(); }
 Number *Object::getNumber(LexInfo *li, ExecutionEnvironment *ee) { slexception.chuck("number not found", li); return (Number *) 0; }
 String *Object::getString(LexInfo *li, ExecutionEnvironment *ee) { slexception.chuck("string not found", li); return (String *) 0; }
@@ -263,25 +263,32 @@ bool Object::isName() { return false; }
 Name *Object::getName(LexInfo *li, ExecutionEnvironment *ee) { slexception.chuck("name not found", li); return (Name *) 0; }
 Code *Object::getCode(LexInfo *li, ExecutionEnvironment *ee) { slexception.chuck("code not found", li); return (Code *) 0; }
 Pointer *Object::getPointer(LexInfo *li, ExecutionEnvironment *ee) { slexception.chuck("pointer not found", li); return (Pointer *) 0; }
+bool Object::isDynamic() { return ! isStatic; }
 void Object::hold() {
-  if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_lock(mutex);
-  referenceCount++;
-  if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_unlock(mutex);
-}
-void Object::release(LexInfo *li) {
-  if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_lock(mutex);
-  if(referenceCount < 0) slexception.chuck("reference error", li);
-  if(referenceCount == 0) {
-    delete(this);
-  } else {
-    referenceCount--;
+  if(! isStatic) {
+    if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_lock(mutex);
+    referenceCount++;
     if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_unlock(mutex);
   }
 }
+void Object::release(LexInfo *li) {
+  if(! isStatic) {
+    if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_lock(mutex);
+    if(referenceCount < 0) slexception.chuck("reference error", li);
+    if(referenceCount == 0) {
+      delete(this);
+    } else {
+      referenceCount--;
+      if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_unlock(mutex);
+    }
+  }
+}
 void Object::allocateMutex() {
-  if(mutex == (pthread_mutex_t *) 0) {
-    mutex = new pthread_mutex_t;
-    pthread_mutex_init(mutex, NULL);
+  if(! isStatic) {
+    if(mutex == (pthread_mutex_t *) 0) {
+      mutex = new pthread_mutex_t;
+      pthread_mutex_init(mutex, NULL);
+    }
   }
 }
 void Object::deallocateMutex() {
@@ -295,9 +302,9 @@ void Object::deallocateMutex() {
 // Number class
 
 Number::Number(INT i) : Object(), intRep(true), valueInt(i) { }
-Number::Number(INT i, ObjectMutex om) : Object(om), intRep(true), valueInt(i) { }
+Number::Number(INT i, ObjectOption oo) : Object(oo), intRep(true), valueInt(i) { }
 Number::Number(double d) : Object(), intRep(false), valueDouble(d) { }
-Number::Number(double d, ObjectMutex om) : Object(om), intRep(false), valueDouble(d) { }
+Number::Number(double d, ObjectOption oo) : Object(oo), intRep(false), valueDouble(d) { }
 Number *Number::getNumber(LexInfo *li, ExecutionEnvironment *ee) { this->hold(); return this; }
 bool Number::isInt() { return intRep; }
 INT Number::getInt() { if(intRep) return valueInt; return valueDouble; }
@@ -305,17 +312,19 @@ void Number::setInt(INT i) { intRep = true; valueInt = i; }
 double Number::getDouble() { if(intRep) return valueInt; return valueDouble; }
 void Number::setDouble(double d) { intRep = false; valueDouble = d; }
 void Number::release(LexInfo *li) {
-  if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_lock(mutex);
-  if(referenceCount < 0) slexception.chuck("reference error", li);
-  if(referenceCount == 0) { this->deallocateMutex(); cache.deleteNumber(this); } else referenceCount--;
-  if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_unlock(mutex);
+  if(isDynamic()) {
+    if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_lock(mutex);
+    if(referenceCount < 0) slexception.chuck("reference error", li);
+    if(referenceCount == 0) { this->deallocateMutex(); cache.deleteNumber(this); } else referenceCount--;
+    if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_unlock(mutex);
+  }
 }
 void Number::debug() { char fmt[32]; printf("Number: "); if(intRep) { sprintf(fmt, "%%%sd\n", PCTD); printf(fmt, valueInt); } else printf("%0.3f\n", valueDouble); }
 
 // String class
 
 String::String(const char *s) : Object(), str(s), removeStringFlag(false) { }
-String::String(const char *s, ObjectMutex om) : Object(om), str(s), removeStringFlag(false) { }
+String::String(const char *s, ObjectOption oo) : Object(oo), str(s), removeStringFlag(false) { }
 String::String(const char *s, bool rsf) : Object(), str(s), removeStringFlag(rsf) { }
 String::~String() { if(removeStringFlag) free((void *) str); }
 String *String::getString(LexInfo *li, ExecutionEnvironment *ee) { this->hold(); return this; }
@@ -324,10 +333,12 @@ bool String::getRemoveStringFlag() { return removeStringFlag; }
 void String::setString(const char *s) { str = s; }
 void String::setRemoveStringFlag(bool rsf) { removeStringFlag = rsf; }
 void String::release(LexInfo *li) {
-  if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_lock(mutex);
-  if(referenceCount < 0) slexception.chuck("reference error", li);
-  if(referenceCount == 0) { this->deallocateMutex(); cache.deleteString(this); } else referenceCount--;
-  if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_unlock(mutex);
+  if(isDynamic()) {
+    if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_lock(mutex);
+    if(referenceCount < 0) slexception.chuck("reference error", li);
+    if(referenceCount == 0) { this->deallocateMutex(); cache.deleteString(this); } else referenceCount--;
+    if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_unlock(mutex);
+  }
 }
 void String::debug() { printf("String: %s\n", str); }
 
@@ -342,7 +353,7 @@ Name::Name(const char *n) : Object() {
   name[i] = 0;
 }
 
-Name::Name(const char *n, ObjectMutex om) : Object(om) {
+Name::Name(const char *n, ObjectOption oo) : Object(oo) {
   int i;
 
   for(i = 0; (i < (MAX_NAME_LENGTH - 1)) && (n[i] != 0); i++) {
@@ -400,7 +411,7 @@ void Name::debug() { printf("Name: %s\n", name); }
 // Code class
 
 Code::Code(OperationList *ol) : Object(), operationList(ol) { }
-Code::Code(OperationList *ol, ObjectMutex om) : Object(om), operationList(ol) { }
+Code::Code(OperationList *ol, ObjectOption oo) : Object(oo), operationList(ol) { }
 Code *Code::getCode(LexInfo *li, ExecutionEnvironment *ee) { this->hold(); return this; }
 OperationList *Code::getOperationList() { return operationList; }
 OperatorReturn Code::action(ExecutionEnvironment *ee) { return operationList->action(ee); }
@@ -414,11 +425,13 @@ void Pointer::setObject(Object *o) { if(object != (Object *) 0) object->release(
 Object *Pointer::getObject() { return object; }
 void Pointer::hold() { Object::hold(); if(object != (Object *) 0) object->hold(); }
 void Pointer::release(LexInfo *li) {
-  if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_lock(mutex);
-  if(referenceCount < 0) slexception.chuck("reference error", li);
-  if(object != (Object *) 0) object->release(li);
-  if(referenceCount == 0) { this->deallocateMutex(); cache.deletePointer(this); } else referenceCount--;
-  if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_unlock(mutex);
+  if(isDynamic()) {
+    if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_lock(mutex);
+    if(referenceCount < 0) slexception.chuck("reference error", li);
+    if(object != (Object *) 0) object->release(li);
+    if(referenceCount == 0) { this->deallocateMutex(); cache.deletePointer(this); } else referenceCount--;
+    if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_unlock(mutex);
+  }
 }
 void Pointer::debug() { printf("Pointer\n"); }
 

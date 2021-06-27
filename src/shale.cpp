@@ -681,22 +681,22 @@ void olBuild(Lex &lex) {
     case LEX_TOKEN_NAME:
       if((p = (char *) malloc(strlen(lex.str) + 1)) != (char *) 0) {
         strcpy(p, lex.str);
-        olStack[olStackIndex]->addOperation(new Push(new Name(p, ALLOCATE_MUTEX), li));
+        olStack[olStackIndex]->addOperation(new Push(new Name(p, IS_STATIC), li));
       } else {
         shaleException.chuck("malloc failed", li);
       }
       break;
 
     case LEX_TOKEN_NUMBER:
-      if(lex.number.intRepresentation) o = new Number(lex.number.valueInt, ALLOCATE_MUTEX);
-      else o = new Number(lex.number.valueDouble, ALLOCATE_MUTEX);
+      if(lex.number.intRepresentation) o = new Number(lex.number.valueInt, IS_STATIC);
+      else o = new Number(lex.number.valueDouble, IS_STATIC);
       olStack[olStackIndex]->addOperation(new Push(o, li));
       break;
 
     case LEX_TOKEN_STRING:
       if((p = (char *) malloc(strlen(lex.str) + 1)) != (char *) 0) {
         strcpy(p, lex.str);
-        olStack[olStackIndex]->addOperation(new Push(new String(p, ALLOCATE_MUTEX), li));
+        olStack[olStackIndex]->addOperation(new Push(new String(p, IS_STATIC), li));
       }
       break;
 
@@ -712,7 +712,7 @@ void olBuild(Lex &lex) {
     case LEX_TOKEN_CLOSE_CURLY:
       if(olStackIndex > 0) {
         olStackIndex--;
-        olStack[olStackIndex]->addOperation(new Push(new Code(olStack[olStackIndex + 1], ALLOCATE_MUTEX), li));
+        olStack[olStackIndex]->addOperation(new Push(new Code(olStack[olStackIndex + 1], IS_STATIC), li));
       } else {
         shaleException.chuck("code stack underrun", li);
       }
