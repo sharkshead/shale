@@ -1,7 +1,5 @@
 #!/usr/local/bin/shale
 
-time library
-
 // This solves a sudoku with:
 //  row/column/3x3box constraints (standard sudoku)
 //  row/column/irregular, or jigsaw, region constraints
@@ -14,11 +12,11 @@ time library
 // The sudoku example from this video is used below, along with
 // several Cracking the Cryptic examples and one from Andrew Stuart.
 
-// You can specify which of the sudokus to solve by adding s=n on the command line.
+// You can specify which of the sudokus to solve by adding s=n ro the command line.
 // If it is not specified then you get text explaining how to choose an option
 // and what the options are, and the default (s=1) option is solved.
 
-// To use, threads add threads=n to the command line, where n (must be >= 2) is the maximum number
+// To use threads, add threads=n to the command line, where n (>= 2) is the maximum number
 // of threads. Add progress=true to the command line to get a view of the threads in use.
 // Using threads won't always lead to a faster solve in this current implementation.
 // For example, the s=3 sudoku produces the solution faster single-threaded than threaded,
@@ -29,6 +27,8 @@ time library
 // and adding it where indicated, and add s=11 to the command line. There are instructions
 // on what and how to add a sudoku, and you can check the examples I've included
 // that immediately precede that section.
+
+time library
 
 startTime vars:: dup var now time::() =
 
@@ -1308,7 +1308,7 @@ found {
     running var
     waiting var
     finished var
-    list var
+    states var
     i var
 
     thread library
@@ -1322,18 +1322,18 @@ found {
       i++
     } while
 
-    list 0 =
+    states 0 =
     tn 1 =
     { tn threads <= } {
       tn.value th:: 1 =   // Running.
       tn.value startThread create thread::()
       tn++
-      list list 10 * 1 + =
+      states states 10 * 1 + =
     } while
 
     i tn =
     { i 10 < } {
-      list list 10 * =
+      states states 10 * =
       i++
     } while
     running tn 1 - =
@@ -1343,7 +1343,7 @@ found {
     { finished 9 != } {
       progress initialised { progress } and {
         mutex lock thread::()
-        list finished waiting running now time::() dup timems time::() swap date time::() "%s %s running %d, waiting %d, finished %d, grid (thread) states %09d (0 = waiting, 1 = running, 2 = finished)\n" printf
+        states finished waiting running now time::() dup timems time::() swap date time::() "%s %s running %d, waiting %d, finished %d, grid (thread) states %09d (0 = waiting, 1 = running, 2 = finished)\n" printf
         mutex unlock thread::()
       } ifthen
 
@@ -1356,22 +1356,24 @@ found {
       } ifthen
 
       // Check the status of all the threads.
-      running 0 =
-      waiting 0 =
-      finished 0 =
-      list 0 =
-      i 1 =
-      mutex lock thread::()
-      { i 10 < } {
-        i.value th:: value dup dup list 10 * + list swap = 0 == { waiting++ pop } { 1 == { running++ } { finished++ } if } if
-        i++
-      } while
-      mutex unlock thread::()
+      progress initialised { progress } and {
+        running 0 =
+        waiting 0 =
+        finished 0 =
+        states 0 =
+        i 1 =
+        mutex lock thread::()
+        { i 10 < } {
+          i.value th:: value dup dup states 10 * + states swap = 0 == { waiting++ pop } { 1 == { running++ } { finished++ } if } if
+          i++
+        } while
+        mutex unlock thread::()
+      } ifthen
     } while
 
     progress initialised { progress } and {
       mutex lock thread::()
-      list finished waiting running now time::() dup timems time::() swap date time::() "%s %s running %d, waiting %d, finished %d, grid (thread) states %09d (0 = waiting, 1 = running, 2 = finished)\n" printf
+      states finished waiting running now time::() dup timems time::() swap date time::() "%s %s running %d, waiting %d, finished %d, grid (thread) states %09d (0 = waiting, 1 = running, 2 = finished)\n" printf
       mutex unlock thread::()
     } ifthen
   } {
