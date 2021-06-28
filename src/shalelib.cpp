@@ -67,46 +67,7 @@ void CacheDebug::decUsed() { used--; }
 void CacheDebug::incNew() { news++; }
 void CacheDebug::debug() { printf("count %d, free %d", news, used); }
 
-Cache::Cache() : inShutdown(false), usedNumbers((ObjectBag *) 0), usedStrings((ObjectBag *) 0), usedPointers((ObjectBag *) 0), unusedBags((ObjectBag *) 0) { }
-#if 0
-Cache::~Cache() {
-  ObjectBag *ob;
-  ObjectBag *t;
-
-  inShutdown = true;
-
-  ob = usedNumbers;
-  while(ob != (ObjectBag *) 0) {
-    t = ob->next;
-    if(ob->object != (Object *) 0) ob->object->release((LexInfo *) 0);
-    delete(ob);
-    ob = t;
-  }
-
-  ob = usedStrings;
-  while(ob != (ObjectBag *) 0) {
-    t = ob->next;
-    if(ob->object != (Object *) 0) ob->object->release((LexInfo *) 0);
-    delete(ob);
-    ob = t;
-  }
-
-  ob = usedPointers;
-  while(ob != (ObjectBag *) 0) {
-    t = ob->next;
-    if(ob->object != (Object *) 0) ob->object->release((LexInfo *) 0);
-    delete(ob);
-    ob = t;
-  }
-
-  ob = unusedBags;
-  while(ob != (ObjectBag *) 0) {
-    t = ob->next;
-    delete(ob);
-    ob = t;
-  }
-}
-#endif
+Cache::Cache() : usedNumbers((ObjectBag *) 0), usedStrings((ObjectBag *) 0), usedPointers((ObjectBag *) 0), unusedBags((ObjectBag *) 0) { }
 
 void Cache::incUnused() { unused++; }
 void Cache::decUnused() { unused--; }
@@ -158,21 +119,17 @@ Number *Cache::newNumber(double d) {
 void Cache::deleteNumber(Number *n) {
   ObjectBag *ob;
 
-  if(inShutdown) {
-    delete(n);
+  if(unusedBags != (ObjectBag *) 0) {
+    ob = unusedBags;
+    unusedBags = unusedBags->next;
+    decUnused();
   } else {
-    if(unusedBags != (ObjectBag *) 0) {
-      ob = unusedBags;
-      unusedBags = unusedBags->next;
-      decUnused();
-    } else {
-      ob = new ObjectBag;
-    }
-    ob->object = n;
-    ob->next = usedNumbers;
-    usedNumbers = ob;
-    numbers.incUsed();
+    ob = new ObjectBag;
   }
+  ob->object = n;
+  ob->next = usedNumbers;
+  usedNumbers = ob;
+  numbers.incUsed();
 }
 
 String *Cache::newString(const char *s) { return newString(s, false); }
@@ -203,22 +160,18 @@ String *Cache::newString(const char *s, bool rsf) {
 void Cache::deleteString(String *str) {
   ObjectBag *ob;
 
-  if(inShutdown) {
-    delete(str);
+  if(str->getRemoveStringFlag()) free((void *) str->getValue());
+  if(unusedBags != (ObjectBag *) 0) {
+    ob = unusedBags;
+    unusedBags = unusedBags->next;
+    decUnused();
   } else {
-    if(str->getRemoveStringFlag()) free((void *) str->getValue());
-    if(unusedBags != (ObjectBag *) 0) {
-      ob = unusedBags;
-      unusedBags = unusedBags->next;
-      decUnused();
-    } else {
-      ob = new ObjectBag;
-    }
-    ob->object = str;
-    ob->next = usedStrings;
-    usedStrings = ob;
-    strings.incUsed();
+    ob = new ObjectBag;
   }
+  ob->object = str;
+  ob->next = usedStrings;
+  usedStrings = ob;
+  strings.incUsed();
 }
 
 Pointer *Cache::newPointer(Object *o) {
@@ -246,21 +199,17 @@ Pointer *Cache::newPointer(Object *o) {
 void Cache::deletePointer(Pointer *p) {
   ObjectBag *ob;
 
-  if(inShutdown) {
-    delete(p);
+  if(unusedBags != (ObjectBag *) 0) {
+    ob = unusedBags;
+    unusedBags = unusedBags->next;
+    decUnused();
   } else {
-    if(unusedBags != (ObjectBag *) 0) {
-      ob = unusedBags;
-      unusedBags = unusedBags->next;
-      decUnused();
-    } else {
-      ob = new ObjectBag;
-    }
-    ob->object = p;
-    ob->next = usedPointers;
-    usedPointers = ob;
-    pointers.incUsed();
+    ob = new ObjectBag;
   }
+  ob->object = p;
+  ob->next = usedPointers;
+  usedPointers = ob;
+  pointers.incUsed();
 }
 
 void Cache::debug() {

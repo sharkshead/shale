@@ -258,7 +258,6 @@ class Cache {
     void debug();
 
   private:
-    bool inShutdown;
     CacheDebug numbers;
     CacheDebug strings;
     CacheDebug pointers;
