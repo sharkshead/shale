@@ -60,7 +60,6 @@ void Exception::printError() {
 // This implements a cache of pre-used objects to cut down on malloc()/free() calls.
 
 ObjectBag::ObjectBag() : object((Object *) 0), next((ObjectBag *) 0) { }
-ObjectBag::~ObjectBag() { if(object != (Object *) 0) delete(object); }
 
 CacheDebug::CacheDebug() : used(0), news(0) { }
 void CacheDebug::incUsed() { used++; }
@@ -68,40 +67,46 @@ void CacheDebug::decUsed() { used--; }
 void CacheDebug::incNew() { news++; }
 void CacheDebug::debug() { printf("count %d, free %d", news, used); }
 
-Cache::Cache() : usedNumbers((ObjectBag *) 0), usedStrings((ObjectBag *) 0), usedPointers((ObjectBag *) 0), unusedBags((ObjectBag *) 0) { }
+Cache::Cache() : inShutdown(false), usedNumbers((ObjectBag *) 0), usedStrings((ObjectBag *) 0), usedPointers((ObjectBag *) 0), unusedBags((ObjectBag *) 0) { }
+#if 0
 Cache::~Cache() {
   ObjectBag *ob;
   ObjectBag *t;
 
+  inShutdown = true;
+
   ob = usedNumbers;
   while(ob != (ObjectBag *) 0) {
     t = ob->next;
-    // delete(ob);
+    if(ob->object != (Object *) 0) ob->object->release((LexInfo *) 0);
+    delete(ob);
     ob = t;
   }
 
   ob = usedStrings;
   while(ob != (ObjectBag *) 0) {
     t = ob->next;
-    // delete(ob);
+    if(ob->object != (Object *) 0) ob->object->release((LexInfo *) 0);
+    delete(ob);
     ob = t;
   }
 
   ob = usedPointers;
   while(ob != (ObjectBag *) 0) {
     t = ob->next;
-    // delete(ob);
+    if(ob->object != (Object *) 0) ob->object->release((LexInfo *) 0);
+    delete(ob);
     ob = t;
   }
 
-// fixme
-//  ob = usedBags;
-//  while(ob != (ObjectBag *) 0) {
-//    t = ob->next;
-//    delete(ob);
-//    ob = t;
-//  }
+  ob = unusedBags;
+  while(ob != (ObjectBag *) 0) {
+    t = ob->next;
+    delete(ob);
+    ob = t;
+  }
 }
+#endif
 
 void Cache::incUnused() { unused++; }
 void Cache::decUnused() { unused--; }
@@ -153,17 +158,21 @@ Number *Cache::newNumber(double d) {
 void Cache::deleteNumber(Number *n) {
   ObjectBag *ob;
 
-  if(unusedBags != (ObjectBag *) 0) {
-    ob = unusedBags;
-    unusedBags = unusedBags->next;
-    decUnused();
+  if(inShutdown) {
+    delete(n);
   } else {
-    ob = new ObjectBag;
+    if(unusedBags != (ObjectBag *) 0) {
+      ob = unusedBags;
+      unusedBags = unusedBags->next;
+      decUnused();
+    } else {
+      ob = new ObjectBag;
+    }
+    ob->object = n;
+    ob->next = usedNumbers;
+    usedNumbers = ob;
+    numbers.incUsed();
   }
-  ob->object = n;
-  ob->next = usedNumbers;
-  usedNumbers = ob;
-  numbers.incUsed();
 }
 
 String *Cache::newString(const char *s) { return newString(s, false); }
@@ -194,18 +203,22 @@ String *Cache::newString(const char *s, bool rsf) {
 void Cache::deleteString(String *str) {
   ObjectBag *ob;
 
-  if(str->getRemoveStringFlag()) free((void *) str->getValue());
-  if(unusedBags != (ObjectBag *) 0) {
-    ob = unusedBags;
-    unusedBags = unusedBags->next;
-    decUnused();
+  if(inShutdown) {
+    delete(str);
   } else {
-    ob = new ObjectBag;
+    if(str->getRemoveStringFlag()) free((void *) str->getValue());
+    if(unusedBags != (ObjectBag *) 0) {
+      ob = unusedBags;
+      unusedBags = unusedBags->next;
+      decUnused();
+    } else {
+      ob = new ObjectBag;
+    }
+    ob->object = str;
+    ob->next = usedStrings;
+    usedStrings = ob;
+    strings.incUsed();
   }
-  ob->object = str;
-  ob->next = usedStrings;
-  usedStrings = ob;
-  strings.incUsed();
 }
 
 Pointer *Cache::newPointer(Object *o) {
@@ -233,17 +246,21 @@ Pointer *Cache::newPointer(Object *o) {
 void Cache::deletePointer(Pointer *p) {
   ObjectBag *ob;
 
-  if(unusedBags != (ObjectBag *) 0) {
-    ob = unusedBags;
-    unusedBags = unusedBags->next;
-    decUnused();
+  if(inShutdown) {
+    delete(p);
   } else {
-    ob = new ObjectBag;
+    if(unusedBags != (ObjectBag *) 0) {
+      ob = unusedBags;
+      unusedBags = unusedBags->next;
+      decUnused();
+    } else {
+      ob = new ObjectBag;
+    }
+    ob->object = p;
+    ob->next = usedPointers;
+    usedPointers = ob;
+    pointers.incUsed();
   }
-  ob->object = p;
-  ob->next = usedPointers;
-  usedPointers = ob;
-  pointers.incUsed();
 }
 
 void Cache::debug() {

@@ -219,7 +219,6 @@ class Pointer : public Object {
 class ObjectBag {
   public:
     ObjectBag();
-    ~ObjectBag();
     Object *object;
     ObjectBag *next;
 };
@@ -242,7 +241,6 @@ class CacheDebug {
 class Cache {
   public:
     Cache();
-    ~Cache();
     Number *newNumber(INT);
     Number *newNumber(double);
     void deleteNumber(Number *);
@@ -260,6 +258,7 @@ class Cache {
     void debug();
 
   private:
+    bool inShutdown;
     CacheDebug numbers;
     CacheDebug strings;
     CacheDebug pointers;

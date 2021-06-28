@@ -192,8 +192,6 @@ void *theThread(void *arg) {
     tp->code->release((LexInfo *) 0);
   } catch(Exception *e) { e->printError(); }
 
-  delete(tp);
-
   return (void *) 0;
 }
 
