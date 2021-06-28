@@ -28,7 +28,7 @@ SOFTWARE.
 
 #define MAJOR   (INT) 1
 #define MINOR   (INT) 2
-#define MICRO   (INT) 1
+#define MICRO   (INT) 2
 
 class PrimesHelp : public Operation {
   public:
@@ -118,55 +118,55 @@ extern "C" void slmain() {
   ol = new OperationList;
   ol->addOperation(new PrimesHelp((LexInfo *) 0));
   v = new Variable("/help/primes");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   v = new Variable("/major/version/primes");
-  v->setObject(cache.newNumber(MAJOR));
+  v->setObject(mainEE.cache.newNumber(MAJOR));
   btree.addVariable(v);
 
   v = new Variable("/minor/version/primes");
-  v->setObject(cache.newNumber(MINOR));
+  v->setObject(mainEE.cache.newNumber(MINOR));
   btree.addVariable(v);
 
   v = new Variable("/micro/version/primes");
-  v->setObject(cache.newNumber(MICRO));
+  v->setObject(mainEE.cache.newNumber(MICRO));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new PrimesType((LexInfo *) 0));
   v = new Variable("/type/primes");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new PrimesGenerate((LexInfo *) 0));
   v = new Variable("/generate/primes");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new PrimesGet((LexInfo *) 0));
   v = new Variable("/get/primes");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new PrimesIsPrime((LexInfo *) 0));
   v = new Variable("/isprime/primes");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new PrimesPhi((LexInfo *) 0));
   v = new Variable("/phi/primes");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new PrimesMap((LexInfo *) 0));
   v = new Variable("/map/primes");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 }
 
@@ -212,7 +212,7 @@ OperatorReturn PrimesType::action(ExecutionEnvironment *ee) {
     v = new Variable(buf);
     if((p = (char *) malloc(strlen(typeValue) + 1)) != (char *) 0) {
       strcpy(p, typeValue);
-      v->setObject(cache.newString(p, true));
+      v->setObject(mainEE.cache.newString(p, true));
       btree.addVariable(v);
     } else {
       slexception.chuck("Out of memory in type primes::()", getLexInfo());
@@ -275,7 +275,7 @@ OperatorReturn PrimesGenerate::action(ExecutionEnvironment *ee) {
     v = btree.findVariable(buf);
     if(v == (Variable *) 0) {
       v = new Variable(buf);
-      v->setObject(cache.newNumber((INT) 0));
+      v->setObject(mainEE.cache.newNumber((INT) 0));
       btree.addVariable(v);
     }
     num = v->getObject()->getNumber(getLexInfo(), ee);
@@ -286,7 +286,7 @@ OperatorReturn PrimesGenerate::action(ExecutionEnvironment *ee) {
     v = btree.findVariable(buf);
     if(v == (Variable *) 0) {
       v = new Variable(buf);
-      v->setObject(cache.newNumber((INT) 0));
+      v->setObject(mainEE.cache.newNumber((INT) 0));
       btree.addVariable(v);
     }
     num = v->getObject()->getNumber(getLexInfo(), ee);
@@ -303,7 +303,7 @@ OperatorReturn PrimesGenerate::action(ExecutionEnvironment *ee) {
       if((p = (char *) malloc(8)) == (char *) 0) slexception.chuck("Out of memory in generate primes::()", getLexInfo());
       strcpy(p, "array");
       v = new Variable(buf);
-      v->setObject(cache.newString(p, true));
+      v->setObject(mainEE.cache.newString(p, true));
       btree.addVariable(v);
       isArrayType = true;
     } else {
@@ -319,7 +319,7 @@ OperatorReturn PrimesGenerate::action(ExecutionEnvironment *ee) {
       v = btree.findVariable(buf);
       if(v == (Variable *) 0) {
         v = new Variable(buf);
-        v->setObject(cache.newNumber((INT) 2));
+        v->setObject(mainEE.cache.newNumber((INT) 2));
         btree.addVariable(v);
       }
 
@@ -350,10 +350,10 @@ OperatorReturn PrimesGenerate::action(ExecutionEnvironment *ee) {
           v = btree.findVariable(buf);
           if(v == (Variable *) 0) {
             v = new Variable(buf);
-            v->setObject(cache.newNumber(candidate));
+            v->setObject(mainEE.cache.newNumber(candidate));
             btree.addVariable(v);
           } else {
-            v->setObject(cache.newNumber(candidate));
+            v->setObject(mainEE.cache.newNumber(candidate));
           }
           last = candidate;
           count++;
@@ -378,7 +378,7 @@ OperatorReturn PrimesGenerate::action(ExecutionEnvironment *ee) {
           v = btree.findVariable(buf);
           if(v == (Variable *) 0) {
             v = new Variable(buf);
-            v->setObject(cache.newNumber((INT) -1));
+            v->setObject(mainEE.cache.newNumber((INT) -1));
             btree.addVariable(v);
           }
           num = v->getObject()->getNumber(getLexInfo(), ee);
@@ -394,7 +394,7 @@ OperatorReturn PrimesGenerate::action(ExecutionEnvironment *ee) {
               v = btree.findVariable(buf);
               if(v == (Variable *) 0) {
                 v = new Variable(buf);
-                v->setObject(cache.newNumber((INT) -1));
+                v->setObject(mainEE.cache.newNumber((INT) -1));
                 btree.addVariable(v);
               }
               num = v->getObject()->getNumber(getLexInfo(), ee);
@@ -434,7 +434,7 @@ OperatorReturn PrimesGenerate::action(ExecutionEnvironment *ee) {
     sprintf(buf, "/count/%s", name);
     v = btree.findVariable(buf);
     if(v != (Variable *) 0) {
-      v->setObject(cache.newNumber(count));
+      v->setObject(mainEE.cache.newNumber(count));
     }
     num = v->getObject()->getNumber(getLexInfo(), ee);
     count = num->getInt();
@@ -443,7 +443,7 @@ OperatorReturn PrimesGenerate::action(ExecutionEnvironment *ee) {
     sprintf(buf, "/last/%s", name);
     v = btree.findVariable(buf);
     if(v != (Variable *) 0) {
-      v->setObject(cache.newNumber(last));
+      v->setObject(mainEE.cache.newNumber(last));
     }
     num = v->getObject()->getNumber(getLexInfo(), ee);
     last = num->getInt();
@@ -511,14 +511,14 @@ OperatorReturn PrimesGet::action(ExecutionEnvironment *ee) {
   if(isArrayType) {
     sprintf(buf, fmt, index);
     if((v = btree.findVariable(buf)) == (Variable *) 0) {
-      ret = cache.newNumber((INT) 0);
+      ret = mainEE.cache.newNumber((INT) 0);
     } else {
       ret = v->getObject()->getNumber(getLexInfo(), ee);
     }
   } else {
     // Sieve type
     if(index == (INT) 0) {
-      ret = cache.newNumber((INT) 2);
+      ret = mainEE.cache.newNumber((INT) 2);
     } else {
       // fixme - this is really crud because it start at the beginning and linearly searches for the
       // index-th prime.
@@ -555,7 +555,7 @@ OperatorReturn PrimesGet::action(ExecutionEnvironment *ee) {
           if(word & bit) {
             c++;
             if(c == index) {
-              ret = cache.newNumber((i * 64 + j) * 2 + 3);
+              ret = mainEE.cache.newNumber((i * 64 + j) * 2 + 3);
               break;
             }
           }
@@ -566,7 +566,7 @@ OperatorReturn PrimesGet::action(ExecutionEnvironment *ee) {
       }
       if(ret == (Number *) 0) {
         cachedIndex = -1;
-        ret = cache.newNumber((INT) 0);
+        ret = mainEE.cache.newNumber((INT) 0);
       }
     }
   }
@@ -666,7 +666,7 @@ OperatorReturn PrimesIsPrime::action(ExecutionEnvironment *ee) {
       num->release(getLexInfo());
     }
   }
-  ee->stack.push(isPrime ? trueValue : falseValue);      // cache.newNumber(isPrime ? (INT) 1 : (INT) 0));
+  ee->stack.push(isPrime ? trueValue : falseValue);
 
   n->release(getLexInfo());
   ns->release(getLexInfo());
@@ -784,7 +784,7 @@ OperatorReturn PrimesPhi::action(ExecutionEnvironment *ee) {
   }
   if(m > 1) ret *= m - 1;
 
-  ee->stack.push(cache.newNumber(ret));
+  ee->stack.push(mainEE.cache.newNumber(ret));
 
   no->release(getLexInfo());
   nso->release(getLexInfo());
@@ -841,10 +841,10 @@ OperatorReturn PrimesMap::action(ExecutionEnvironment *ee) {
     v = btree.findVariable(buf);
     if(v == (Variable *) 0) {
       v = new Variable(buf);
-      v->setObject(cache.newNumber(index));
+      v->setObject(mainEE.cache.newNumber(index));
       btree.addVariable(v);
     } else {
-      v->setObject(cache.newNumber(index));
+      v->setObject(mainEE.cache.newNumber(index));
     }
   }
 

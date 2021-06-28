@@ -83,6 +83,7 @@ class Exception {
 };
 
 class ExecutionEnvironment;
+class Cache;
 class Number;
 class String;
 class Name;
@@ -102,8 +103,8 @@ enum ObjectOption {
 
 class Object {
   public:
-    Object();
-    Object(ObjectOption);
+    Object(Cache *);
+    Object(Cache *, ObjectOption);
     virtual ~Object();
     virtual Number *getNumber(LexInfo *, ExecutionEnvironment *);
     virtual String *getString(LexInfo *, ExecutionEnvironment *);
@@ -118,6 +119,7 @@ class Object {
     void allocateMutex();
     void deallocateMutex();
     bool isDynamic();
+    Cache *cache;
 
   protected:
     pthread_mutex_t *mutex;
@@ -126,10 +128,10 @@ class Object {
 
 class Number : public Object {
   public:
-    Number(INT);
-    Number(INT, ObjectOption);
-    Number(double);
-    Number(double, ObjectOption);
+    Number(INT, Cache *);
+    Number(INT, Cache *, ObjectOption);
+    Number(double, Cache *);
+    Number(double, Cache *, ObjectOption);
     Number *getNumber(LexInfo *, ExecutionEnvironment *);
     bool isInt();
     INT getInt();
@@ -149,9 +151,9 @@ class Number : public Object {
 
 class String : public Object {
   public:
-    String(const char *);
-    String(const char *, ObjectOption);
-    String(const char *, bool);
+    String(const char *, Cache *);
+    String(const char *, Cache *, ObjectOption);
+    String(const char *, Cache *, bool);
     ~String();
     String *getString(LexInfo *, ExecutionEnvironment *);
     const char *getValue();
@@ -168,8 +170,8 @@ class String : public Object {
 
 class Name : public Object {
   public:
-    Name(const char *);
-    Name(const char *, ObjectOption);
+    Name(const char *, Cache *);
+    Name(const char *, Cache *, ObjectOption);
     bool isName();
     Name *getName(LexInfo *, ExecutionEnvironment *);
     char *getValue();
@@ -187,8 +189,8 @@ class OperationList;
 
 class Code : public Object {
   public:
-    Code(OperationList *);
-    Code(OperationList *, ObjectOption);
+    Code(OperationList *, Cache *);
+    Code(OperationList *, Cache *, ObjectOption);
     Code *getCode(LexInfo *, ExecutionEnvironment *);
     OperationList *getOperationList();
     OperatorReturn action(ExecutionEnvironment *);
@@ -202,7 +204,7 @@ class ObjectList;
 
 class Pointer : public Object {
   public:
-    Pointer(Object *);
+    Pointer(Object *, Cache *);
     Pointer *getPointer(LexInfo *, ExecutionEnvironment *);
     Object *getObject();
     void setObject(Object *);
@@ -217,6 +219,7 @@ class Pointer : public Object {
 class ObjectBag {
   public:
     ObjectBag();
+    ~ObjectBag();
     Object *object;
     ObjectBag *next;
 };
@@ -239,6 +242,7 @@ class CacheDebug {
 class Cache {
   public:
     Cache();
+    ~Cache();
     Number *newNumber(INT);
     Number *newNumber(double);
     void deleteNumber(Number *);
@@ -253,7 +257,6 @@ class Cache {
     ObjectBag *unusedBags;
     void incUnused();
     void decUnused();
-    void setThreadSafe();
     void debug();
 
   private:
@@ -261,7 +264,6 @@ class Cache {
     CacheDebug strings;
     CacheDebug pointers;
     int unused;
-    pthread_mutex_t *mutex;
 };
 
 // Start of the Operation classes
@@ -789,6 +791,7 @@ class ExecutionEnvironment {
   public:
     VariableStack variableStack;
     Stack stack;
+    Cache cache;
 };
 
 // Plugin support classes
@@ -807,8 +810,7 @@ class PluginSupport {
     BTree *btree;
 };
 
-extern Cache cache;
-extern Stack stack;
+extern ExecutionEnvironment mainEE;
 extern BTree btree;
 extern Exception slexception;
 extern VariableStack variableStack;

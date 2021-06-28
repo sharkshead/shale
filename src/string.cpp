@@ -28,7 +28,7 @@ SOFTWARE.
 
 #define MAJOR   (INT) 1
 #define MINOR   (INT) 0
-#define MICRO   (INT) 1
+#define MICRO   (INT) 2
 
 class StringHelp : public Operation {
   public:
@@ -77,43 +77,43 @@ extern "C" void slmain() {
   ol = new OperationList;
   ol->addOperation(new StringHelp((LexInfo *) 0));
   v = new Variable("/help/string");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   v = new Variable("/major/version/string");
-  v->setObject(cache.newNumber(MAJOR));
+  v->setObject(mainEE.cache.newNumber(MAJOR));
   btree.addVariable(v);
 
   v = new Variable("/minor/version/string");
-  v->setObject(cache.newNumber(MINOR));
+  v->setObject(mainEE.cache.newNumber(MINOR));
   btree.addVariable(v);
 
   v = new Variable("/micro/version/string");
-  v->setObject(cache.newNumber(MICRO));
+  v->setObject(mainEE.cache.newNumber(MICRO));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new StringEquals((LexInfo *) 0));
   v = new Variable("/equals/string");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new StringConcat((LexInfo *) 0));
   v = new Variable("/concat/string");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new StringToNumber((LexInfo *) 0, true));
   v = new Variable("/atoi/string");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new StringToNumber((LexInfo *) 0, false));
   v = new Variable("/atof/string");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 }
 
@@ -145,7 +145,7 @@ OperatorReturn StringEquals::action(ExecutionEnvironment *ee) {
   s2 = o2->getString(getLexInfo(), ee);
 
   n = (strcmp(s1->getValue(), s2->getValue()) == 0 ? 1 : 0);
-  ee->stack.push(cache.newNumber(n));
+  ee->stack.push(mainEE.cache.newNumber(n));
 
   s2->release(getLexInfo());
   s1->release(getLexInfo());
@@ -177,7 +177,7 @@ OperatorReturn StringConcat::action(ExecutionEnvironment *ee) {
   p2 = s2->getValue();
   if((p = (char *) malloc(strlen(p1) + strlen(p2) + 1)) == (char *) 0) slexception.chuck("Out of memory in concat string::()", getLexInfo());
   sprintf(p, "%s%s", p1, p2);
-  ee->stack.push(cache.newString(p, true));
+  ee->stack.push(mainEE.cache.newString(p, true));
 
   s2->release(getLexInfo());
   s1->release(getLexInfo());
@@ -199,9 +199,9 @@ OperatorReturn StringToNumber::action(ExecutionEnvironment *ee) {
   s = o->getString(getLexInfo(), ee);
 
   if(toInt) {
-    n = cache.newNumber((INT) atoi(s->getValue()));
+    n = mainEE.cache.newNumber((INT) atoi(s->getValue()));
   } else {
-    n = cache.newNumber((double) atof(s->getValue()));
+    n = mainEE.cache.newNumber((double) atof(s->getValue()));
   }
   ee->stack.push(n);
 

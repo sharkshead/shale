@@ -60,6 +60,7 @@ void Exception::printError() {
 // This implements a cache of pre-used objects to cut down on malloc()/free() calls.
 
 ObjectBag::ObjectBag() : object((Object *) 0), next((ObjectBag *) 0) { }
+ObjectBag::~ObjectBag() { if(object != (Object *) 0) delete(object); }
 
 CacheDebug::CacheDebug() : used(0), news(0) { }
 void CacheDebug::incUsed() { used++; }
@@ -67,7 +68,40 @@ void CacheDebug::decUsed() { used--; }
 void CacheDebug::incNew() { news++; }
 void CacheDebug::debug() { printf("count %d, free %d", news, used); }
 
-Cache::Cache() : usedNumbers((ObjectBag *) 0), usedStrings((ObjectBag *) 0), usedPointers((ObjectBag *) 0), unusedBags((ObjectBag *) 0), mutex((pthread_mutex_t *) 0) { }
+Cache::Cache() : usedNumbers((ObjectBag *) 0), usedStrings((ObjectBag *) 0), usedPointers((ObjectBag *) 0), unusedBags((ObjectBag *) 0) { }
+Cache::~Cache() {
+  ObjectBag *ob;
+  ObjectBag *t;
+
+  ob = usedNumbers;
+  while(ob != (ObjectBag *) 0) {
+    t = ob->next;
+    // delete(ob);
+    ob = t;
+  }
+
+  ob = usedStrings;
+  while(ob != (ObjectBag *) 0) {
+    t = ob->next;
+    // delete(ob);
+    ob = t;
+  }
+
+  ob = usedPointers;
+  while(ob != (ObjectBag *) 0) {
+    t = ob->next;
+    // delete(ob);
+    ob = t;
+  }
+
+// fixme
+//  ob = usedBags;
+//  while(ob != (ObjectBag *) 0) {
+//    t = ob->next;
+//    delete(ob);
+//    ob = t;
+//  }
+}
 
 void Cache::incUnused() { unused++; }
 void Cache::decUnused() { unused--; }
@@ -76,23 +110,20 @@ Number *Cache::newNumber(INT i) {
   ObjectBag *nb;
   Number *ret;
 
-  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_lock(mutex);
-
   if(usedNumbers != (ObjectBag *) 0) {
     nb = usedNumbers;
     usedNumbers = usedNumbers->next;
     nb->next = unusedBags;
     unusedBags = nb;
     ret = (Number *) nb->object;
+    nb->object = (Object *) 0;
     ret->setInt(i);
     numbers.decUsed();
     incUnused();
   } else {
-    ret = new Number(i);
+    ret = new Number(i, this);
     numbers.incNew();
   }
-
-  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(mutex);
 
   return ret;
 }
@@ -101,31 +132,26 @@ Number *Cache::newNumber(double d) {
   ObjectBag *nb;
   Number *ret;
 
-  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_lock(mutex);
-
   if(usedNumbers != (ObjectBag *) 0) {
     nb = usedNumbers;
     usedNumbers = usedNumbers->next;
     nb->next = unusedBags;
     unusedBags = nb;
     ret = (Number *) nb->object;
+    nb->object = (Object *) 0;
     ret->setDouble(d);
     numbers.decUsed();
     incUnused();
   } else {
-    ret = new Number(d);
+    ret = new Number(d, this);
     numbers.incNew();
   }
-
-  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(mutex);
 
   return ret;
 }
 
 void Cache::deleteNumber(Number *n) {
   ObjectBag *ob;
-
-  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_lock(mutex);
 
   if(unusedBags != (ObjectBag *) 0) {
     ob = unusedBags;
@@ -138,8 +164,6 @@ void Cache::deleteNumber(Number *n) {
   ob->next = usedNumbers;
   usedNumbers = ob;
   numbers.incUsed();
-
-  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(mutex);
 }
 
 String *Cache::newString(const char *s) { return newString(s, false); }
@@ -148,32 +172,27 @@ String *Cache::newString(const char *s, bool rsf) {
   ObjectBag *ob;
   String *ret;
 
-  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_lock(mutex);
-
   if(usedStrings != (ObjectBag *) 0) {
     ob = usedStrings;
     usedStrings = usedStrings->next;
     ob->next = unusedBags;
     unusedBags = ob;
     ret = (String *) ob->object;
+    ob->object = (Object *) 0;
     ret->setString(s);
     ret->setRemoveStringFlag(rsf);
     strings.decUsed();
     incUnused();
   } else {
-    ret = new String(s, rsf);
+    ret = new String(s, this, rsf);
     strings.incNew();
   }
-
-  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(mutex);
 
   return ret;
 }
 
 void Cache::deleteString(String *str) {
   ObjectBag *ob;
-
-  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_lock(mutex);
 
   if(str->getRemoveStringFlag()) free((void *) str->getValue());
   if(unusedBags != (ObjectBag *) 0) {
@@ -187,15 +206,11 @@ void Cache::deleteString(String *str) {
   ob->next = usedStrings;
   usedStrings = ob;
   strings.incUsed();
-
-  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(mutex);
 }
 
 Pointer *Cache::newPointer(Object *o) {
   ObjectBag *pb;
   Pointer *ret;
-
-  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_lock(mutex);
 
   if(usedPointers != (ObjectBag *) 0) {
     pb = usedPointers;
@@ -203,23 +218,20 @@ Pointer *Cache::newPointer(Object *o) {
     pb->next = unusedBags;
     unusedBags = pb;
     ret = (Pointer *) pb->object;
+    pb->object = (Object *) 0;
     ret->setObject(o);
     pointers.decUsed();
     incUnused();
   } else {
-    ret = new Pointer(o);
+    ret = new Pointer(o, this);
     pointers.incNew();
   }
-
-  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(mutex);
 
   return ret;
 }
 
 void Cache::deletePointer(Pointer *p) {
   ObjectBag *ob;
-
-  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_lock(mutex);
 
   if(unusedBags != (ObjectBag *) 0) {
     ob = unusedBags;
@@ -232,32 +244,19 @@ void Cache::deletePointer(Pointer *p) {
   ob->next = usedPointers;
   usedPointers = ob;
   pointers.incUsed();
-
-  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(mutex);
-}
-
-void Cache::setThreadSafe() {
-  mutex = new pthread_mutex_t;
-  pthread_mutex_init(mutex, NULL);
 }
 
 void Cache::debug() {
-  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_lock(mutex);
-
   printf("Number: "); numbers.debug(); printf(".  ");
   printf("String: "); strings.debug(); printf(".  ");
   printf("Pointer: "); pointers.debug(); printf(".  ");
   printf("Free bags: %d\n", unused);
-
-  if(mutex != (pthread_mutex_t *) 0) pthread_mutex_unlock(mutex);
 }
-
-Cache cache;
 
 // Object class
 
-Object::Object() : isStatic(false), referenceCount(0), mutex((pthread_mutex_t *) 0) { }
-Object::Object(ObjectOption oo) : referenceCount(0) { isStatic = (oo == IS_STATIC); mutex = (pthread_mutex_t *) 0; if(oo == ALLOCATE_MUTEX) { allocateMutex(); } }
+Object::Object(Cache *c) : cache(c), isStatic(false), referenceCount(0), mutex((pthread_mutex_t *) 0) { }
+Object::Object(Cache *c, ObjectOption oo) : cache(c), referenceCount(0) { isStatic = (oo == IS_STATIC); mutex = (pthread_mutex_t *) 0; if(oo == ALLOCATE_MUTEX) { allocateMutex(); } }
 Object::~Object() { deallocateMutex(); }
 Number *Object::getNumber(LexInfo *li, ExecutionEnvironment *ee) { slexception.chuck("number not found", li); return (Number *) 0; }
 String *Object::getString(LexInfo *li, ExecutionEnvironment *ee) { slexception.chuck("string not found", li); return (String *) 0; }
@@ -303,10 +302,10 @@ void Object::deallocateMutex() {
 
 // Number class
 
-Number::Number(INT i) : Object(), intRep(true), valueInt(i) { }
-Number::Number(INT i, ObjectOption oo) : Object(oo), intRep(true), valueInt(i) { }
-Number::Number(double d) : Object(), intRep(false), valueDouble(d) { }
-Number::Number(double d, ObjectOption oo) : Object(oo), intRep(false), valueDouble(d) { }
+Number::Number(INT i, Cache *c) : Object(c), intRep(true), valueInt(i) { }
+Number::Number(INT i, Cache *c, ObjectOption oo) : Object(c, oo), intRep(true), valueInt(i) { }
+Number::Number(double d, Cache *c) : Object(c), intRep(false), valueDouble(d) { }
+Number::Number(double d, Cache *c, ObjectOption oo) : Object(c, oo), intRep(false), valueDouble(d) { }
 Number *Number::getNumber(LexInfo *li, ExecutionEnvironment *ee) { this->hold(); return this; }
 bool Number::isInt() { return intRep; }
 INT Number::getInt() { if(intRep) return valueInt; return valueDouble; }
@@ -317,7 +316,7 @@ void Number::release(LexInfo *li) {
   if(isDynamic()) {
     if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_lock(mutex);
     if(referenceCount < 0) slexception.chuck("reference error", li);
-    if(referenceCount == 0) { this->deallocateMutex(); cache.deleteNumber(this); } else referenceCount--;
+    if(referenceCount == 0) { this->deallocateMutex(); cache->deleteNumber(this); } else referenceCount--;
     if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_unlock(mutex);
   }
 }
@@ -325,9 +324,9 @@ void Number::debug() { char fmt[32]; printf("Number: "); if(intRep) { sprintf(fm
 
 // String class
 
-String::String(const char *s) : Object(), str(s), removeStringFlag(false) { }
-String::String(const char *s, ObjectOption oo) : Object(oo), str(s), removeStringFlag(false) { }
-String::String(const char *s, bool rsf) : Object(), str(s), removeStringFlag(rsf) { }
+String::String(const char *s, Cache *c) : Object(c), str(s), removeStringFlag(false) { }
+String::String(const char *s, Cache *c, ObjectOption oo) : Object(c, oo), str(s), removeStringFlag(false) { }
+String::String(const char *s, Cache *c, bool rsf) : Object(c), str(s), removeStringFlag(rsf) { }
 String::~String() { if(removeStringFlag) free((void *) str); }
 String *String::getString(LexInfo *li, ExecutionEnvironment *ee) { this->hold(); return this; }
 const char *String::getValue() { return str; }
@@ -338,7 +337,7 @@ void String::release(LexInfo *li) {
   if(isDynamic()) {
     if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_lock(mutex);
     if(referenceCount < 0) slexception.chuck("reference error", li);
-    if(referenceCount == 0) { this->deallocateMutex(); cache.deleteString(this); } else referenceCount--;
+    if(referenceCount == 0) { this->deallocateMutex(); cache->deleteString(this); } else referenceCount--;
     if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_unlock(mutex);
   }
 }
@@ -346,7 +345,7 @@ void String::debug() { printf("String: %s\n", str); }
 
 // Name class
 
-Name::Name(const char *n) : Object() {
+Name::Name(const char *n, Cache *c) : Object(c) {
   int i;
 
   for(i = 0; (i < (MAX_NAME_LENGTH - 1)) && (n[i] != 0); i++) {
@@ -355,7 +354,7 @@ Name::Name(const char *n) : Object() {
   name[i] = 0;
 }
 
-Name::Name(const char *n, ObjectOption oo) : Object(oo) {
+Name::Name(const char *n, Cache *c, ObjectOption oo) : Object(c, oo) {
   int i;
 
   for(i = 0; (i < (MAX_NAME_LENGTH - 1)) && (n[i] != 0); i++) {
@@ -412,16 +411,16 @@ void Name::debug() { printf("Name: %s\n", name); }
 
 // Code class
 
-Code::Code(OperationList *ol) : Object(), operationList(ol) { }
-Code::Code(OperationList *ol, ObjectOption oo) : Object(oo), operationList(ol) { }
-Code *Code::getCode(LexInfo *li, ExecutionEnvironment *ee) { this->hold(); return this; }
+Code::Code(OperationList *ol, Cache *c) : Object(c), operationList(ol) { }
+Code::Code(OperationList *ol, Cache *c, ObjectOption oo) : Object(c, oo), operationList(ol) { }
+Code *Code::getCode(LexInfo *li, ExecutionEnvironment *e) { this->hold(); return this; }
 OperationList *Code::getOperationList() { return operationList; }
 OperatorReturn Code::action(ExecutionEnvironment *ee) { return operationList->action(ee); }
 void Code::debug() { printf("Code\n"); }
 
 // Pointer class
 
-Pointer::Pointer(Object *o) : Object(), object(o) { object->hold(); }
+Pointer::Pointer(Object *o, Cache *c) : Object(c), object(o) { object->hold(); }
 Pointer *Pointer::getPointer(LexInfo *li, ExecutionEnvironment *ee) { this->hold(); return this; }
 void Pointer::setObject(Object *o) { if(object != (Object *) 0) object->release((LexInfo *) 0); object = o; object->hold(); }
 Object *Pointer::getObject() { return object; }
@@ -431,7 +430,7 @@ void Pointer::release(LexInfo *li) {
     if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_lock(mutex);
     if(referenceCount < 0) slexception.chuck("reference error", li);
     if(object != (Object *) 0) object->release(li);
-    if(referenceCount == 0) { this->deallocateMutex(); cache.deletePointer(this); } else referenceCount--;
+    if(referenceCount == 0) { this->deallocateMutex(); cache->deletePointer(this); } else referenceCount--;
     if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_unlock(mutex);
   }
 }
@@ -617,7 +616,7 @@ OperatorReturn Int::action(ExecutionEnvironment *ee) {
 
   o = ee->stack.pop(getLexInfo());
   n = o->getNumber(getLexInfo(), ee);
-  ee->stack.push(cache.newNumber(n->getInt()));
+  ee->stack.push(ee->cache.newNumber(n->getInt()));
   n->release(getLexInfo());
   o->release(getLexInfo());
 
@@ -632,7 +631,7 @@ OperatorReturn Double::action(ExecutionEnvironment *ee) {
 
   o = ee->stack.pop(getLexInfo());
   n = o->getNumber(getLexInfo(), ee);
-  ee->stack.push(cache.newNumber(n->getDouble()));
+  ee->stack.push(ee->cache.newNumber(n->getDouble()));
   n->release(getLexInfo());
   o->release(getLexInfo());
 
@@ -663,11 +662,11 @@ OperatorReturn Plus::action(ExecutionEnvironment *ee) {
     n2 = o2->getNumber(getLexInfo(), ee);
 
     if(n1->isInt()) {
-      if(n2->isInt()) res = cache.newNumber(n1->getInt() + n2->getInt());
-      else res = cache.newNumber(n1->getInt() + n2->getDouble());
+      if(n2->isInt()) res = ee->cache.newNumber(n1->getInt() + n2->getInt());
+      else res = ee->cache.newNumber(n1->getInt() + n2->getDouble());
     } else {
-      if(n2->isInt()) res = cache.newNumber(n1->getDouble() + n2->getInt());
-      else res = cache.newNumber(n1->getDouble() + n2->getDouble());
+      if(n2->isInt()) res = ee->cache.newNumber(n1->getDouble() + n2->getInt());
+      else res = ee->cache.newNumber(n1->getDouble() + n2->getDouble());
     }
     ee->stack.push(res);
 
@@ -689,7 +688,7 @@ OperatorReturn Plus::action(ExecutionEnvironment *ee) {
       for(oli = c2->getOperationList()->getOperationList(); oli != (OperationListItem *) 0; oli = oli->getNext()) {
         ol->addOperation(oli->getOperation());
       }
-      ee->stack.push(new Code(ol));
+      ee->stack.push(new Code(ol, &ee->cache));
 
       c1->release(getLexInfo());
       c2->release(getLexInfo());
@@ -721,11 +720,11 @@ OperatorReturn Minus::action(ExecutionEnvironment *ee) {
   n2 = o2->getNumber(getLexInfo(), ee);
 
   if(n1->isInt()) {
-    if(n2->isInt()) res = cache.newNumber(n1->getInt() - n2->getInt());
-    else res = cache.newNumber(n1->getInt() - n2->getDouble());
+    if(n2->isInt()) res = ee->cache.newNumber(n1->getInt() - n2->getInt());
+    else res = ee->cache.newNumber(n1->getInt() - n2->getDouble());
   } else {
-    if(n2->isInt()) res = cache.newNumber(n1->getDouble() - n2->getInt());
-    else res = cache.newNumber(n1->getDouble() - n2->getDouble());
+    if(n2->isInt()) res = ee->cache.newNumber(n1->getDouble() - n2->getInt());
+    else res = ee->cache.newNumber(n1->getDouble() - n2->getDouble());
   }
   ee->stack.push(res);
 
@@ -752,11 +751,11 @@ OperatorReturn Times::action(ExecutionEnvironment *ee) {
   n2 = o2->getNumber(getLexInfo(), ee);
 
   if(n1->isInt()) {
-    if(n2->isInt()) res = cache.newNumber(n1->getInt() * n2->getInt());
-    else res = cache.newNumber(n1->getInt() * n2->getDouble());
+    if(n2->isInt()) res = ee->cache.newNumber(n1->getInt() * n2->getInt());
+    else res = ee->cache.newNumber(n1->getInt() * n2->getDouble());
   } else {
-    if(n2->isInt()) res = cache.newNumber(n1->getDouble() * n2->getInt());
-    else res = cache.newNumber(n1->getDouble() * n2->getDouble());
+    if(n2->isInt()) res = ee->cache.newNumber(n1->getDouble() * n2->getInt());
+    else res = ee->cache.newNumber(n1->getDouble() * n2->getDouble());
   }
   ee->stack.push(res);
 
@@ -783,11 +782,11 @@ OperatorReturn Divide::action(ExecutionEnvironment *ee) {
   n2 = o2->getNumber(getLexInfo(), ee);
 
   if(n1->isInt()) {
-    if(n2->isInt()) res = cache.newNumber(n1->getInt() / n2->getInt());
-    else res = cache.newNumber(n1->getInt() / n2->getDouble());
+    if(n2->isInt()) res = ee->cache.newNumber(n1->getInt() / n2->getInt());
+    else res = ee->cache.newNumber(n1->getInt() / n2->getDouble());
   } else {
-    if(n2->isInt()) res = cache.newNumber(n1->getDouble() / n2->getInt());
-    else res = cache.newNumber(n1->getDouble() / n2->getDouble());
+    if(n2->isInt()) res = ee->cache.newNumber(n1->getDouble() / n2->getInt());
+    else res = ee->cache.newNumber(n1->getDouble() / n2->getDouble());
   }
   ee->stack.push(res);
 
@@ -812,7 +811,7 @@ OperatorReturn Mod::action(ExecutionEnvironment *ee) {
   n1 = o1->getNumber(getLexInfo(), ee);
   n2 = o2->getNumber(getLexInfo(), ee);
 
-  ee->stack.push(cache.newNumber(n1->getInt() % n2->getInt()));
+  ee->stack.push(ee->cache.newNumber(n1->getInt() % n2->getInt()));
 
   n1->release(getLexInfo());
   n2->release(getLexInfo());
@@ -835,7 +834,7 @@ OperatorReturn BitwiseAnd::action(ExecutionEnvironment *ee) {
   n1 = o1->getNumber(getLexInfo(), ee);
   n2 = o2->getNumber(getLexInfo(), ee);
 
-  ee->stack.push(cache.newNumber(n1->getInt() & n2->getInt()));
+  ee->stack.push(ee->cache.newNumber(n1->getInt() & n2->getInt()));
 
   n1->release(getLexInfo());
   n2->release(getLexInfo());
@@ -858,7 +857,7 @@ OperatorReturn BitwiseOr::action(ExecutionEnvironment *ee) {
   n1 = o1->getNumber(getLexInfo(), ee);
   n2 = o2->getNumber(getLexInfo(), ee);
 
-  ee->stack.push(cache.newNumber(n1->getInt() | n2->getInt()));
+  ee->stack.push(ee->cache.newNumber(n1->getInt() | n2->getInt()));
 
   n1->release(getLexInfo());
   n2->release(getLexInfo());
@@ -881,7 +880,7 @@ OperatorReturn BitwiseXor::action(ExecutionEnvironment *ee) {
   n1 = o1->getNumber(getLexInfo(), ee);
   n2 = o2->getNumber(getLexInfo(), ee);
 
-  ee->stack.push(cache.newNumber(n1->getInt() ^ n2->getInt()));
+  ee->stack.push(ee->cache.newNumber(n1->getInt() ^ n2->getInt()));
 
   n1->release(getLexInfo());
   n2->release(getLexInfo());
@@ -900,7 +899,7 @@ OperatorReturn BitwiseNot::action(ExecutionEnvironment *ee) {
   o1 = ee->stack.pop(getLexInfo());
   n1 = o1->getNumber(getLexInfo(), ee);
 
-  ee->stack.push(cache.newNumber(~n1->getInt()));
+  ee->stack.push(ee->cache.newNumber(~n1->getInt()));
 
   n1->release(getLexInfo());
   o1->release(getLexInfo());
@@ -921,7 +920,7 @@ OperatorReturn LeftShift::action(ExecutionEnvironment *ee) {
   n1 = o1->getNumber(getLexInfo(), ee);
   n2 = o2->getNumber(getLexInfo(), ee);
 
-  ee->stack.push(cache.newNumber(n1->getInt() << n2->getInt()));
+  ee->stack.push(ee->cache.newNumber(n1->getInt() << n2->getInt()));
 
   n1->release(getLexInfo());
   n2->release(getLexInfo());
@@ -944,7 +943,7 @@ OperatorReturn RightShift::action(ExecutionEnvironment *ee) {
   n1 = o1->getNumber(getLexInfo(), ee);
   n2 = o2->getNumber(getLexInfo(), ee);
 
-  ee->stack.push(cache.newNumber(n1->getInt() >> n2->getInt()));
+  ee->stack.push(ee->cache.newNumber(n1->getInt() >> n2->getInt()));
 
   n1->release(getLexInfo());
   n2->release(getLexInfo());
@@ -1082,7 +1081,7 @@ OperatorReturn PointerAssign::action(ExecutionEnvironment *ee) {
   try {
     v = ee->variableStack.findVariable(var->getName(getLexInfo(), ee)->getValue());
     if(v != (Variable *) 0) {
-      p = cache.newPointer(val);
+      p = ee->cache.newPointer(val);
       if(v->getName()[0] == '/') p->allocateMutex();
       v->setObject(p);
       p->release(getLexInfo());
@@ -1145,8 +1144,8 @@ OperatorReturn PlusPlus::action(ExecutionEnvironment *ee) {
   }
   n = no->getNumber(getLexInfo(), ee);
 
-  if(n->isInt()) v->setObject(newn = cache.newNumber(n->getInt() + (INT) 1));
-  else v->setObject(newn = cache.newNumber(n->getDouble() + 1.0));
+  if(n->isInt()) v->setObject(newn = ee->cache.newNumber(n->getInt() + (INT) 1));
+  else v->setObject(newn = ee->cache.newNumber(n->getDouble() + 1.0));
 
   newn->release(getLexInfo());
   n->release(getLexInfo());
@@ -1181,8 +1180,8 @@ OperatorReturn MinusMinus::action(ExecutionEnvironment *ee) {
   }
   n = no->getNumber(getLexInfo(), ee);
 
-  if(n->isInt()) v->setObject(newn = cache.newNumber(n->getInt() - (INT) 1));
-  else v->setObject(newn = cache.newNumber(n->getDouble() - 1.0));
+  if(n->isInt()) v->setObject(newn = ee->cache.newNumber(n->getInt() - (INT) 1));
+  else v->setObject(newn = ee->cache.newNumber(n->getDouble() - 1.0));
 
   newn->release(getLexInfo());
   n->release(getLexInfo());
@@ -1691,7 +1690,7 @@ OperatorReturn ToName::action(ExecutionEnvironment *ee) {
       sprintf(fmt, "%%%sd", PCTD);
       sprintf(buf, fmt, n->getInt());
     } else sprintf(buf, "%0.3f", n->getDouble());
-    ee->stack.push(new Name(buf));
+    ee->stack.push(new Name(buf, &ee->cache));
     n->release(getLexInfo());
     o->release(getLexInfo());
     return or_continue;
@@ -1699,7 +1698,7 @@ OperatorReturn ToName::action(ExecutionEnvironment *ee) {
 
   try {
     s = o->getString(getLexInfo(), ee);
-    ee->stack.push(new Name(s->getValue()));
+    ee->stack.push(new Name(s->getValue(), &ee->cache));
     s->release(getLexInfo());
     o->release(getLexInfo());
     return or_continue;
@@ -1817,7 +1816,7 @@ OperatorReturn Namespace::action(ExecutionEnvironment *ee) {
   if(p[j] != 0) slexception.chuck("name too long", getLexInfo());
 
   namebuf[i] = 0;
-  ee->stack.push(new Name(namebuf));
+  ee->stack.push(new Name(namebuf, &ee->cache));
 
   if(nsreleasestring) nsstring->release(getLexInfo());
   if(inreleasestring) instring->release(getLexInfo());
@@ -2045,7 +2044,7 @@ OperatorReturn Printf::action(ExecutionEnvironment *ee) {
   } else {
     if((q = (char *) malloc(strlen(res) + 1)) == (char *) 0) slexception.chuck("malloc error", getLexInfo());
     strcpy(q, res);
-    ee->stack.push(cache.newString(q, true));
+    ee->stack.push(ee->cache.newString(q, true));
   }
 
   format->release(getLexInfo());
@@ -2072,7 +2071,7 @@ OperatorReturn Defined::action(ExecutionEnvironment *ee) {
     v = ee->variableStack.findVariable(o->getName(getLexInfo(), ee)->getValue());
     if(v == (Variable *) 0) n = 0;
   }
-  ee->stack.push(cache.newNumber(n));
+  ee->stack.push(ee->cache.newNumber(n));
 
   o->release(getLexInfo());
 
@@ -2093,7 +2092,7 @@ OperatorReturn Initialised::action(ExecutionEnvironment *ee) {
     v = ee->variableStack.findVariable(o->getName(getLexInfo(), ee)->getValue());
     if((v == (Variable *) 0) || (! v->isInitialised())) n = 0;
   }
-  ee->stack.push(cache.newNumber(n));
+  ee->stack.push(ee->cache.newNumber(n));
 
   o->release(getLexInfo());
 
@@ -2178,7 +2177,7 @@ OperatorReturn PrintStack::action(ExecutionEnvironment *ee) {
 Debug::Debug(LexInfo *li) : Operation(li) { }
 
 OperatorReturn Debug::action(ExecutionEnvironment *ee) {
-  cache.debug();
+  ee->cache.debug();
   ee->stack.debug();
   btree.debug();
 

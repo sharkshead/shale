@@ -41,6 +41,7 @@ const char *shaleFileName;
 int olStackIndex;
 bool interactive;
 Exception shaleException;
+ExecutionEnvironment mainEE;
 
 Keyword keyword[] = {
   { "dup",            LEX_TOKEN_KEYWORD_DUP             },
@@ -681,22 +682,22 @@ void olBuild(Lex &lex) {
     case LEX_TOKEN_NAME:
       if((p = (char *) malloc(strlen(lex.str) + 1)) != (char *) 0) {
         strcpy(p, lex.str);
-        olStack[olStackIndex]->addOperation(new Push(new Name(p, IS_STATIC), li));
+        olStack[olStackIndex]->addOperation(new Push(new Name(p, &mainEE.cache, IS_STATIC), li));
       } else {
         shaleException.chuck("malloc failed", li);
       }
       break;
 
     case LEX_TOKEN_NUMBER:
-      if(lex.number.intRepresentation) o = new Number(lex.number.valueInt, IS_STATIC);
-      else o = new Number(lex.number.valueDouble, IS_STATIC);
+      if(lex.number.intRepresentation) o = new Number(lex.number.valueInt, &mainEE.cache, IS_STATIC);
+      else o = new Number(lex.number.valueDouble, &mainEE.cache, IS_STATIC);
       olStack[olStackIndex]->addOperation(new Push(o, li));
       break;
 
     case LEX_TOKEN_STRING:
       if((p = (char *) malloc(strlen(lex.str) + 1)) != (char *) 0) {
         strcpy(p, lex.str);
-        olStack[olStackIndex]->addOperation(new Push(new String(p, IS_STATIC), li));
+        olStack[olStackIndex]->addOperation(new Push(new String(p, &mainEE.cache, IS_STATIC), li));
       }
       break;
 
@@ -712,7 +713,7 @@ void olBuild(Lex &lex) {
     case LEX_TOKEN_CLOSE_CURLY:
       if(olStackIndex > 0) {
         olStackIndex--;
-        olStack[olStackIndex]->addOperation(new Push(new Code(olStack[olStackIndex + 1], IS_STATIC), li));
+        olStack[olStackIndex]->addOperation(new Push(new Code(olStack[olStackIndex + 1], &mainEE.cache, IS_STATIC), li));
       } else {
         shaleException.chuck("code stack underrun", li);
       }
@@ -901,23 +902,23 @@ void setupShaleNamespace(const char *arg0) {
   Variable *v;
 
   v = new Variable("/file/arg/shale");
-  v->setObject(cache.newString(arg0, false));
+  v->setObject(mainEE.cache.newString(arg0, false));
   btree.addVariable(v);
 
   v = new Variable("/major/version/shale");
-  v->setObject(cache.newNumber(MAJOR));
+  v->setObject(mainEE.cache.newNumber(MAJOR));
   btree.addVariable(v);
 
   v = new Variable("/minor/version/shale");
-  v->setObject(cache.newNumber(MINOR));
+  v->setObject(mainEE.cache.newNumber(MINOR));
   btree.addVariable(v);
 
   v = new Variable("/micro/version/shale");
-  v->setObject(cache.newNumber(MICRO));
+  v->setObject(mainEE.cache.newNumber(MICRO));
   btree.addVariable(v);
 
   v = new Variable("/language/option/shale");
-  v->setObject(cache.newString("en", false));
+  v->setObject(mainEE.cache.newString("en", false));
   btree.addVariable(v);
 }
 
@@ -930,7 +931,6 @@ int main(int ac, char **av) {
   int node;
   int number;
   int i;
-  ExecutionEnvironment mainEE;
 
   interactive = false;
   lexLineNumber = 0;
@@ -938,8 +938,8 @@ int main(int ac, char **av) {
   lexLineIndex = 0;
   shaleFileName = (char *) 0;
 
-  trueValue = new Number((INT) 1, IS_STATIC);
-  falseValue = new Number((INT) 0, IS_STATIC);
+  trueValue = new Number((INT) 1, &mainEE.cache, IS_STATIC);
+  falseValue = new Number((INT) 0, &mainEE.cache, IS_STATIC);
 
   while((ac > 1) && (av[1][0] == '-')) {
     if((av[1][1] == 'h') || ((av[1][1] == '-') && (av[1][2] == 'h'))) {

@@ -28,7 +28,7 @@ SOFTWARE.
 
 #define MAJOR   (INT) 1
 #define MINOR   (INT) 0
-#define MICRO   (INT) 3
+#define MICRO   (INT) 4
 
 #define FUNCTION_LN      0
 #define FUNCTION_LOG     1
@@ -96,69 +96,69 @@ extern "C" void slmain() {
   ol = new OperationList;
   ol->addOperation(new MathsHelp((LexInfo *) 0));
   v = new Variable("/help/maths");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   v = new Variable("/major/version/maths");
-  v->setObject(cache.newNumber(MAJOR));
+  v->setObject(mainEE.cache.newNumber(MAJOR));
   btree.addVariable(v);
 
   v = new Variable("/minor/version/maths");
-  v->setObject(cache.newNumber(MINOR));
+  v->setObject(mainEE.cache.newNumber(MINOR));
   btree.addVariable(v);
 
   v = new Variable("/micro/version/maths");
-  v->setObject(cache.newNumber(MICRO));
+  v->setObject(mainEE.cache.newNumber(MICRO));
   btree.addVariable(v);
 
   v = new Variable("/e/maths");
-  v->setObject(cache.newNumber(2.718281828459045));
+  v->setObject(mainEE.cache.newNumber(2.718281828459045));
   btree.addVariable(v);
 
   v = new Variable("/pi/maths");
-  v->setObject(cache.newNumber(3.141592653589793));
+  v->setObject(mainEE.cache.newNumber(3.141592653589793));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new MathsFunction(FUNCTION_LN, (LexInfo *) 0));
   v = new Variable("/ln/maths");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new MathsFunction(FUNCTION_LOG, (LexInfo *) 0));
   v = new Variable("/log/maths");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new MathsFunction(FUNCTION_SQRT, (LexInfo *) 0));
   v = new Variable("/sqrt/maths");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new MathsFunction(FUNCTION_GCD, (LexInfo *) 0));
   v = new Variable("/gcd/maths");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new MathsToThePower((LexInfo *) 0));
   v = new Variable("/power/maths");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new MathsRandom((LexInfo *) 0));
   v = new Variable("/random/maths");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new MathsSrandom((LexInfo *) 0));
   v = new Variable("/srandom/maths");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   srandom(time(0) + getpid());
@@ -193,15 +193,15 @@ OperatorReturn MathsFunction::action(ExecutionEnvironment *ee) {
 
   switch(function) {
     case FUNCTION_LN:
-      ee->stack.push(cache.newNumber(log(n->getDouble())));
+      ee->stack.push(mainEE.cache.newNumber(log(n->getDouble())));
       break;
 
     case FUNCTION_LOG:
-      ee->stack.push(cache.newNumber(log10(n->getDouble())));
+      ee->stack.push(mainEE.cache.newNumber(log10(n->getDouble())));
       break;
 
     case FUNCTION_SQRT:
-      ee->stack.push(cache.newNumber(sqrt(n->getDouble())));
+      ee->stack.push(mainEE.cache.newNumber(sqrt(n->getDouble())));
       break;
 
     case FUNCTION_GCD:
@@ -220,7 +220,7 @@ OperatorReturn MathsFunction::action(ExecutionEnvironment *ee) {
         b = a % b;
         a = t;
       }
-      ee->stack.push(cache.newNumber(a));
+      ee->stack.push(mainEE.cache.newNumber(a));
 
       n2->release(getLexInfo());
       o2->release(getLexInfo());
@@ -246,7 +246,7 @@ OperatorReturn MathsToThePower::action(ExecutionEnvironment *ee) {
   n1 = o1->getNumber(getLexInfo(), ee);
   n2 = o2->getNumber(getLexInfo(), ee);
     
-  ee->stack.push(cache.newNumber(exp(n2->getDouble() * log(n1->getDouble()))));
+  ee->stack.push(mainEE.cache.newNumber(exp(n2->getDouble() * log(n1->getDouble()))));
 
   n1->release(getLexInfo());
   n2->release(getLexInfo());
@@ -259,7 +259,7 @@ OperatorReturn MathsToThePower::action(ExecutionEnvironment *ee) {
 MathsRandom::MathsRandom(LexInfo *li) : Operation(li) { }
 
 OperatorReturn MathsRandom::action(ExecutionEnvironment *ee) {
-  ee->stack.push(cache.newNumber((INT) random()));
+  ee->stack.push(mainEE.cache.newNumber((INT) random()));
 
   return or_continue;
 }

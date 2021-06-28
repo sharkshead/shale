@@ -28,7 +28,7 @@ SOFTWARE.
 
 #define MAJOR   (INT) 1
 #define MINOR   (INT) 0
-#define MICRO   (INT) 5
+#define MICRO   (INT) 6
 
 class ThreadPack {
   public:
@@ -111,66 +111,65 @@ extern "C" void slmain() {
   ol = new OperationList;
   ol->addOperation(new ThreadHelp((LexInfo *) 0));
   v = new Variable("/help/thread");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   v = new Variable("/major/version/thread");
-  v->setObject(cache.newNumber(MAJOR));
+  v->setObject(mainEE.cache.newNumber(MAJOR));
   btree.addVariable(v);
 
   v = new Variable("/minor/version/thread");
-  v->setObject(cache.newNumber(MINOR));
+  v->setObject(mainEE.cache.newNumber(MINOR));
   btree.addVariable(v);
 
   v = new Variable("/micro/version/thread");
-  v->setObject(cache.newNumber(MICRO));
+  v->setObject(mainEE.cache.newNumber(MICRO));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new ThreadMutex((LexInfo *) 0));
   v = new Variable("/mutex/thread");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new ThreadCreate((LexInfo *) 0));
   v = new Variable("/create/thread");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new ThreadLock((LexInfo *) 0));
   v = new Variable("/lock/thread");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new ThreadUnlock((LexInfo *) 0));
   v = new Variable("/unlock/thread");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new ThreadSemaphore((LexInfo *) 0));
   v = new Variable("/semaphore/thread");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new ThreadWait((LexInfo *) 0));
   v = new Variable("/wait/thread");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new ThreadPost((LexInfo *) 0));
   v = new Variable("/post/thread");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   useMutex = true;
   btree.setThreadSafe();
-  cache.setThreadSafe();
 }
 
 ThreadHelp::ThreadHelp(LexInfo *li) : Operation(li) { }
@@ -282,7 +281,7 @@ OperatorReturn ThreadMutex::action(ExecutionEnvironment *ee) {
     slexception.chuck("Name already exists", getLexInfo());
   }
   v = new Variable(mutexName);
-  v->setObject(cache.newNumber((INT) mutex));
+  v->setObject(mainEE.cache.newNumber((INT) mutex));
   btree.addVariable(v);
 
   o->release(getLexInfo());
@@ -476,7 +475,7 @@ OperatorReturn ThreadSemaphore::action(ExecutionEnvironment *ee) {
   sem_unlink(externalName);
   if((sem = sem_open(externalName, O_CREAT | O_EXCL, 0666, 0)) == SEM_FAILED) slexception.chuck("Can't create semaphore", getLexInfo());
   v = new Variable(semName);
-  v->setObject(cache.newNumber((INT) sem));
+  v->setObject(mainEE.cache.newNumber((INT) sem));
   btree.addVariable(v);
 
   o->release(getLexInfo());

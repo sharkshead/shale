@@ -29,7 +29,7 @@ SOFTWARE.
 
 #define MAJOR   (INT) 1
 #define MINOR   (INT) 1
-#define MICRO   (INT) 1
+#define MICRO   (INT) 2
 
 class TimeHelp : public Operation {
   public:
@@ -108,59 +108,59 @@ extern "C" void slmain() {
   ol = new OperationList;
   ol->addOperation(new TimeHelp((LexInfo *) 0));
   v = new Variable("/help/time");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   v = new Variable("/major/version/time");
-  v->setObject(cache.newNumber(MAJOR));
+  v->setObject(mainEE.cache.newNumber(MAJOR));
   btree.addVariable(v);
 
   v = new Variable("/minor/version/time");
-  v->setObject(cache.newNumber(MINOR));
+  v->setObject(mainEE.cache.newNumber(MINOR));
   btree.addVariable(v);
 
   v = new Variable("/micro/version/time");
-  v->setObject(cache.newNumber(MICRO));
+  v->setObject(mainEE.cache.newNumber(MICRO));
   btree.addVariable(v);
 
   v = new Variable("/dateformat/time");
-  v->setObject(cache.newString("DMY", false));
+  v->setObject(mainEE.cache.newString("DMY", false));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new TimeNow((LexInfo *) 0));
   v = new Variable("/now/time");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new TimeDate((LexInfo *) 0));
   v = new Variable("/date/time");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new TimeTime((LexInfo *) 0, false));
   v = new Variable("/time/time");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new TimeTime((LexInfo *) 0, true));
   v = new Variable("/timems/time");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new TimeLocaltime((LexInfo *) 0));
   v = new Variable("/localtime/time");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new TimeSleep((LexInfo *) 0));
   v = new Variable("/sleep/time");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 }
 
@@ -182,7 +182,7 @@ OperatorReturn TimeNow::action(ExecutionEnvironment *ee) {
   struct timespec tp;
 
   if(clock_gettime(CLOCK_REALTIME, &tp) == 0) {
-    ee->stack.push(cache.newNumber((((INT) tp.tv_sec) * 1000) + (((INT) tp.tv_nsec) / 1000000)));
+    ee->stack.push(mainEE.cache.newNumber((((INT) tp.tv_sec) * 1000) + (((INT) tp.tv_nsec) / 1000000)));
   } else {
     printf("Can't get the realtime clock. Bailing.\n");
     exit(1);
@@ -258,7 +258,7 @@ OperatorReturn TimeDate::action(ExecutionEnvironment *ee) {
   } else {
     sprintf(output, "%2d %s %4d", tm->tm_mday, month[tm->tm_mon], tm->tm_year + 1900);
   }
-  ee->stack.push(cache.newString(output, true));
+  ee->stack.push(mainEE.cache.newString(output, true));
 
   n->release(getLexInfo());
   o->release(getLexInfo());
@@ -301,7 +301,7 @@ OperatorReturn TimeTime::action(ExecutionEnvironment *ee) {
     sprintf(output, "%2d:%02d:%02d.%03d", tm->tm_hour, tm->tm_min, tm->tm_sec, ms);
   else
     sprintf(output, "%2d:%02d:%02d", tm->tm_hour, tm->tm_min, tm->tm_sec);
-  ee->stack.push(cache.newString(output, true));
+  ee->stack.push(mainEE.cache.newString(output, true));
 
   n->release(getLexInfo());
   o->release(getLexInfo());
@@ -341,91 +341,91 @@ OperatorReturn TimeLocaltime::action(ExecutionEnvironment *ee) {
   v = btree.findVariable("/sec/tm/time");
   if(v == (Variable *) 0) {
     v = new Variable("/sec/tm/time");
-    v->setObject(cache.newNumber((INT) tm->tm_sec));
+    v->setObject(mainEE.cache.newNumber((INT) tm->tm_sec));
     btree.addVariable(v);
     
   } else {
-    v->setObject(cache.newNumber((INT) tm->tm_sec));
+    v->setObject(mainEE.cache.newNumber((INT) tm->tm_sec));
   }
 
   v = btree.findVariable("/min/tm/time");
   if(v == (Variable *) 0) {
     v = new Variable("/min/tm/time");
-    v->setObject(cache.newNumber((INT) tm->tm_min));
+    v->setObject(mainEE.cache.newNumber((INT) tm->tm_min));
     btree.addVariable(v);
     
   } else {
-    v->setObject(cache.newNumber((INT) tm->tm_hour));
+    v->setObject(mainEE.cache.newNumber((INT) tm->tm_hour));
   }
 
   v = btree.findVariable("/hour/tm/time");
   if(v == (Variable *) 0) {
     v = new Variable("/hour/tm/time");
-    v->setObject(cache.newNumber((INT) tm->tm_hour));
+    v->setObject(mainEE.cache.newNumber((INT) tm->tm_hour));
     btree.addVariable(v);
     
   } else {
-    v->setObject(cache.newNumber((INT) tm->tm_hour));
+    v->setObject(mainEE.cache.newNumber((INT) tm->tm_hour));
   }
 
   v = btree.findVariable("/mday/tm/time");
   if(v == (Variable *) 0) {
     v = new Variable("/mday/tm/time");
-    v->setObject(cache.newNumber((INT) tm->tm_mday));
+    v->setObject(mainEE.cache.newNumber((INT) tm->tm_mday));
     btree.addVariable(v);
     
   } else {
-    v->setObject(cache.newNumber((INT) tm->tm_mday));
+    v->setObject(mainEE.cache.newNumber((INT) tm->tm_mday));
   }
 
   v = btree.findVariable("/mon/tm/time");
   if(v == (Variable *) 0) {
     v = new Variable("/mon/tm/time");
-    v->setObject(cache.newNumber((INT) tm->tm_mon));
+    v->setObject(mainEE.cache.newNumber((INT) tm->tm_mon));
     btree.addVariable(v);
     
   } else {
-    v->setObject(cache.newNumber((INT) tm->tm_mon));
+    v->setObject(mainEE.cache.newNumber((INT) tm->tm_mon));
   }
 
   v = btree.findVariable("/year/tm/time");
   if(v == (Variable *) 0) {
     v = new Variable("/year/tm/time");
-    v->setObject(cache.newNumber((INT) tm->tm_year));
+    v->setObject(mainEE.cache.newNumber((INT) tm->tm_year));
     btree.addVariable(v);
     
   } else {
-    v->setObject(cache.newNumber((INT) tm->tm_year));
+    v->setObject(mainEE.cache.newNumber((INT) tm->tm_year));
   }
 
   v = btree.findVariable("/wday/tm/time");
   if(v == (Variable *) 0) {
     v = new Variable("/wday/tm/time");
-    v->setObject(cache.newNumber((INT) tm->tm_wday));
+    v->setObject(mainEE.cache.newNumber((INT) tm->tm_wday));
     btree.addVariable(v);
     
   } else {
-    v->setObject(cache.newNumber((INT) tm->tm_wday));
+    v->setObject(mainEE.cache.newNumber((INT) tm->tm_wday));
   }
 
   v = btree.findVariable("/yday/tm/time");
   if(v == (Variable *) 0) {
     v = new Variable("/yday/tm/time");
-    v->setObject(cache.newNumber((INT) tm->tm_yday));
+    v->setObject(mainEE.cache.newNumber((INT) tm->tm_yday));
     btree.addVariable(v);
     
   } else {
-    v->setObject(cache.newNumber((INT) tm->tm_yday));
+    v->setObject(mainEE.cache.newNumber((INT) tm->tm_yday));
   }
 
   v = btree.findVariable("/isdst/tm/time");
   if(v == (Variable *) 0) {
     v = new Variable("/isdst/tm/time");
-    v->setObject(cache.newNumber((INT) tm->tm_isdst));
+    v->setObject(mainEE.cache.newNumber((INT) tm->tm_isdst));
     btree.addVariable(v);
     
   } else {
-    v->setObject(cache.newNumber((INT) tm->tm_isdst));
+    v->setObject(mainEE.cache.newNumber((INT) tm->tm_isdst));
   }
 
   n->release(getLexInfo());

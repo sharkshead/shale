@@ -28,7 +28,7 @@ SOFTWARE.
 
 #define MAJOR   (INT) 1
 #define MINOR   (INT) 0
-#define MICRO   (INT) 2
+#define MICRO   (INT) 3
 
 class FileHelp : public Operation {
   public:
@@ -105,61 +105,61 @@ extern "C" void slmain() {
   ol = new OperationList;
   ol->addOperation(new FileHelp((LexInfo *) 0));
   v = new Variable("/help/file");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   v = new Variable("/major/version/file");
-  v->setObject(cache.newNumber(MAJOR));
+  v->setObject(mainEE.cache.newNumber(MAJOR));
   btree.addVariable(v);
 
   v = new Variable("/minor/version/file");
-  v->setObject(cache.newNumber(MINOR));
+  v->setObject(mainEE.cache.newNumber(MINOR));
   btree.addVariable(v);
 
   v = new Variable("/micro/version/file");
-  v->setObject(cache.newNumber(MICRO));
+  v->setObject(mainEE.cache.newNumber(MICRO));
   btree.addVariable(v);
 
   v = new Variable("/stdin/file");
-  v->setObject(cache.newNumber((INT) 0));
+  v->setObject(mainEE.cache.newNumber((INT) 0));
   btree.addVariable(v);
 
   v = new Variable("/stdout/file");
-  v->setObject(cache.newNumber((INT) 1));
+  v->setObject(mainEE.cache.newNumber((INT) 1));
   btree.addVariable(v);
 
   v = new Variable("/stderr/file");
-  v->setObject(cache.newNumber((INT) 2));
+  v->setObject(mainEE.cache.newNumber((INT) 2));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new FileOpen((LexInfo *) 0));
   v = new Variable("/open/file");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new FileClose((LexInfo *) 0));
   v = new Variable("/close/file");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new FileFgets((LexInfo *) 0));
   v = new Variable("/fgets/file");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new FileFprintf((LexInfo *) 0));
   v = new Variable("/fprintf/file");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new FileFlush((LexInfo *) 0));
   v = new Variable("/flush/file");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 }
 
@@ -196,13 +196,13 @@ OperatorReturn FileOpen::action(ExecutionEnvironment *ee) {
   if(i < HANDLES) {
     if((f = fopen(filename->getValue(), mode->getValue())) != (FILE *) 0) {
       handle[i] = f;
-      ee->stack.push(cache.newNumber((INT) i));
-      ee->stack.push(cache.newNumber((INT) 1));
+      ee->stack.push(mainEE.cache.newNumber((INT) i));
+      ee->stack.push(mainEE.cache.newNumber((INT) 1));
     } else {
-      ee->stack.push(cache.newNumber((INT) 0));
+      ee->stack.push(mainEE.cache.newNumber((INT) 0));
     }
   } else {
-    ee->stack.push(cache.newNumber((INT) 0));
+    ee->stack.push(mainEE.cache.newNumber((INT) 0));
   }
 
   mode->release(getLexInfo());
@@ -263,11 +263,11 @@ OperatorReturn FileFgets::action(ExecutionEnvironment *ee) {
         slexception.chuck("malloc error", getLexInfo());
       } else {
         strcpy(p, line);
-        ee->stack.push(cache.newString(p, true));
-        ee->stack.push(cache.newNumber((INT) 1));
+        ee->stack.push(mainEE.cache.newString(p, true));
+        ee->stack.push(mainEE.cache.newNumber((INT) 1));
       }
     } else {
-      ee->stack.push(cache.newNumber((INT) 0));
+      ee->stack.push(mainEE.cache.newNumber((INT) 0));
     }
   } else {
     slexception.chuck("Unknown file handle", getLexInfo());

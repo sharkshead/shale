@@ -28,7 +28,7 @@ SOFTWARE.
 
 #define MAJOR   (INT) 1
 #define MINOR   (INT) 0
-#define MICRO   (INT) 2
+#define MICRO   (INT) 3
 
 const char *arrayHelp[] = {
   "Array library:",
@@ -92,47 +92,47 @@ extern "C" void slmain() {
   ol = new OperationList;
   ol->addOperation(new ArrayHelp((LexInfo *) 0));
   v = new Variable("/help/array");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   v = new Variable("/major/version/array");
-  v->setObject(cache.newNumber(MAJOR));
+  v->setObject(mainEE.cache.newNumber(MAJOR));
   btree.addVariable(v);
 
   v = new Variable("/minor/version/array");
-  v->setObject(cache.newNumber(MINOR));
+  v->setObject(mainEE.cache.newNumber(MINOR));
   btree.addVariable(v);
 
   v = new Variable("/micro/version/array");
-  v->setObject(cache.newNumber(MICRO));
+  v->setObject(mainEE.cache.newNumber(MICRO));
   btree.addVariable(v);
 
   // create array::
   ol = new OperationList;
   ol->addOperation(new ArrayCreate((LexInfo *) 0));
   v = new Variable("/create/array");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   // scooch array::
   ol = new OperationList;
   ol->addOperation(new ArrayScooch((LexInfo *) 0));
   v = new Variable("/scooch/array");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   // get array::
   ol = new OperationList;
   ol->addOperation(new ArrayGet((LexInfo *) 0));
   v = new Variable("/get/array");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 
   // set array::
   ol = new OperationList;
   ol->addOperation(new ArraySet((LexInfo *) 0));
   v = new Variable("/set/array");
-  v->setObject(new Code(ol));
+  v->setObject(new Code(ol, &mainEE.cache));
   btree.addVariable(v);
 }
 
@@ -209,7 +209,7 @@ OperatorReturn ArrayCreate::action(ExecutionEnvironment *ee) {
       slexception.chuck(arrayMessage, getLexInfo());
     }
     v = new Variable(element);
-    v->setObject(cache.newNumber(j));
+    v->setObject(mainEE.cache.newNumber(j));
     btree.addVariable(v);
     for(i = 0; i < j; i++) {
       sprintf(element, "/%d/%s", i, buf);
@@ -364,12 +364,12 @@ OperatorReturn ArrayGet::action(ExecutionEnvironment *ee) {
     val = v->getObject();
     if(val != (Object *) 0) {
       ee->stack.push(val);
-      ee->stack.push(cache.newNumber((INT) 1));
+      ee->stack.push(mainEE.cache.newNumber((INT) 1));
     } else {
-      ee->stack.push(cache.newNumber((INT) 0));
+      ee->stack.push(mainEE.cache.newNumber((INT) 0));
     }
   } else {
-    ee->stack.push(cache.newNumber((INT) 0));
+    ee->stack.push(mainEE.cache.newNumber((INT) 0));
   }
 
   array->release(getLexInfo());
