@@ -211,7 +211,9 @@ OperatorReturn ThreadCreate::action(ExecutionEnvironment *ee) {
   o->allocateMutex();
   tp->code = o->getCode(getLexInfo(), ee);
   arg = ee->stack.pop(getLexInfo());
+  arg->hold();
   arg->allocateMutex();
+  arg->cache = &tp->ee.cache;
   tp->ee.stack.push(arg);
 
   if(pthread_attr_init(&attr) != 0) slexception.chuck("Can't initialise thread attributes", getLexInfo());

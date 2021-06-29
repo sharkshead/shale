@@ -958,7 +958,6 @@ OperatorReturn Assign::action(ExecutionEnvironment *ee) {
   Variable *v;
   bool varfound;
   bool valfound;
-  bool allocateMutex;
   static char message[1024];
 
   val = ee->stack.pop(getLexInfo());
@@ -972,12 +971,8 @@ OperatorReturn Assign::action(ExecutionEnvironment *ee) {
     if(v != (Variable *) 0) {
       varfound = true;
 
-      // Not elegant, but if this is going into the BTree then allocate a mutex as this is potentially shared between threads.
-      allocateMutex = (v->getName()[0] == '/');
-        
       try {
         number = val->getNumber(getLexInfo(), ee);
-        if(allocateMutex) number->allocateMutex();
         v->setObject(number);
         number->release(getLexInfo());
         valfound = true;
@@ -986,7 +981,6 @@ OperatorReturn Assign::action(ExecutionEnvironment *ee) {
       if(! valfound) {
         try {
           string = val->getString(getLexInfo(), ee);
-          if(allocateMutex) string->allocateMutex();
           v->setObject(string);
           string->release(getLexInfo());
           valfound = true;
@@ -996,7 +990,6 @@ OperatorReturn Assign::action(ExecutionEnvironment *ee) {
       if(! valfound) {
         try {
           code = val->getCode(getLexInfo(), ee);
-          if(allocateMutex) code->allocateMutex();
           v->setObject(code);
           code->release(getLexInfo());
           valfound = true;
@@ -1006,7 +999,6 @@ OperatorReturn Assign::action(ExecutionEnvironment *ee) {
       if(! valfound) {
         try {
           pointer = val->getPointer(getLexInfo(), ee);
-          if(allocateMutex) pointer->allocateMutex();
           v->setObject(pointer);
           pointer->release(getLexInfo());
           valfound = true;
@@ -1048,7 +1040,6 @@ OperatorReturn PointerAssign::action(ExecutionEnvironment *ee) {
     v = ee->variableStack.findVariable(var->getName(getLexInfo(), ee)->getValue());
     if(v != (Variable *) 0) {
       p = ee->cache.newPointer(val);
-      if(v->getName()[0] == '/') p->allocateMutex();
       v->setObject(p);
       p->release(getLexInfo());
       found = true;
@@ -2182,6 +2173,7 @@ Object *Variable::getObject() {
 void Variable::setObject(Object *o) {
   if(object != (Object *) 0) object->release((LexInfo *) 0);
   object = o;
+  if(name[0] == '/') object->allocateMutex();
   object->hold();
 }
 
