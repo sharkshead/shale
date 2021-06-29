@@ -12,16 +12,12 @@
 // The sudoku example from this video is used below, along with
 // several Cracking the Cryptic examples and one from Andrew Stuart.
 
-// You can specify which of the sudokus to solve by adding s=n ro the command line.
+// You can specify which of the sudokus to solve by adding s=n to the command line.
 // If it is not specified then you get text explaining how to choose an option
 // and what the options are, and the default (s=1) option is solved.
 
 // To use threads, add threads=n to the command line, where n (>= 2) is the maximum number
 // of threads. Add progress=true to the command line to get a view of the threads in use.
-// Using threads won't always lead to a faster solve in this current implementation.
-// For example, the s=3 sudoku produces the solution faster single-threaded than threaded,
-// whereas s=6 produces the solution much faster when threaded. The overall time to complete is
-// always faster when threads are used.
 
 // You can also add your own sudoku to solve by skipping down towards the end of this file
 // and adding it where indicated, and add s=11 to the command line. There are instructions
@@ -771,11 +767,7 @@ kropkiConstraint fn:: dup var { function
   true
 } =
 
-// Very simple naked singles detector. Seems to improve the speed more often than not.
-// When it does improve the solve speed, the improvement can be anyhere from seconds
-// to 5 or more times faster.
-// Solving s=1 is done entirely by this function, and s=8 enjoys a 4x speed improvement.
-// Can only be used before calling solve().
+// Very simple naked singles detector.
 nakedSingles fn:: dup var {
   r var
   c var
