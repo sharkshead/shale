@@ -282,7 +282,7 @@ void Number::release(LexInfo *li) {
   if(isDynamic()) {
     if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_lock(mutex);
     if(referenceCount < 0) slexception.chuck("reference error", li);
-    if(referenceCount == 0) { this->deallocateMutex(); cache->deleteNumber(this); } else referenceCount--;
+    if(referenceCount == 0) { cache->deleteNumber(this); } else referenceCount--;
     if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_unlock(mutex);
   }
 }
@@ -303,7 +303,7 @@ void String::release(LexInfo *li) {
   if(isDynamic()) {
     if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_lock(mutex);
     if(referenceCount < 0) slexception.chuck("reference error", li);
-    if(referenceCount == 0) { this->deallocateMutex(); cache->deleteString(this); } else referenceCount--;
+    if(referenceCount == 0) { cache->deleteString(this); } else referenceCount--;
     if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_unlock(mutex);
   }
 }
@@ -388,15 +388,15 @@ void Code::debug() { printf("Code\n"); }
 
 Pointer::Pointer(Object *o, Cache *c) : Object(c), object(o) { object->hold(); }
 Pointer *Pointer::getPointer(LexInfo *li, ExecutionEnvironment *ee) { this->hold(); return this; }
-void Pointer::setObject(Object *o) { if(object != (Object *) 0) object->release((LexInfo *) 0); object = o; object->hold(); }
+void Pointer::setObject(Object *o) { if(object != (Object *) 0) object->release((LexInfo *) 0); object = o; if(object != (Object *) 0) object->hold(); }
 Object *Pointer::getObject() { return object; }
 void Pointer::hold() { Object::hold(); if(object != (Object *) 0) object->hold(); }
 void Pointer::release(LexInfo *li) {
   if(isDynamic()) {
     if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_lock(mutex);
     if(referenceCount < 0) slexception.chuck("reference error", li);
-    if(object != (Object *) 0) object->release(li);
-    if(referenceCount == 0) { this->deallocateMutex(); cache->deletePointer(this); } else referenceCount--;
+    if(object != (Object *) 0) { object->release(li); }
+    if(referenceCount == 0) { object = (Object *) 0; cache->deletePointer(this); } else referenceCount--;
     if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_unlock(mutex);
   }
 }
