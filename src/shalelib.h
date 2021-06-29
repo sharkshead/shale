@@ -223,6 +223,13 @@ class ObjectBag {
     ObjectBag *next;
 };
 
+class MutexBag {
+  public:
+    MutexBag();
+    pthread_mutex_t *mutex;
+    MutexBag *next;
+};
+
 class CacheDebug {
   public:
     CacheDebug();
@@ -249,10 +256,14 @@ class Cache {
     void deleteString(String *);
     Pointer *newPointer(Object *);
     void deletePointer(Pointer *);
+    pthread_mutex_t *newMutex();
+    void deleteMutex(pthread_mutex_t *);
     ObjectBag *usedNumbers;
     ObjectBag *usedStrings;
     ObjectBag *usedPointers;
     ObjectBag *unusedBags;
+    MutexBag *usedMutexes;
+    MutexBag *unusedMutexBags;
     void incUnused();
     void decUnused();
     void debug();

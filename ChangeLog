@@ -1,7 +1,10 @@
 shale:
 
-  1.3.12 - 19 Jun 2021
-    - fix the incorrect release of objects back into the cache when using tthreads
+  1.3.13 - 29 Jun 2021
+    - improved thread performance by using a mutex cache
+
+  1.3.12 - 29 Jun 2021
+    - fix the incorrect release of objects back into the cache when using threads
 
   1.3.11 - 28 Jun 2021
     - improved thread performance by using one object cache per thread,
