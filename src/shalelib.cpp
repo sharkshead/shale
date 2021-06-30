@@ -278,7 +278,10 @@ void Object::release(LexInfo *li) {
     if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_lock(mutex);
     if(referenceCount < 0) slexception.chuck("reference error", li);
     if(referenceCount == 0) {
-      if(useMutex && (mutex != (pthread_mutex_t *) 0)) { pthread_mutex_unlock(mutex); cache->deleteMutex(mutex); }
+      if(mutex != (pthread_mutex_t *) 0) {
+        if(useMutex) pthread_mutex_unlock(mutex);
+        cache->deleteMutex(mutex);
+      }
       delete(this);
     } else {
       referenceCount--;
@@ -317,8 +320,8 @@ void Number::release(LexInfo *li) {
     if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_lock(mutex);
     if(referenceCount < 0) slexception.chuck("reference error", li);
     if(referenceCount == 0) {
-      if(useMutex && (mutex != (pthread_mutex_t *) 0)) {
-        pthread_mutex_unlock(mutex);
+      if(mutex != (pthread_mutex_t *) 0) {
+        if(useMutex) pthread_mutex_unlock(mutex);
         cache->deleteMutex(mutex);
         mutex = (pthread_mutex_t *) 0;
       }
@@ -347,8 +350,8 @@ void String::release(LexInfo *li) {
     if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_lock(mutex);
     if(referenceCount < 0) slexception.chuck("reference error", li);
     if(referenceCount == 0) {
-      if(useMutex && (mutex != (pthread_mutex_t *) 0)) {
-        pthread_mutex_unlock(mutex);
+      if(mutex != (pthread_mutex_t *) 0) {
+        if(useMutex) pthread_mutex_unlock(mutex);
         cache->deleteMutex(mutex);
         mutex = (pthread_mutex_t *) 0;
       }
@@ -449,8 +452,8 @@ void Pointer::release(LexInfo *li) {
     if(referenceCount < 0) slexception.chuck("reference error", li);
     if(object != (Object *) 0) { object->release(li); }
     if(referenceCount == 0) {
-      if(useMutex && (mutex != (pthread_mutex_t *) 0)) {
-        pthread_mutex_unlock(mutex);
+      if(mutex != (pthread_mutex_t *) 0) {
+        if(useMutex) pthread_mutex_unlock(mutex);
         cache->deleteMutex(mutex);
         mutex = (pthread_mutex_t *) 0;
       }
@@ -2233,11 +2236,10 @@ Object *Variable::getObject() {
 }
 
 void Variable::setObject(Object *o) {
+  o->hold();
+  if(name[0] == '/') o->allocateMutex();
   if(object != (Object *) 0) object->release((LexInfo *) 0);
   object = o;
-  if(name[0] == '/') object->allocateMutex();
-  else object->deallocateMutex();
-  object->hold();
 }
 
 bool Variable::isInitialised() {
