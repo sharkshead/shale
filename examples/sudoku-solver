@@ -1348,19 +1348,17 @@ found {
       } ifthen
 
       // Check the status of all the threads.
-      progress initialised { progress } and {
-        running 0 =
-        waiting 0 =
-        finished 0 =
-        states 0 =
-        i 1 =
-        mutex lock thread::()
-        { i 10 < } {
-          i.value th:: value dup dup states 10 * + states swap = 0 == { waiting++ pop } { 1 == { running++ } { finished++ } if } if
-          i++
-        } while
-        mutex unlock thread::()
-      } ifthen
+      running 0 =
+      waiting 0 =
+      finished 0 =
+      states 0 =
+      i 1 =
+      mutex lock thread::()
+      { i 10 < } {
+        i.value th:: value dup dup states 10 * + states swap = 0 == { waiting++ pop } { 1 == { running++ } { finished++ } if } if
+        i++
+      } while
+      mutex unlock thread::()
     } while
 
     progress initialised { progress } and {
