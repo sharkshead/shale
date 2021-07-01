@@ -3,9 +3,9 @@
 // This solves a sudoku with:
 //  row/column/3x3box constraints (standard sudoku)
 //  row/column/irregular, or jigsaw, region constraints
-// optionally with Chess King's or Knight's move constraints,
-// non-consecutive, arrow, thermo or kropki dot constraints, with any combintions of these.
-// Threads are also supported.
+// optionally with any combination of Chess King's or Knight's move constraints,
+// non-consecutive, arrow, thermo or kropki dot constraints.
+// Threads are also supported to shorted the time to the solution.
 
 // It is based on the python code from the Computerphile video
 //  https://www.youtube.com/watch?v=G_UYXzGuqvM
