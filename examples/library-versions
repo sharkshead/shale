@@ -1,0 +1,19 @@
+#!/usr/local/bin/shale
+
+// Prints the version number of each library.
+
+printVersion dup var {
+  lib dup var swap &=
+
+  lib-> library
+
+  micro version:: lib->:: minor version:: lib->:: major version:: lib->:: lib-> "%n %d.%d.%d\n" printf
+} =
+
+array printVersion()
+file printVersion()
+maths printVersion()
+primes printVersion()
+string printVersion()
+thread printVersion()
+time printVersion()
