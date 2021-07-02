@@ -28,7 +28,7 @@ SOFTWARE.
 
 #define MAJOR   (INT) 1
 #define MINOR   (INT) 0
-#define MICRO   (INT) 6
+#define MICRO   (INT) 7
 
 class ThreadPack {
   public:
@@ -96,6 +96,7 @@ const char *threadHelp[] = {
   "  major version:: thread::        - major version number",
   "  minor version:: thread::        - minor version number",
   "  micro version:: number::        - micro version number",
+  "  help thread::()                 - this",
   (const char *) 0
 };
 
@@ -111,7 +112,7 @@ extern "C" void slmain() {
   ol = new OperationList;
   ol->addOperation(new ThreadHelp((LexInfo *) 0));
   v = new Variable("/help/thread");
-  v->setObject(new Code(ol, &mainEE.cache));
+  v->setObject(new Code(ol, &mainEE.cache, IS_STATIC));
   btree.addVariable(v);
 
   v = new Variable("/major/version/thread");
@@ -127,45 +128,45 @@ extern "C" void slmain() {
   btree.addVariable(v);
 
   ol = new OperationList;
-  ol->addOperation(new ThreadMutex((LexInfo *) 0));
-  v = new Variable("/mutex/thread");
-  v->setObject(new Code(ol, &mainEE.cache));
+  ol->addOperation(new ThreadCreate((LexInfo *) 0));
+  v = new Variable("/create/thread");
+  v->setObject(new Code(ol, &mainEE.cache, IS_STATIC));
   btree.addVariable(v);
 
   ol = new OperationList;
-  ol->addOperation(new ThreadCreate((LexInfo *) 0));
-  v = new Variable("/create/thread");
-  v->setObject(new Code(ol, &mainEE.cache));
+  ol->addOperation(new ThreadMutex((LexInfo *) 0));
+  v = new Variable("/mutex/thread");
+  v->setObject(new Code(ol, &mainEE.cache, IS_STATIC));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new ThreadLock((LexInfo *) 0));
   v = new Variable("/lock/thread");
-  v->setObject(new Code(ol, &mainEE.cache));
+  v->setObject(new Code(ol, &mainEE.cache, IS_STATIC));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new ThreadUnlock((LexInfo *) 0));
   v = new Variable("/unlock/thread");
-  v->setObject(new Code(ol, &mainEE.cache));
+  v->setObject(new Code(ol, &mainEE.cache, IS_STATIC));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new ThreadSemaphore((LexInfo *) 0));
   v = new Variable("/semaphore/thread");
-  v->setObject(new Code(ol, &mainEE.cache));
+  v->setObject(new Code(ol, &mainEE.cache, IS_STATIC));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new ThreadWait((LexInfo *) 0));
   v = new Variable("/wait/thread");
-  v->setObject(new Code(ol, &mainEE.cache));
+  v->setObject(new Code(ol, &mainEE.cache, IS_STATIC));
   btree.addVariable(v);
 
   ol = new OperationList;
   ol->addOperation(new ThreadPost((LexInfo *) 0));
   v = new Variable("/post/thread");
-  v->setObject(new Code(ol, &mainEE.cache));
+  v->setObject(new Code(ol, &mainEE.cache, IS_STATIC));
   btree.addVariable(v);
 
   useMutex = true;
@@ -244,10 +245,9 @@ OperatorReturn ThreadMutex::action(ExecutionEnvironment *ee) {
   name[0] = 0;
 
   try {
-    no = o->getNumber(getLexInfo(), ee);
-    if(no->isInt()) { sprintf(fmt, "%%%sd", PCTD); sprintf(name, fmt, no->getInt()); }
-    else sprintf(name, "%0.3f", no->getDouble());
-    no->release(getLexInfo());
+    n = o->getName(getLexInfo(), ee);
+    str = n->getValue();
+    strcpy(name, str + (str[0] == '/' ? 1 : 0));
   } catch(Exception *e) { }
 
   if(name[0] == 0) {
@@ -260,9 +260,10 @@ OperatorReturn ThreadMutex::action(ExecutionEnvironment *ee) {
 
   if(name[0] == 0) {
     try {
-      n = o->getName(getLexInfo(), ee);
-      str = n->getValue();
-      strcpy(name, str + (str[0] == '/' ? 1 : 0));
+      no = o->getNumber(getLexInfo(), ee);
+      if(no->isInt()) { sprintf(fmt, "%%%sd", PCTD); sprintf(name, fmt, no->getInt()); }
+      else sprintf(name, "%0.3f", no->getDouble());
+      no->release(getLexInfo());
     } catch(Exception *e) { }
   }
 
@@ -281,7 +282,7 @@ OperatorReturn ThreadMutex::action(ExecutionEnvironment *ee) {
     slexception.chuck("Name already exists", getLexInfo());
   }
   v = new Variable(mutexName);
-  v->setObject(mainEE.cache.newNumber((INT) mutex));
+  v->setObject(ee->cache.newNumber((INT) mutex));
   btree.addVariable(v);
 
   o->release(getLexInfo());
@@ -308,10 +309,9 @@ OperatorReturn ThreadLock::action(ExecutionEnvironment *ee) {
   name[0] = 0;
 
   try {
-    no = o->getNumber(getLexInfo(), ee);
-    if(no->isInt()) { sprintf(fmt, "%%%sd", PCTD); sprintf(name, fmt, no->getInt()); }
-    else sprintf(name, "%0.3f", no->getDouble());
-    no->release(getLexInfo());
+    n = o->getName(getLexInfo(), ee);
+    str = n->getValue();
+    strcpy(name, str + (str[0] == '/' ? 1 : 0));
   } catch(Exception *e) { }
 
   if(name[0] == 0) {
@@ -324,9 +324,10 @@ OperatorReturn ThreadLock::action(ExecutionEnvironment *ee) {
 
   if(name[0] == 0) {
     try {
-      n = o->getName(getLexInfo(), ee);
-      str = n->getValue();
-      strcpy(name, str + (str[0] == '/' ? 1 : 0));
+      no = o->getNumber(getLexInfo(), ee);
+      if(no->isInt()) { sprintf(fmt, "%%%sd", PCTD); sprintf(name, fmt, no->getInt()); }
+      else sprintf(name, "%0.3f", no->getDouble());
+      no->release(getLexInfo());
     } catch(Exception *e) { }
   }
 
@@ -370,10 +371,9 @@ OperatorReturn ThreadUnlock::action(ExecutionEnvironment *ee) {
   name[0] = 0;
 
   try {
-    no = o->getNumber(getLexInfo(), ee);
-    if(no->isInt()) { sprintf(fmt, "%%%sd", PCTD); sprintf(name, fmt, no->getInt()); }
-    else sprintf(name, "%0.3f", no->getDouble());
-    no->release(getLexInfo());
+    n = o->getName(getLexInfo(), ee);
+    str = n->getValue();
+    strcpy(name, str + (str[0] == '/' ? 1 : 0));
   } catch(Exception *e) { }
 
   if(name[0] == 0) {
@@ -386,9 +386,10 @@ OperatorReturn ThreadUnlock::action(ExecutionEnvironment *ee) {
 
   if(name[0] == 0) {
     try {
-      n = o->getName(getLexInfo(), ee);
-      str = n->getValue();
-      strcpy(name, str + (str[0] == '/' ? 1 : 0));
+      no = o->getNumber(getLexInfo(), ee);
+      if(no->isInt()) { sprintf(fmt, "%%%sd", PCTD); sprintf(name, fmt, no->getInt()); }
+      else sprintf(name, "%0.3f", no->getDouble());
+      no->release(getLexInfo());
     } catch(Exception *e) { }
   }
 
@@ -434,10 +435,9 @@ OperatorReturn ThreadSemaphore::action(ExecutionEnvironment *ee) {
   name[0] = 0;
 
   try {
-    no = o->getNumber(getLexInfo(), ee);
-    if(no->isInt()) { sprintf(fmt, "%%%sd", PCTD); sprintf(name, fmt, no->getInt()); }
-    else sprintf(name, "%0.3f", no->getDouble());
-    no->release(getLexInfo());
+    n = o->getName(getLexInfo(), ee);
+    str = n->getValue();
+    strcpy(name, str + (str[0] == '/' ? 1 : 0));
   } catch(Exception *e) { }
 
   if(name[0] == 0) {
@@ -450,9 +450,10 @@ OperatorReturn ThreadSemaphore::action(ExecutionEnvironment *ee) {
 
   if(name[0] == 0) {
     try {
-      n = o->getName(getLexInfo(), ee);
-      str = n->getValue();
-      strcpy(name, str + (str[0] == '/' ? 1 : 0));
+      no = o->getNumber(getLexInfo(), ee);
+      if(no->isInt()) { sprintf(fmt, "%%%sd", PCTD); sprintf(name, fmt, no->getInt()); }
+      else sprintf(name, "%0.3f", no->getDouble());
+      no->release(getLexInfo());
     } catch(Exception *e) { }
   }
 
@@ -475,7 +476,7 @@ OperatorReturn ThreadSemaphore::action(ExecutionEnvironment *ee) {
   sem_unlink(externalName);
   if((sem = sem_open(externalName, O_CREAT | O_EXCL, 0666, 0)) == SEM_FAILED) slexception.chuck("Can't create semaphore", getLexInfo());
   v = new Variable(semName);
-  v->setObject(mainEE.cache.newNumber((INT) sem));
+  v->setObject(ee->cache.newNumber((INT) sem));
   btree.addVariable(v);
 
   o->release(getLexInfo());
@@ -502,10 +503,9 @@ OperatorReturn ThreadWait::action(ExecutionEnvironment *ee) {
   name[0] = 0;
 
   try {
-    no = o->getNumber(getLexInfo(), ee);
-    if(no->isInt()) { sprintf(fmt, "%%%sd", PCTD); sprintf(name, fmt, no->getInt()); }
-    else sprintf(name, "%0.3f", no->getDouble());
-    no->release(getLexInfo());
+    n = o->getName(getLexInfo(), ee);
+    str = n->getValue();
+    strcpy(name, str + (str[0] == '/' ? 1 : 0));
   } catch(Exception *e) { }
 
   if(name[0] == 0) {
@@ -518,9 +518,10 @@ OperatorReturn ThreadWait::action(ExecutionEnvironment *ee) {
 
   if(name[0] == 0) {
     try {
-      n = o->getName(getLexInfo(), ee);
-      str = n->getValue();
-      strcpy(name, str + (str[0] == '/' ? 1 : 0));
+      no = o->getNumber(getLexInfo(), ee);
+      if(no->isInt()) { sprintf(fmt, "%%%sd", PCTD); sprintf(name, fmt, no->getInt()); }
+      else sprintf(name, "%0.3f", no->getDouble());
+      no->release(getLexInfo());
     } catch(Exception *e) { }
   }
 
@@ -564,10 +565,9 @@ OperatorReturn ThreadPost::action(ExecutionEnvironment *ee) {
   name[0] = 0;
 
   try {
-    no = o->getNumber(getLexInfo(), ee);
-    if(no->isInt()) { sprintf(fmt, "%%%sd", PCTD); sprintf(name, fmt, no->getInt()); }
-    else sprintf(name, "%0.3f", no->getDouble());
-    no->release(getLexInfo());
+    n = o->getName(getLexInfo(), ee);
+    str = n->getValue();
+    strcpy(name, str + (str[0] == '/' ? 1 : 0));
   } catch(Exception *e) { }
 
   if(name[0] == 0) {
@@ -580,9 +580,10 @@ OperatorReturn ThreadPost::action(ExecutionEnvironment *ee) {
 
   if(name[0] == 0) {
     try {
-      n = o->getName(getLexInfo(), ee);
-      str = n->getValue();
-      strcpy(name, str + (str[0] == '/' ? 1 : 0));
+      no = o->getNumber(getLexInfo(), ee);
+      if(no->isInt()) { sprintf(fmt, "%%%sd", PCTD); sprintf(name, fmt, no->getInt()); }
+      else sprintf(name, "%0.3f", no->getDouble());
+      no->release(getLexInfo());
     } catch(Exception *e) { }
   }
 
