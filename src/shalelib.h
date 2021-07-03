@@ -571,15 +571,6 @@ class IfThen : public Operation {
     OperatorReturn action(ExecutionEnvironment *);
 };
 
-class Repeat : public Operation {
-  public:
-    Repeat(LexInfo *);
-    OperatorReturn action(ExecutionEnvironment *);
-
-  private:
-    bool checkTimers(int *);
-};
-
 class Value : public Operation {
   public:
     Value(LexInfo *);
