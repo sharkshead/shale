@@ -273,6 +273,9 @@ void Object::hold() {
     if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_unlock(mutex);
   }
 }
+void Object::setStatic() {
+  isStatic = true;
+}
 void Object::release(LexInfo *li) {
   if(! isStatic) {
     if(useMutex && (mutex != (pthread_mutex_t *) 0)) pthread_mutex_lock(mutex);
@@ -2610,6 +2613,43 @@ Variable *BTree::findVariable(const char *v) {
   return (Variable *) 0;
 }
 
+void BTree::toStatic(const char *ns) {
+  if(tree == (BTreeNode *) 0) return;
+
+  setNodeToStatic(tree, ns);
+}
+
+void BTree::setNodeToStatic(BTreeNode *node, const char *ns) {
+  Variable *v;
+  int n;
+
+  if(node == (BTreeNode *) 0) return;
+
+  for(n = 0; n < node->getNumber(); n++) {
+    if(! node->isLeaf()) setNodeToStatic(node->getPointer(n), ns);
+    v = node->getData(n);
+    if(isNamespace(v, ns)) {
+      v->getObject()->setStatic();
+    }
+  }
+  if(! node->isLeaf()) setNodeToStatic(node->getPointer(n), ns);
+}
+
+bool BTree::isNamespace(Variable *v, const char *ns) {
+  const char *nsp;
+  const char *vp;
+
+  nsp = (ns[0] == '/' ? &ns[1] : &ns[0]);
+  vp = v->getName();
+  while(*vp == '/') {
+    vp++;
+    if(strcmp(vp, nsp) == 0) return true;
+    while((*vp != 0) && (*vp != '/')) vp++;
+  }
+
+  return false;
+}
+
 void BTree::setThreadSafe() {
   pthread_rwlockattr_t attr;
 
@@ -2704,6 +2744,8 @@ void BTree::printDetail(BTreeNode *t, int i) {
   }
 
   if(! found) printf("...unknown");
+
+  if(! o->isDynamic()) printf(" (static)");
 
   printf("\n");
 }

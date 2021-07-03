@@ -119,6 +119,7 @@ class Object {
     void allocateMutex();
     void deallocateMutex();
     bool isDynamic();
+    void setStatic();
     Cache *cache;
 
   protected:
@@ -752,6 +753,7 @@ class BTree {
     BTree();
     bool addVariable(Variable *);
     Variable *findVariable(const char *);
+    void toStatic(const char *);
     void debug();
     void print();
     void setThreadSafe();
@@ -762,6 +764,8 @@ class BTree {
     int nodes;
     int entries;
     pthread_rwlock_t *mutex;
+    void setNodeToStatic(BTreeNode *, const char *);
+    bool isNamespace(Variable *, const char *);
     void printTree(BTreeNode *);
     void printDetail(BTreeNode *, int);
 };

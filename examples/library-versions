@@ -13,6 +13,7 @@ printVersion dup var {
 array printVersion()
 file printVersion()
 maths printVersion()
+namespace printVersion()
 primes printVersion()
 string printVersion()
 thread printVersion()

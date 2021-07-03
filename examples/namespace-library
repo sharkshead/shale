@@ -1,0 +1,111 @@
+#!/usr/local/bin/shale
+
+// The namespace library provied the following:
+//
+//  static namespace::()
+//  help nammespace::()
+//  major version:: nammespace::
+//  minor version:: nammespace::
+//  micro version:: nammespace::
+
+// The namespace library provides control over objects stored in namespace variables.
+//
+// Currently there is only a single operation possible, setting objects to be "static",
+// but could, one day, include such operations as setting variables to be read-only or
+// assigning thread ownership.
+//
+// Setting a namespace variable to static may improve the speed of threaded scripts.
+// Non-threaded scripts will see no impact on performance. An object set to static
+// changes the way in which memory management is applied to the object. If you think of
+// constants, such as the number 123 or the string "abs123" or variable names, these are static,
+// in that the memory they consume can never be released back into the free memory pool.
+// And so there is no memory management (hold/release) applied to them.
+//
+// On the other hand, when a calculation is done, such as 1 2 +, the resultant 3 consumes
+// memory that can be returned to the free memory pool once there are no further references
+// to that number 3. This is handled by a hold/release mechanism, and when all the holds
+// have been released then the memory can be returned to the free memory pool.
+// 
+// In a threaded scipt, the hold/release code must be protected by a mutex lock/unlock.
+// While this usually only entails a very small overhead, it is still worth removing if
+// you're trying to improve the runtime execution speed of your script. And that's where
+// setting a namespace variable as static comes in - it removes the memory management overhead.
+//
+// Static is not the same as read-only. You can change the value of a namespace variable
+// that has been labelled as static, the new value reverting to the default non-static
+// memory management style.
+//
+// To set a namesspace variable to static, or all of the variables below a particular namespace, do
+//
+//  i ns:: static namespace::()                                     <-- set a variable as static
+//  5 8:: a:: static namespace::()                                  <-- any depth you like
+//  "Arnold Schwarzenegger" "Famous Quotes":: static namespace::()  <-- set everything below here static
+//  "Famous Quotes" static namespace::()                            <-- set them all static
+//
+// The namespace you pass to static namespace::() is matched to the end of the namespace variables
+// stored in the BTree, not the beginning. And the the name must match exactly. These will not
+// do what the above does
+//
+//  "Arnold Schwarzenegger" static namespace::()              <-- must match to the end of the namespace
+//  "Schwarzenegger" "Famous Quotes":: static namespace::()   <-- won't match "Arnold Schwarzenegger"
+//
+// To use this, first you need to load the namespace library
+
+namespace library
+
+// For the purposes of this script we'll create a few namespace variables.
+
+i var
+
+// The first 10 Fibonacci numbers.
+0 fibonacci:: sequence:: dup var 1 =    // Since 1 is static so too will 0 fibonacci:: sequence::
+1 fibonacci:: sequence:: dup var 1 =    // ditto
+i 2 =
+{ i 10 < } {
+  i.value fibonacci:: sequence:: dup var i 1 - fibonacci:: sequence:: i 2 - fibonacci:: sequence:: + =
+  i++
+} while
+
+// The first 10 factorials.
+0 factorial:: sequence:: dup var 1 =    // ditto
+i 1 =
+{ i 10 < } {
+  i.value factorial:: sequence:: dup var i i 1 - factorial:: sequence:: * =
+  i++
+} while
+
+// Now a few that "look" like fibonacci sequences namespace variables, but aren't.
+0 fibonacci:: sequence:: fake:: dup var 3 4 + =
+1 fibonacci:: sequence:: fake:: dup var 4 5 + =
+
+// The btree operator shows which objects are static. Here's how things are before
+// use use the static namespace::() function.
+"Namespace variables, before" println
+btree
+
+// Now we'll change the fibonacci numbers to be static.
+
+fibonacci sequence:: static namespace::()
+
+"" println
+"Namespace variables, after" println
+btree
+
+// You'll notice that the fake entries were not changed, because their namesspace
+// name did not "end match" fibonacci sequence::. The fact that fibonacci sequence::
+// is part of the fake:: namespace is of no importance.
+
+// And one final thing about the match, you must have a whole matching name,
+// so this will not match factorial sequence::
+
+actorial sequence:: static namespace::()
+
+"" println
+"Namespace variables, after non-matching name" println
+btree
+
+// This library is not for verybody, and when it applies it usually doesn't give
+// your script much of a performance increase. Every bit counts, though.
+
+"" println
+micro version:: namespace:: minor version:: namespace:: major version:: namespace:: "Namespace library version %d.%d.%d\n" printf

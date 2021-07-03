@@ -1,6 +1,6 @@
-all: shale maths.so array.so primes.so time.so file.so thread.so string.so
+all: shale maths.so array.so primes.so time.so file.so thread.so string.so namespace.so
 
-install: /usr/local/bin/shale /usr/local/lib/shale/maths.so /usr/local/lib/shale/array.so /usr/local/lib/shale/primes.so /usr/local/lib/shale/time.so /usr/local/lib/shale/file.so /usr/local/lib/shale/thread.so /usr/local/lib/shale/string.so
+install: /usr/local/bin/shale /usr/local/lib/shale/maths.so /usr/local/lib/shale/array.so /usr/local/lib/shale/primes.so /usr/local/lib/shale/time.so /usr/local/lib/shale/file.so /usr/local/lib/shale/thread.so /usr/local/lib/shale/string.so /usr/local/lib/shale/namespace.so
 
 clean:
 	rm -f shale *.o *.so
@@ -62,6 +62,12 @@ string.o: string.cpp shalelib.h
 string.so: string.o
 	g++ -flat_namespace -bundle -undefined suppress -o string.so string.o
 
+namespace.o: namespace.cpp shalelib.h
+	g++ -c -o namespace.o namespace.cpp
+
+namespace.so: namespace.o
+	g++ -flat_namespace -bundle -undefined suppress -o namespace.so namespace.o
+
 /usr/local/bin/shale: shale
 	[ -d /usr/local/bin ] || sudo mkdir -p /usr/local/bin
 	sudo rm -f /usr/local/bin/shale
@@ -101,3 +107,8 @@ string.so: string.o
 	[ -d /usr/local/lib/shale ] || sudo mkdir -p /usr/local/lib/shale
 	sudo rm -f /usr/local/lib/shale/string.so
 	sudo cp string.so /usr/local/lib/shale/string.so
+
+/usr/local/lib/shale/namespace.so: namespace.so
+	[ -d /usr/local/lib/shale ] || sudo mkdir -p /usr/local/lib/shale
+	sudo rm -f /usr/local/lib/shale/namespace.so
+	sudo cp namespace.so /usr/local/lib/shale/namespace.so

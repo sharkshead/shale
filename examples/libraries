@@ -9,6 +9,7 @@
 //  array
 //  file
 //  maths
+//  namespace
 //  primes
 //  string
 //  thread
@@ -19,6 +20,7 @@
 array library
 file library
 maths library
+namespace library
 primes library
 string library
 thread library

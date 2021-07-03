@@ -1304,6 +1304,16 @@ found {
     i var
 
     thread library
+    namespace library
+
+    // Turn some of the namespaces static so they won't incur mutex contention overhead.
+    grid static namespace::()
+    region static namespace::()
+    arrows static namespace::()
+    thermos static namespace::()
+    blackDot static namespace::()
+    whiteDot static namespace::()
+    fn static namespace::()
 
     main semaphore thread::()
     mutex mutex thread::()
