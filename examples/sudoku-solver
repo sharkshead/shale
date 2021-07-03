@@ -3,8 +3,16 @@
 // This solves a sudoku with:
 //  row/column/3x3box constraints (standard sudoku)
 //  row/column/irregular, or jigsaw, region constraints
-// optionally with any combination of Chess King's or Knight's move constraints,
-// non-consecutive, arrow, thermo or kropki dot constraints.
+// optionally with any combination of constraints:
+//  Chess King's move
+//  Check Kinght's move
+//  non-consecutive
+//  arrow
+//  thermo
+//  kropki dot
+//  anti-kropki dot
+//  top-left to bottom-right diagonal
+//  botton-left to top-right diagonal
 // Threads are also supported to shorted the time to the solution.
 
 // It is based on the python code from the Computerphile video
@@ -767,6 +775,74 @@ kropkiConstraint fn:: dup var { function
   true
 } =
 
+// Anti-Kropki constraint.
+antiKropkiConstraint fn:: dup var { function
+  c var
+
+  // Does this cell have any black dots?
+  count row.value:: col.value:: blackDot:: initialised { true return } ifthen
+
+  // Does this cell have any white dots?
+  count row.value:: col.value:: whiteDot:: initialised { true return } ifthen
+
+  // Check right.
+  col 8 < {
+    c row.value$ col 11 + $ / 10 % =
+    c 0 != { num c 1 - == { num c 1 + == { num c 2 * == { num 2 * c == } or } or } or } and { false return } ifthen
+  } ifthen
+
+  // Check down.
+  row 8 < {
+    c row 1 + $ col 10 + $ / 10 % =
+    c 0 != { num c 1 - == { num c 1 + == { num c 2 * == { num 2 * c == } or } or } or } and { false return } ifthen
+  } ifthen
+
+  // Check left.
+  col 0 > {
+    c row.value$ col 9 + $ / 10 % =
+    c 0 != { num c 1 - == { num c 1 + == { num c 2 * == { num 2 * c == } or } or } or } and { false return } ifthen
+  } ifthen
+
+  // Check up.
+  row 0 > {
+    c row 1 - $ col 10 + $ / 10 % =
+    c 0 != { num c 1 - == { num c 1 + == { num c 2 * == { num 2 * c == } or } or } or } and { false return } ifthen
+  } ifthen
+
+  true
+} =
+
+diagonalTLBRConstraint fn:: dup var { function
+  i dup var 0 =
+  c var
+
+  row col == {
+    { i 9 < } {
+      c i.value$ i 10 + $ / 10 % =
+      c num == { false return } ifthen
+      i++
+    } while
+  } ifthen
+
+  true
+} =
+
+diagonalBLTRConstraint fn:: dup var { function
+  i dup var 0 =
+  n dup var 1 num << =
+  c var
+
+  8 row - col == {
+    { i 9 < } {
+      c 8 i - $ i 10 + $ / 10 % =
+      c num == { false return } ifthen
+      i++
+    } while
+  } ifthen
+
+  true
+} =
+
 // Very simple naked singles detector.
 nakedSingles fn:: dup var {
   r var
@@ -1248,6 +1324,9 @@ whichSudoku 11 == {
   // constraint fn:: { arrowConstraint          fn::() not { false return } ifthen } constraint fn:: + =
   // constraint fn:: { thermoConstraint         fn::() not { false return } ifthen } constraint fn:: + =
   // constraint fn:: { kropkiConstraint         fn::() not { false return } ifthen } constraint fn:: + =
+  // constraint fn:: { antiKropkiConstraint     fn::() not { false return } ifthen } constraint fn:: + =
+  // constraint fn:: { diagonalTLBRConstraint   fn::() not { false return } ifthen } constraint fn:: + =
+  // constraint fn:: { diagonalBLTRConstraint   fn::() not { false return } ifthen } constraint fn:: + =
 
   // Add the grid. Each grid line looks like
   //  grid {r} {c1} {c2} ... {c9} setRow()
