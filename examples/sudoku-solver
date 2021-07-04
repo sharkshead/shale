@@ -5,7 +5,7 @@
 //  row/column/irregular, or jigsaw, region constraints
 // optionally with any combination of constraints:
 //  Chess King's move
-//  Check Kinght's move
+//  Chess Kinght's move
 //  non-consecutive
 //  arrow
 //  thermo
@@ -13,7 +13,8 @@
 //  anti-kropki dot
 //  top-left to bottom-right diagonal
 //  botton-left to top-right diagonal
-// Threads are also supported to shorted the time to the solution.
+//  odd or even cells
+// Threads may also be used to shorten the time to the solution.
 
 // It is based on the python code from the Computerphile video
 //  https://www.youtube.com/watch?v=G_UYXzGuqvM
@@ -456,6 +457,31 @@ whiteDot dup var {
   p->++
 } =
 
+// Odd and even cells.
+oddCell dup var {
+  c dup var swap =
+  r dup var swap =
+
+  r.value c.value:: oddEven:: dup initialised {
+    c r "Cell at %d, %d already set as odd or even\n" printf
+    1 exit
+  } ifthen
+
+  dup var 1 =
+} =
+
+evenCell dup var {
+  c dup var swap =
+  r dup var swap =
+
+  r.value c.value:: oddEven:: dup initialised {
+    c r "Cell at %d, %d already set as odd or even\n" printf
+    1 exit
+  } ifthen
+
+  dup var 0 =
+} =
+
 constraint fn:: dup var { function true } =
 
 kingsMoveConstraint fn:: dup var { function
@@ -842,6 +868,14 @@ diagonalBLTRConstraint fn:: dup var { function
   } ifthen
 
   true
+} =
+
+oddEvenConstraint fn:: dup var {
+  row.value col.value:: oddEven:: initialised {
+    num 2 % row.value col.value:: oddEven:: ==
+  } {
+    true
+  } if
 } =
 
 // Very simple naked singles detector.
@@ -1349,6 +1383,7 @@ whichSudoku 12 == {
   // constraint fn:: { antiKropkiConstraint     fn::() not { false return } ifthen } constraint fn:: + =
   // constraint fn:: { diagonalTLBRConstraint   fn::() not { false return } ifthen } constraint fn:: + =
   // constraint fn:: { diagonalBLTRConstraint   fn::() not { false return } ifthen } constraint fn:: + =
+  // constraint fn:: { oddEvenConstraint        fn::() not { false return } ifthen } constraint fn:: + =
 
   // Add the grid. Each grid line looks like
   //  grid {r} {c1} {c2} ... {c9} setRow()
