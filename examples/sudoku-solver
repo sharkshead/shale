@@ -28,7 +28,7 @@
 // of threads. Add progress=true to the command line to get a view of the threads in use.
 
 // You can also add your own sudoku to solve by skipping down towards the end of this file
-// and adding it where indicated, and add s=11 to the command line. There are instructions
+// and adding it where indicated, and add s=12 to the command line. There are instructions
 // on what and how to add a sudoku, and you can check the examples I've included
 // that immediately precede that section.
 
@@ -53,7 +53,8 @@ s initialised {
   "  8: regular sudoku with a thermo constraint, from Cracking the Cryptic." println
   "  9: regular sudoku with King's and Knight's move and non-consecutive constraints. Cracking the Cryptic's Miracle sudoku." println
   " 10: irregular sudoku with a kropki dot constraint, from Cracking the Cryptic." println
-  " 11: empty and waiting for you to fill it in with an unsolved sudoku. Check towards the end of this file for details." println
+  " 11: regular sudoku with anti-kropki dot and both main diagonal constraints, from Cracking the Cryptic." println
+  " 12: empty and waiting for you to fill it in with an unsolved sudoku. Check towards the end of this file for details." println
   "" println
   "You can enable the use of threads by adding threads=n to the command line," println
   "where n is the maximum number of threads to use. Add progress=true to see thread details." println
@@ -1309,6 +1310,27 @@ whichSudoku 10 == {
 } ifthen
 
 whichSudoku 11 == {
+  found true =
+  "Another CTC video: https://www.youtube.com/watch?v=1QP7yviZYTU" println
+  "This is by Phistomefel and is another take on the Miracle Sudoku." println
+  "Anti-kropki dot and both main diagonal constraints." println
+  regionChecker fn:: standardRegions  fn:: =
+  constraint fn:: { antiKropkiConstraint     fn::() not { false return } ifthen } constraint fn:: + =
+  constraint fn:: { diagonalTLBRConstraint   fn::() not { false return } ifthen } constraint fn:: + =
+  constraint fn:: { diagonalBLTRConstraint   fn::() not { false return } ifthen } constraint fn:: + =
+
+  grid 0 0 0 0 0 0 0 0 0 0 setRow()
+  grid 1 0 0 0 0 0 0 0 0 0 setRow()
+  grid 2 0 0 0 0 0 0 0 0 0 setRow()
+  grid 3 0 1 0 0 0 0 0 2 0 setRow()
+  grid 4 0 0 0 0 4 0 0 0 0 setRow()
+  grid 5 0 0 0 0 0 0 0 0 0 setRow()
+  grid 6 0 0 0 0 0 0 0 0 0 setRow()
+  grid 7 0 0 0 0 0 0 0 0 0 setRow()
+  grid 8 0 0 0 0 0 0 0 0 0 setRow()
+} ifthen
+
+whichSudoku 12 == {
   found true =
 
   // If you want to add your own sudoku, add it here.
