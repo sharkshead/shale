@@ -43,12 +43,21 @@
 //  "Famous Quotes" static namespace::()                            <-- set them all static
 //
 // The namespace you pass to static namespace::() is matched to the end of the namespace variables
-// stored in the BTree, not the beginning. And the the name must match exactly. These will not
+// stored in the BTree, not the beginning. And the name must match exactly. These will not
 // do what the above does
 //
 //  "Arnold Schwarzenegger" static namespace::()              <-- must match to the end of the namespace
 //  "Schwarzenegger" "Famous Quotes":: static namespace::()   <-- won't match "Arnold Schwarzenegger"
 //
+// Setting object to static is a point-in-time operation, meaning it affects the objects
+// that exist in the given namespaace at the time you call static namespace::().
+// Object added to that namespace after this will typically be non-static and will incur
+// the small memory management overhead.
+//
+// For a reeal example of using this librrary, see sudoku-solver.
+
+
+
 // To use this, first you need to load the namespace library
 
 namespace library
@@ -79,7 +88,7 @@ i 1 =
 1 fibonacci:: sequence:: fake:: dup var 4 5 + =
 
 // The btree operator shows which objects are static. Here's how things are before
-// use use the static namespace::() function.
+// we use the static namespace::() function.
 "Namespace variables, before" println
 btree
 
@@ -91,9 +100,11 @@ fibonacci sequence:: static namespace::()
 "Namespace variables, after" println
 btree
 
-// You'll notice that the fake entries were not changed, because their namesspace
+// You'll notice that the fake entries were not changed because their namesspace
 // name did not "end match" fibonacci sequence::. The fact that fibonacci sequence::
-// is part of the fake:: namespace is of no importance.
+// is part of the fake:: namespace is of no importance. To change the fake ones you
+// need to do
+//  fibonacci sequence:: fake:: static namespace::()
 
 // And one final thing about the match, you must have a whole matching name,
 // so this will not match factorial sequence::
@@ -104,8 +115,11 @@ actorial sequence:: static namespace::()
 "Namespace variables, after non-matching name" println
 btree
 
-// This library is not for verybody, and when it applies it usually doesn't give
-// your script much of a performance increase. Every bit counts, though.
+// Closing comment.
+//
+// This library isn't for everybody. It has no impact on a single-threaded script,
+// and somewhat marginal use in threaded scripts where you're trying to gain
+// every last bit of performance.
 
 "" println
 micro version:: namespace:: minor version:: namespace:: major version:: namespace:: "Namespace library version %d.%d.%d\n" printf
