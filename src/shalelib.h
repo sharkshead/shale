@@ -529,18 +529,6 @@ class LogicalNot : public Operation {
     OperatorReturn action(ExecutionEnvironment *);
 };
 
-class Stop : public Operation {
-  public:
-    Stop(LexInfo *);
-    OperatorReturn action(ExecutionEnvironment *);
-};
-
-class Start : public Operation {
-  public:
-    Start(LexInfo *);
-    OperatorReturn action(ExecutionEnvironment *);
-};
-
 class Break : public Operation {
   public:
     Break(LexInfo *);
