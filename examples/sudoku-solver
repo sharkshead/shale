@@ -11,6 +11,7 @@
 //  thermo
 //  kropki dot
 //  anti-kropki dot
+//  XV
 //  top-left to bottom-right diagonal
 //  botton-left to top-right diagonal
 //  odd or even cells
@@ -457,6 +458,56 @@ whiteDot dup var {
   p->++
 } =
 
+// Join two cells with an X.
+X dup var {
+  c2 dup var swap =
+  r2 dup var swap =
+  c1 dup var swap =
+  r1 dup var swap =
+  p var
+
+  p count r1.value:: c1.value:: X:: &=
+  p-> initialised not {
+    p-> dup var 0 =
+  } ifthen
+  row p->value:: r1.value:: c1.value:: X:: dup var r2 =
+  col p->value:: r1.value:: c1.value:: X:: dup var c2 =
+  p->++
+
+  p count r2.value:: c2.value:: X:: &=
+  p-> initialised not {
+    p-> dup var 0 =
+  } ifthen
+  row p->value:: r2.value:: c2.value:: X:: dup var r1 =
+  col p->value:: r2.value:: c2.value:: X:: dup var c1 =
+  p->++
+} =
+
+// Join two cells with a V.
+V dup var {
+  c2 dup var swap =
+  r2 dup var swap =
+  c1 dup var swap =
+  r1 dup var swap =
+  p var
+
+  p count r1.value:: c1.value:: V:: &=
+  p-> initialised not {
+    p-> dup var 0 =
+  } ifthen
+  row p->value:: r1.value:: c1.value:: V:: dup var r2 =
+  col p->value:: r1.value:: c1.value:: V:: dup var c2 =
+  p->++
+
+  p count r2.value:: c2.value:: V:: &=
+  p-> initialised not {
+    p-> dup var 0 =
+  } ifthen
+  row p->value:: r2.value:: c2.value:: V:: dup var r1 =
+  col p->value:: r2.value:: c2.value:: V:: dup var c1 =
+  p->++
+} =
+
 // Odd and even cells.
 oddCell dup var {
   c dup var swap =
@@ -834,6 +885,52 @@ antiKropkiConstraint fn:: dup var { function
   row 0 > {
     c row 1 - $ col 10 + $ / 10 % =
     c 0 != { num c 1 - == { num c 1 + == { num c 2 * == { num 2 * c == } or } or } or } and { false return } ifthen
+  } ifthen
+
+  true
+} =
+
+// XV constraint.
+xvConstraint fn:: dup var { function
+  i var
+  n var
+  r var
+  c var
+  p var
+  cell var
+
+  // Does this cell have any X's?
+  count row.value:: col.value:: X:: initialised {
+    // Yes. Go through the related cells and check they add to 10.
+    n count row.value:: col.value:: X:: =
+    i 0 =
+    { i n < } {
+      p i.value row.value:: col.value:: X:: &=
+      r row p->:: =
+      c col p->:: =
+      cell r.value$ c 10 + $ / 10 % =
+      cell 0 != {
+        num cell + 10 != { false return } ifthen
+      } ifthen
+      i++
+    } while
+  } ifthen
+
+  // Does this cell have any V's?
+  count row.value:: col.value:: V:: initialised {
+    // Yes. Go through the related cells and check they add to 5.
+    n count row.value:: col.value:: V:: =
+    i 0 =
+    { i n < } {
+      p i.value row.value:: col.value:: V:: &=
+      r row p->:: =
+      c col p->:: =
+      cell r.value$ c 10 + $ / 10 % =
+      cell 0 != {
+        num cell + 5 != { false return } ifthen
+      } ifthen
+      i++
+    } while
   } ifthen
 
   true
@@ -1381,11 +1478,12 @@ whichSudoku 12 == {
   // constraint fn:: { thermoConstraint         fn::() not { false return } ifthen } constraint fn:: + =
   // constraint fn:: { kropkiConstraint         fn::() not { false return } ifthen } constraint fn:: + =
   // constraint fn:: { antiKropkiConstraint     fn::() not { false return } ifthen } constraint fn:: + =
+  // constraint fn:: { xvConstraint             fn::() not { false return } ifthen } constraint fn:: + =
   // constraint fn:: { diagonalTLBRConstraint   fn::() not { false return } ifthen } constraint fn:: + =
   // constraint fn:: { diagonalBLTRConstraint   fn::() not { false return } ifthen } constraint fn:: + =
   // constraint fn:: { oddEvenConstraint        fn::() not { false return } ifthen } constraint fn:: + =
 
-  // Add the grid. Each grid line looks like
+  // Add the grid. Each grid line represents one row and looks like
   //  grid {r} {c1} {c2} ... {c9} setRow()
   // wheren {r} is the row number, starting at 0 for the top row and 8 for the last,
   // and {c1} {c2} etc are the cell values going from column 1 through to column 9 of that row.
@@ -1419,6 +1517,12 @@ whichSudoku 12 == {
   // from 0 and go to 8. Here's an example, or check the sudoku example above.
   //  3 1 3 2 blackDot()
   //  8 0 8 1 whiteDot()
+
+  // Adding XV consrtaints is similar to kropki dots where you specify the row and column of the
+  // first cell, row and column of the connecting cell, then either call X() or V() as appropriate.
+  // As with other cell coordinate constrints, row and column start from 0 (top row, left column) and go to 8.
+  //  4 1 5 1 X()
+  //  4 0 4 1 V()
 
   // To add an odd or even cell do
   //  {r} {c} oddCell()      or
@@ -1454,6 +1558,9 @@ found {
     thermos static namespace::()
     blackDot static namespace::()
     whiteDot static namespace::()
+    X static namespace::()
+    V static namespace::()
+    oddEven static namespace::()
     fn static namespace::()
 
     main semaphore thread::()
