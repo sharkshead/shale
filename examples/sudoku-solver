@@ -13,6 +13,7 @@
 //  anti-kropki dot
 //  XV
 //  anti-XV
+//  killer cages
 //  top-left to bottom-right diagonal
 //  botton-left to top-right diagonal
 //  odd or even cells
@@ -510,6 +511,35 @@ V dup var {
   p->++
 } =
 
+killerCage dup var {
+  n dup var swap =
+  cage var
+
+  count killer:: initialised not {
+    count killer:: dup var 0 =
+  } {
+    count killer::++
+  } if
+  cage count killer:: =                       // Unique cage number.
+
+  sum cage.value:: killer:: dup var n =       // Cage sum. 0 = no sum specified.
+  count cage.value:: killer:: dup var 0 =     // Number of cells in this cage.
+} =
+
+killerCell dup var {
+  c dup var swap =
+  r dup var swap =
+  cage var
+  i var
+
+  cage count killer:: =
+  i count cage.value:: killer:: =             // Current cage number.
+  r.value c.value:: killer:: dup var cage =   // The cage number this cell is part of.
+  row i.value:: cage.value:: killer:: dup var r =
+  col i.value:: cage.value:: killer:: dup var c =
+  count cage.value:: killer::++
+} =
+
 // Odd and even cells.
 oddCell dup var {
   c dup var swap =
@@ -970,6 +1000,55 @@ antiXVConstraint fn:: dup var { function
   row 0 > {
     c row 1 - $ col 10 + $ / 10 % =
     c 0 != { num c + 10 == { num c + 5 == } or } and { false return } ifthen
+  } ifthen
+
+  true
+} =
+
+killerConstraint fn:: dup var { function
+  cage var
+  i var
+  n var
+  empty var
+  sum var
+  v var
+  r var
+  c var
+
+  // Is this cell in a cage?
+  row.value col.value:: killer:: initialised {
+    // Yes.
+    cage row.value col.value:: killer:: =
+
+    // Go through each cell and tally the sum and check for duplicate entries.
+    empty 0 =
+    sum 0 =
+    n count cage.value:: killer:: =
+    i 0 =
+    { i n < } {
+      r row i.value:: cage.value:: killer:: =
+      c col i.value:: cage.value:: killer:: =
+      v r.value$ c 10 + $ / 10 % =
+      num v == { false return } ifthen        // Duplicate.
+      v 0 == { empty++ } ifthen
+      sum sum v + =
+      i++
+    } while
+
+    // If we have a sum given for this cage, then check it.
+    n sum cage.value:: killer:: =             // The cage's given sum.
+    n 0 != {
+      sum num + n
+      empty 1 == {
+        // If there is 1 empty cell then it must be ours, so the sum must be exact.
+        ==
+      } {
+        // If there are more empty cells then we can't exceed the total.
+        <
+      } if
+      return
+    } ifthen
+
   } ifthen
 
   true
@@ -1548,26 +1627,28 @@ whichSudoku 12 == {
   // constraint fn:: { antiKropkiConstraint     fn::() not { false return } ifthen } constraint fn:: + =
   // constraint fn:: { xvConstraint             fn::() not { false return } ifthen } constraint fn:: + =
   // constraint fn:: { antiXVConstraint         fn::() not { false return } ifthen } constraint fn:: + =
+  // constraint fn:: { killerConstraint         fn::() not { false return } ifthen } constraint fn:: + =
   // constraint fn:: { diagonalTLBRConstraint   fn::() not { false return } ifthen } constraint fn:: + =
   // constraint fn:: { diagonalBLTRConstraint   fn::() not { false return } ifthen } constraint fn:: + =
   // constraint fn:: { oddEvenConstraint        fn::() not { false return } ifthen } constraint fn:: + =
 
+  // Rows, columns and cells are all referenced from 0, not 1 as is typical when discussing sudokus.
+  // Row 0 is the top row and 8 the bottom. Column 0 is the left column and 8 the right.
+  // Cells coordinates are always given row first then column. Keep these rules in mind when usng any of the
+  // functions below.
+
   // Add the grid. Each grid line represents one row and looks like
-  //  grid {r} {c1} {c2} ... {c9} setRow()
-  // wheren {r} is the row number, starting at 0 for the top row and 8 for the last,
-  // and {c1} {c2} etc are the cell values going from column 1 through to column 9 of that row.
+  //  grid {r} {c0} {c1} ... {c8} setRow()
+  // where {r} is the row number, and {c0} {c1} etc are the cell values of that row.
   // A zero value indicates an empty cell.
 
   // For irregular sudokus you enter the regions in a similar fashion to the grid.
   // You assign each region a unique number from 1 to 9, and then use the setRow()
   // function to add each row, like
   //  regions {r} {R1} {R2} ... {R9} setRow()
-  // {r} is the same as for the grid, the row number starting from 0, and {R1} {R2} etc
-  // are the region numbers you've assigned for each cell of the row.
+  // where {R1} {R2} etc are the region numbers you've assigned for each cell of the row.
 
   // To create an arrow you use newArrow() (the circle) followed by arrowCell() for each cell in the arrow.
-  // You give the row number first then the column number for both functions.
-  // Row and column numbers start from 0 and go to 8.
   // You can have multiple arrows starting from the same cell by creating
   // new arrows from the same cell, eg
   //    4 5 newArrow()    4 6 arrowCell()   4 7 arrowCell()
@@ -1577,26 +1658,32 @@ whichSudoku 12 == {
 
   // Adding thermos is similar to arrows, where you start a new thermo (the bulb) from a given cell,
   // row first then column then call newThermo(). After that, add each cell of the thermo with
-  // row column thermoCell(). Row and column both start at 0 and go to 8.
-  // The thermo cells must be added in sequence, starting from the cell next to the bulb with the
-  // last being the tip.
+  // row column thermoCell(). The thermo cells must be added in sequence,
+  // starting from the cell next to the bulb with the last being the tip. For example,
+  //  4 7 newThermo()   3 7 thermoCell()    2 7 thermoCell()    2 6 thermoCell()
 
   // Adding kropki dots is done by giving the row and column of one cell and the row and column
-  // of the other cell and calling blackDot() or whiteDot() as appropriate. Rows and columns start
-  // from 0 and go to 8. Here's an example, or check the sudoku example above.
+  // of the other cell and calling blackDot() or whiteDot() as appropriate. Here's an example,
+  // or check the sudoku example above.
   //  3 1 3 2 blackDot()
   //  8 0 8 1 whiteDot()
 
   // Adding XV consrtaints is similar to kropki dots where you specify the row and column of the
   // first cell, row and column of the connecting cell, then either call X() or V() as appropriate.
-  // As with other cell coordinate constrints, row and column start from 0 (top row, left column) and go to 8.
   //  4 1 5 1 X()
   //  4 0 4 1 V()
 
-  // To add an odd or even cell do
-  //  {r} {c} oddCell()      or
-  //  {r} {c} evenCell()
-  // where {r} and {c} are the row and column starting from 0.
+  // Adding killer cages is done with the killerCage() and killerCell() functions.
+  // killerCage() takes one argument being the sum of the cage. If a cage has no sum given then
+  // specify 0 as the sum. Folllowing that you call killerCage() for each cell comprising the cage.
+  // For example,
+  //  16 kiilerCage()   4 5 killerCell()    5 4 killerCell()    5 5 killerCell()
+  // defines a 3-cell cage which sums to 16. For a cage with no sum give,
+  //  0 killerCage()    5 6 killerCell()    6 5 kiillerCage()   6 6 killerCake()
+
+  // To add an odd or even cells, give the cell coordinates followed by oddCell() or evenCell()
+  //  5 3 oddCell()
+  //  2 5 evenCell()
 
 } ifthen
 
@@ -1629,6 +1716,7 @@ found {
     whiteDot static namespace::()
     X static namespace::()
     V static namespace::()
+    killer static namespace::()
     oddEven static namespace::()
     fn static namespace::()
 
