@@ -46,7 +46,9 @@ SOFTWARE.
 #include <dlfcn.h>
 #include <pthread.h>
 #include <semaphore.h>
-#include "config.h"
+
+#define INT
+#define PCTD
 
 using namespace std;
 

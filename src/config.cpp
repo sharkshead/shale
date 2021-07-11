@@ -1,10 +1,13 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 int main(int ac, char **av) {
   const char *INT;
   const char *PCTD;
-  FILE *fd;
+  FILE *fdin;
+  FILE *fdout;
+  char line[1024];
 
   if(sizeof(int) == 8) {
     INT = "int";
@@ -20,13 +23,24 @@ int main(int ac, char **av) {
     PCTD = "";
   }
 
-  fd = fopen("config.h", "w");
-  if(fd == NULL) {
-    perror("ocnfig.h");
-    return 1;
+  if((fdin = fopen("shalelib.h.template", "r")) == (FILE *) 0) {
+    perror("shalelib.h.template");
+    exit(1);
   }
-  fprintf(fd, "#define INT %s\n#define PCTD \"%s\"\n", INT, PCTD);
-  fclose(fd);
+  if((fdout = fopen("shalelib.h", "w")) == (FILE *) 0) {
+    perror(".sshalelib.h");
+    exit(1);
+  }
+
+  while(fgets(line, sizeof(line), fdin) != NULL) {
+    if(strncmp(line, "#define INT", 11) == 0) {
+      fprintf(fdout, "#define INT %s\n", INT);
+    } else if(strncmp(line, "#define PCTD",  12) == 0) {
+      fprintf(fdout, "#define PCTD \"%s\"\n", PCTD);
+    } else {
+      fputs(line, fdout);
+    }
+  }
 
   return 0;
 }
