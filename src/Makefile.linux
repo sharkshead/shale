@@ -1,6 +1,6 @@
 all: shale maths.so array.so primes.so time.so file.so thread.so string.so namespace.so
 
-install: /usr/local/bin/shale /usr/local/lib/shale/maths.so /usr/local/lib/shale/array.so /usr/local/lib/shale/primes.so /usr/local/lib/shale/time.so /usr/local/lib/shale/file.so /usr/local/lib/shale/thread.so /usr/local/lib/shale/string.so /usr/local/lib/shale/namespace.so
+install: /usr/local/bin/shale /usr/local/lib/shale/maths.so /usr/local/lib/shale/array.so /usr/local/lib/shale/primes.so /usr/local/lib/shale/time.so /usr/local/lib/shale/file.so /usr/local/lib/shale/thread.so /usr/local/lib/shale/string.so /usr/local/lib/shale/namespace.so /usr/local/lib/shalelib.o /usr/local/include/shalelib.h
 
 clean:
 	rm -f shale *.o *.so config config.h config.o Makefile
@@ -111,3 +111,11 @@ namespace.so: namespace.o
 	[ -d /usr/local/lib/shale ] || sudo mkdir /usr/local/lib/shale
 	sudo rm -f /usr/local/lib/shale/namespace.so
 	sudo cp namespace.so /usr/local/lib/shale/namespace.so
+
+/usr/local/lib/shalelib.o: shalelib.o
+	[ -d /usr/local/lib ] || sudo mkdir /usr/local/lib
+	sudo cp shalelib.o /usr/local/lib/shalelib.o
+
+/usr/local/include/shalelib.h: shalelib.h
+	[ -d /usr/local/include ] || sudo mkdir /usr/local/include
+	sudo cp shalelib.h /usr/local/include/shalelib.h
