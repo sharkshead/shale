@@ -54,7 +54,7 @@
 // Object added to that namespace after this will typically be non-static and will incur
 // the small memory management overhead.
 //
-// For a reeal example of using this library, see sudoku-solver.
+// For a real example of using this library, see sudoku-solver.
 
 
 
