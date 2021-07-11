@@ -42,5 +42,8 @@ int main(int ac, char **av) {
     }
   }
 
+  fclose(fdin);
+  fclose(fdout);
+
   return 0;
 }
