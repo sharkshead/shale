@@ -1,6 +1,6 @@
 #!/usr/local/bin/shale
 
-// The namespace library provied the following:
+// The namespace library provies the following:
 //
 //  static namespace::()
 //  help nammespace::()
@@ -26,7 +26,7 @@
 // to that number 3. This is handled by a hold/release mechanism, and when all the holds
 // have been released then the memory can be returned to the free memory pool.
 // 
-// In a threaded scipt, the hold/release code must be protected by a mutex lock/unlock.
+// In a threaded script, the hold/release code must be protected by a mutex lock/unlock.
 // While this usually only entails a very small overhead, it is still worth removing if
 // you're trying to improve the runtime execution speed of your script. And that's where
 // setting a namespace variable as static comes in - it removes the memory management overhead.
@@ -54,7 +54,7 @@
 // Object added to that namespace after this will typically be non-static and will incur
 // the small memory management overhead.
 //
-// For a reeal example of using this librrary, see sudoku-solver.
+// For a reeal example of using this library, see sudoku-solver.
 
 
 
@@ -118,8 +118,7 @@ btree
 // Closing comment.
 //
 // This library isn't for everybody. It has no impact on a single-threaded script,
-// and somewhat marginal use in threaded scripts where you're trying to gain
-// every last bit of performance.
+// and somewhat marginal impact on threaded scripts.
 
 "" println
 micro version:: namespace:: minor version:: namespace:: major version:: namespace:: "Namespace library version %d.%d.%d\n" printf
