@@ -1,6 +1,6 @@
 all: shalelib.h shale maths.so array.so primes.so time.so file.so thread.so string.so namespace.so
 
-install: /usr/local/bin/shale /usr/local/lib/shale/maths.so /usr/local/lib/shale/array.so /usr/local/lib/shale/primes.so /usr/local/lib/shale/time.so /usr/local/lib/shale/file.so /usr/local/lib/shale/thread.so /usr/local/lib/shale/string.so /usr/local/lib/shale/namespace.so /usr/lica/lib/shalelib.o /usr/local/include/shalelib.h /usr/local/include/shaleconfig.h
+install: /usr/local/bin/shale /usr/local/lib/shale/maths.so /usr/local/lib/shale/array.so /usr/local/lib/shale/primes.so /usr/local/lib/shale/time.so /usr/local/lib/shale/file.so /usr/local/lib/shale/thread.so /usr/local/lib/shale/string.so /usr/local/lib/shale/namespace.so /usr/local/lib/shalelib.o /usr/local/include/shalelib.h /usr/local/include/shaleconfig.h
 
 clean:
 	rm -f shale *.o *.so config config.o Makefile shakeliib.h
