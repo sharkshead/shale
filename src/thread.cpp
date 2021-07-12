@@ -95,7 +95,7 @@ const char *threadHelp[] = {
   "  {s} post thread::()             - post to a semaphore",
   "  major version:: thread::        - major version number",
   "  minor version:: thread::        - minor version number",
-  "  micro version:: number::        - micro version number",
+  "  micro version:: thread::        - micro version number",
   "  help thread::()                 - this",
   (const char *) 0
 };
