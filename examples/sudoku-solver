@@ -794,7 +794,7 @@ thermoConstraint fn:: dup var { function
       thermo i.value thermoList:: row.value:: col.value:: thermos:: =
       o ordinal row.value:: col.value:: thermo.value:: thermos:: =
       num o <= { false return } ifthen
-      num o 11 + cells thermo.value:: thermos:: - > { false return } ifthen
+      num o 10 + cells thermo.value:: thermos:: - > { false return } ifthen
 
       // It passed the initial tests. Now put the number in the grid and check the thermo manually.
       v row.value$ =
