@@ -364,28 +364,30 @@ newThermo dup var {
   0$ dup var swap =  // column
   1$ dup var swap =  // row
   thermo var
-  i var
+  p var
 
   // Allocate a new thermo number.
-  count thermos:: initialised not {
-    count thermos:: dup var 0 =
+  p count thermos:: &=
+  p-> initialised not {
+    p-> dup var 0 =
   } {
-    count thermos::++
+    p->++
   } if
-  thermo count thermos:: =
+  thermo p-> =
 
-  // Every cell can have multiple thermos eminating from it.
-  thermoCount 1$.value:: 0$.value:: thermos:: initialised not {
-    thermoCount 1$.value:: 0$.value:: thermos:: dup var 0 =
-  } {
-    thermoCount 1$.value:: 0$.value:: thermos::++
-  } if
-  i thermoCount 1$.value:: 0$.value:: thermos:: =
+  // Add this thermo to the cell's thermo list.
+  p thermoCount 1$.value:: 0$.value:: thermos:: &=
+  p-> initialised not {
+    p-> dup var 0 =
+  } ifthen
+  p->value thermoList:: 1$.value:: 0$.value$:: thermos:: dup var thermo =
+  p->++
 
-  thermo i.value:: 1$.value:: 0$.value:: thermos:: dup var thermo =   // Tag this cell with the thermo number.
-  cells thermo.value:: thermos:: dup var 0 =                          // Number of cells this thermo contains.
-  row thermo.value:: thermos:: dup var 1$ =                           // Save the location of this bulb.
-  column thermo.value:: thermos:: dup var 0$ =
+  p thermo.value thermos:: &=
+  row 0:: p->:: dup var 1$ =
+  col 0:: p->:: dup var 0$ =
+  cells p->:: dup var 1 =
+  ordinal 1$.value:: 0$.value:: p->:: dup var 0 =
 } =
 
 // Add a cell to the current thermo. Each cell can be part of multiple thermos.
@@ -393,23 +395,23 @@ thermoCell dup var {
   0$ dup var swap =  // column
   1$ dup var swap =  // row
   thermo var
-  cell var
+  p var
   i var
 
   thermo count thermos:: =                // Current thermo number.
-  cell cells thermo.value:: thermos:: =   // Number of cells in this thermo so far.
-  cells thermo.value:: thermos::++        // Increment the number of cells.
+  p thermo.value thermos:: &=
+  i cells p->:: =                         // Number of cells in this thermo so far.
+  row i.value:: p->:: dup var 1$ =
+  col i.value:: p->:: dup var 0$ =
+  cells p->::++
+  ordinal 1$.value:: 0$.value:: p->:: dup var i =
 
-  cellCount 1$.value:: 0$.value:: thermos:: initialised not {
-    cellCount 1$.value:: 0$.value:: thermos:: dup var 0 =
-  } {
-    cellCount 1$.value:: 0$.value:: thermos::++
-  } if
-  i cellCount 1$.value:: 0$.value:: thermos:: =
-
-  thermo i.value:: 1$.value:: 0$.value:: thermos:: dup var thermo =
-  row cell.value:: thermo.value:: thermos:: dup var 1$ =
-  column cell.value:: thermo.value:: thermos:: dup var 0$ =
+  p thermoCount 1$.value:: 0$.value:: thermos:: &=
+  p-> initialised not {
+    p-> dup var 0 =
+  } ifthen
+  p->value thermoList:: 1$.value:: 0$.value$:: thermos:: dup var thermo =
+  p->++
 } =
 
 // Join two cells with a black kropki dot.
@@ -774,63 +776,56 @@ sumArrow fn:: dup var {
 
 // This is a thermo constraint.
 thermoConstraint fn:: dup var { function
+  thermo var
+  p var
   i var
+  n var
+  o var
   v var
-  cell var
 
-  // Is this a thermo bulb?
-  thermoCount row.value:: col.value:: thermos:: initialised {
-    // Yes.
-    v row.value$ =
-    row.value$ v num col 10 + $ * + =   // Temporarily put the number in the grid.
+  // Is this cell part of some thermos?
+  p row.value col.value:: thermos:: &=
+  thermoCount p->:: initialised {
+    // Yes. Go through them all.
+    n thermoCount p->:: =
     i 0 =
-    { i thermoCount row.value:: col.value:: thermos:: <= } {
-      thermo i.value:: row.value:: col.value:: thermos:: thermoIsBad fn::() { row.value$ v = false return } ifthen
+    { i n < } {
+      // First check that num is within the bounds for this cell within this thermo.
+      thermo i.value thermoList:: row.value:: col.value:: thermos:: =
+      o ordinal row.value:: col.value:: thermo.value:: thermos:: =
+      num o <= { false return } ifthen
+      num o 11 + cells thermo.value:: thermos:: - > { false return } ifthen
+
+      // It passed the initial tests. Now put the number in the grid and check the thermo manually.
+      v row.value$ =
+      row.value$ v num col 10 + $ * + =
+      thermoIsBad fn::() row.value$ v = { false return } ifthen
       i++
     } while
-    row.value$ v =                      // Take it out again.
-  } {
-    // No.
-    // Is this cell part of a thermo?
-    cellCount row.value:: col.value:: thermos:: initialised {
-      // Yes.
-      v row.value$ =
-      row.value$ v num col 10 + $ * + = // Temporarily put the number in the grid.
-      i 0 =
-      { i cellCount row.value:: col.value:: thermos:: <= } {
-        thermo i.value:: row.value:: col.value:: thermos:: thermoIsBad fn::() { row.value$ v = false return } ifthen
-        i++
-      } while
-      row.value$ v =                    // Take it out again.
-    } ifthen
-  } if
+  } ifthen
 
   true
 } =
 
 // Returns true if the given thermo is incorrect, false otherwise.
 thermoIsBad fn:: dup var { function
-  thermo dup var swap =
+  i var
+  n var
   r var
   c var
-  lastValue var
-  n var
-  i var
+  l var
+  v var
 
-  r row thermo.value:: thermos:: =
-  c column thermo.value:: thermos:: =
-  lastValue r.value$ c 10 + $ / 10 % =
-  lastValue 0 == { false return } ifthen  // When any cell is 0 we return false.
-  lastValue 9 == { true return } ifthen   // Cant put a 9 in the bulb.
-
+  l 0 =
+  n cells thermo.value:: thermos:: =
   i 0 =
-  { i cells thermo.value:: thermos:: < } {
+  { i n < } {
     r row i.value:: thermo.value:: thermos:: =
-    c column i.value:: thermo.value:: thermos:: =
-    n r.value$ c 10 + $ / 10 % =
-    n 0 == { false return } ifthen
-    n lastValue <= { true return } ifthen
-    lastValue n =
+    c col i.value:: thermo.value:: thermos:: =
+    v r.value$ c 10 + $ / 10 % =
+    v 0 == { false return } ifthen
+    v l <= { true return } ifthen
+    l v =
     i++
   } while
 
