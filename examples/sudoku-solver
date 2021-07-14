@@ -514,6 +514,8 @@ V dup var {
   p->++
 } =
 
+// Create a new killer cage. This takes the cage sum as argument.
+// If the cage has no sum given, then use 0 as the argument.
 killerCage dup var {
   n dup var swap =
   cage var
@@ -529,6 +531,7 @@ killerCage dup var {
   count cage.value:: killer:: dup var 0 =     // Number of cells in this cage.
 } =
 
+// Add a cell to the current killer cage.
 killerCell dup var {
   c dup var swap =
   r dup var swap =
@@ -1696,7 +1699,7 @@ whichSudoku 12 == {
   // specify 0 as the sum. Folllowing that you call killerCage() for each cell comprising the cage.
   // For example,
   //  16 kiilerCage()   4 5 killerCell()    5 4 killerCell()    5 5 killerCell()
-  // defines a 3-cell cage which sums to 16. For a cage with no sum give,
+  // defines a 3-cell cage which sums to 16. For a cage with no sum given,
   //  0 killerCage()    5 6 killerCell()    6 5 kiillerCage()   6 6 killerCake()
 
   // To add an odd or even cells, give the cell coordinates followed by oddCell() or evenCell()
