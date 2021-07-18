@@ -158,6 +158,10 @@ primes library:
 
 time library:
 
+  1.1.3 - 18 Jul 2021
+    - fix to the localtime time::() function
+    - shale version 1.3.14
+
   1.1.2 - 28 Jun 2021
     - use new cache model
     - shale version 1.3.11

@@ -29,7 +29,7 @@ SOFTWARE.
 
 #define MAJOR   (INT) 1
 #define MINOR   (INT) 1
-#define MICRO   (INT) 2
+#define MICRO   (INT) 3
 
 class TimeHelp : public Operation {
   public:
@@ -355,7 +355,7 @@ OperatorReturn TimeLocaltime::action(ExecutionEnvironment *ee) {
     btree.addVariable(v);
     
   } else {
-    v->setObject(mainEE.cache.newNumber((INT) tm->tm_hour));
+    v->setObject(mainEE.cache.newNumber((INT) tm->tm_min));
   }
 
   v = btree.findVariable("/hour/tm/time");
