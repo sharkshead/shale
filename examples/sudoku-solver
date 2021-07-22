@@ -884,7 +884,7 @@ kropkiConstraint fn:: dup var { function
   true
 } =
 
-// Anti-Kropki constraint.
+// Negative-Kropki constraint.
 negativeKropkiConstraint fn:: dup var { function
   c var
 
@@ -967,38 +967,96 @@ xvConstraint fn:: dup var { function
   true
 } =
 
-// Anti-XV constraint.
+// Negative-XV helper routine.
+negativeXVCheck fn:: dup var {
+  cond dup var swap =
+  p var
+  i var
+  n var
+  ret var
+
+  ret true =
+  px-> initialised {
+    n px-> =
+    i 0 =
+    { i n < } {
+      p i.value row.value:: col.value:: X:: &=
+      cond() {
+        ret false =       // There is an X between the two cells, so no need to check the negative constraint.
+        break
+      } ifthen
+      i++
+    } while
+  } ifthen
+
+  ret {
+    pv-> initialised {
+      n pv-> =
+      i 0 =
+      { i n < } {
+        p i.value row.value:: col.value:: V:: &=
+        cond() {
+          ret false =     // There is a V between the two cells, so no need to check the negative constraint.
+          break
+        } ifthen
+        i++
+      } while
+    } ifthen
+  } ifthen
+
+  ret.value
+} =
+
+// Negative-XV constraint.
 negativeXVConstraint fn:: dup var { function
+  r var
   c var
+  v var
+  px dup var count row.value:: col.value:: X:: &=
+  pv dup var count row.value:: col.value:: V:: &=
 
-  // Does this cell have any X's?
-  count row.value:: col.value:: X:: initialised { true return } ifthen
-
-  // Does this cell have any V's?
-  count row.value:: col.value:: V:: initialised { true return } ifthen
+  // Check up.
+  c col 1 - =
+  c 0 >= {
+    // Is there an X or V between row/col and row/c.
+    { row p->:: row == { col p->:: c == } and } negativeXVCheck fn::() {
+      // We need to check.
+      v row.value$ c 10 + $ / 10 % =
+      v 0 != { num v + 10 == { num v + 5 == } or } and { false return } ifthen
+    } ifthen
+  } ifthen
 
   // Check right.
-  col 8 < {
-    c row.value$ col 11 + $ / 10 % =
-    c 0 != { num c + 10 == { num c + 5 == } or } and { false return } ifthen
+  r row 1 + =
+  r 9 < {
+    // Is there an X or V between row/col and r/col.
+    { row p->:: r == { col p->:: col == } and } negativeXVCheck fn::() {
+      // We need to check.
+      v r.value$ col 10 + $ / 10 % =
+      v 0 != { num v + 10 == { num v + 5 == } or } and { false return } ifthen
+    } ifthen
   } ifthen
 
   // Check down.
-  row 8 < {
-    c row 1 + $ col 10 + $ / 10 % =
-    c 0 != { num c + 10 == { num c + 5 == } or } and { false return } ifthen
+  c col 1 + =
+  c 9 < {
+    // Is there an X or V between row/col and row/c.
+    { row p->:: row == { col p->:: c == } and } negativeXVCheck fn::() {
+      // We need to check.
+      v row.value$ c 10 + $ / 10 % =
+      v 0 != { num v + 10 == { num v + 5 == } or } and { false return } ifthen
+    } ifthen
   } ifthen
 
   // Check left.
-  col 0 > {
-    c row.value$ col 9 + $ / 10 % =
-    c 0 != { num c + 10 == { num c + 5 == } or } and { false return } ifthen
-  } ifthen
-
-  // Check up.
-  row 0 > {
-    c row 1 - $ col 10 + $ / 10 % =
-    c 0 != { num c + 10 == { num c + 5 == } or } and { false return } ifthen
+  r row 1 - =
+  r 0 >= {
+    // Is there an X or V between row/col and r/col.
+    { row p->:: r == { col p->:: col == } and } negativeXVCheck fn::() {
+      // We need to check.
+      v r.value$ col 10 + $ / 10 % =
+      v 0 != { num v + 10 == { num v + 5 == } or } and { false return } ifthen
+    } ifthen
   } ifthen
 
   true
@@ -1610,7 +1668,7 @@ whichSudoku 11 == {
   found true =
   "Another CTC video: https://www.youtube.com/watch?v=1QP7yviZYTU" println
   "This is by Phistomefel and is another take on the Miracle Sudoku." println
-  "Anti-kropki dot and both main diagonal constraints." println
+  "Negative-kropki dot and both main diagonal constraints." println
 
   regionChecker fn:: standardRegions  fn:: =
   constraint fn:: { negativeKropkiConstraint fn::() not { false return } ifthen } constraint fn:: + =
