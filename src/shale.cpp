@@ -855,8 +855,10 @@ void syntax() {
   printf("    array       - support for sparse and fully populated arrays. See help array::() for details.\n");
   printf("    file        - some stdio functions. See help file::() for details.\n");
   printf("    maths       - pi, e, log functions, etc. See help maths::() for details.\n");
+  printf("    namespace   - namespace operations\n");
   printf("    primes      - generate primes\n");
   printf("    string      - string handling\n");
+  printf("    thread      - POSIX threads, mutexes and semaphores, See help thread::() for details.\n");
   printf("    time        - date and time functions\n");
   printf("\n");
   printf("Generating new shale code from within shale\n");
