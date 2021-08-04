@@ -69,7 +69,7 @@ class FileFlush : public Operation {
 const char *fileHelp[] = {
   "File library",
   "  {filename} {mode} open file::()      - open filename according to fopen's mode. if the file cannot",
-  "                                         be opened it pushes false on the ee->stack, otherwise it",
+  "                                         be opened it pushes false on the stack, otherwise it",
   "                                         pushes the file handle then true on the stack.",
   "                                         file and mode must both be strings",
   "  {handle} close file::()              - close the given file handle",
