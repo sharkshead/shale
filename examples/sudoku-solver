@@ -18,6 +18,7 @@
 //  botton-left to top-right diagonal
 //  odd or even cells
 //  disjoint sets
+//  palindrome lines
 // Threads may also be used to shorten the time to the solution.
 
 // It is based on the python code from the Computerphile video
@@ -75,15 +76,15 @@ s initialised {
 } if
 
 // This sets up the colour map for irregular sudokus.
-1 colour:: dup var 30 =
-2 colour:: dup var 31 =
-3 colour:: dup var 32 =
-4 colour:: dup var 33 =
-5 colour:: dup var 34 =
-6 colour:: dup var 35 =
-7 colour:: dup var 36 =
-8 colour:: dup var 30 =   // skip 37 (too light) and reuse 30 and 31 (with luck they won't be close to regions 1 and 2).
-9 colour:: dup var 31 =
+1 colour:: dup var 31 =
+2 colour:: dup var 32 =
+3 colour:: dup var 33 =
+4 colour:: dup var 34 =
+5 colour:: dup var 35 =
+6 colour:: dup var 36 =
+7 colour:: dup var 31 =
+8 colour:: dup var 32 =
+9 colour:: dup var 33 =
 
 // Helper function to print seconds as days, hours, minutes and seconds.
 dhms fn:: dup var {
@@ -569,6 +570,19 @@ evenCell dup var {
   } ifthen
 
   dup var 0 =
+} =
+
+// Used to build palindrome lines.
+same dup var {
+  c2 dup var swap =
+  r2 dup var swap =
+  c1 dup var swap =
+  r1 dup var swap =
+
+  row r1.value:: c1.value:: same:: dup var r2 =
+  col r1.value:: c1.value:: same:: dup var c2 =
+  row r2.value:: c2.value:: same:: dup var r1 =
+  col r2.value:: c2.value:: same:: dup var c1 =
 } =
 
 constraint fn:: dup var { function true } =
@@ -1249,6 +1263,17 @@ disjointSetsConstraint fn:: dup var { function
   true
 } =
 
+palindromeConstraint fn:: dup var {
+  row row.value:: col.value:: same:: initialised {
+    r dup var row row.value:: col.value:: same:: =
+    c dup var col row.value:: col.value:: same:: =
+    n dup var r.value$ c 10 + $ / 10 % =
+    n 0 == { n num == } or
+  } {
+    true
+  } if
+} =
+
 // Very simple naked singles detector.
 nakedSingles fn:: dup var {
   r var
@@ -1788,6 +1813,7 @@ whichSudoku 12 == {
   // constraint fn:: { diagonalBLTRConstraint   fn::() not { false return } ifthen } constraint fn:: + =
   // constraint fn:: { oddEvenConstraint        fn::() not { false return } ifthen } constraint fn:: + =
   // constraint fn:: { disjointSetsConstraint   fn::() not { false return } ifthen } constraint fn:: + =
+  // constraint fn:: { palindromeConstraint     fn::() not { false return } ifthen } constraint fn:: + =
 
   // Rows, columns and cells are all referenced from 0, not 1 as is typical when discussing sudokus.
   // Row 0 is the top row and 8 the bottom. Column 0 is the left column and 8 the right.
@@ -1842,6 +1868,13 @@ whichSudoku 12 == {
   //  5 3 oddCell()
   //  2 5 evenCell()
 
+  // Adding palindrome lines is simply done by indicating which pairs of cells must have the same value.
+  // You do this in a similar fashion to Kropki dots and X and V - specify the row and column of a pair
+  // of cells that must have the same value, and call same():
+  //  3 1 1 4 same()    3 2 2 4 same()
+  // That's a 5-cell long palindrome, and because its length is odd you don't need to do anything
+  // with the middle cell.
+
 } ifthen
 
 found {
@@ -1875,6 +1908,7 @@ found {
     V static namespace::()
     killer static namespace::()
     oddEven static namespace::()
+    same static namespace::()
     fn static namespace::()
 
     main semaphore thread::()
