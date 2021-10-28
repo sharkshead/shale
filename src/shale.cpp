@@ -166,6 +166,19 @@ INT hextoi(char *p) {
   return ret;
 }
 
+INT bintoi(char *p) {
+  INT ret;
+  int n;
+
+  ret = 0;
+  while(*p != 0) {
+    ret = ret * 2 + (*p - '0');
+    p++;
+  }
+
+  return ret;
+}
+
 void lexNextToken(Lex &lex) {
   LexReplacement *r;
   Keyword *kp;
@@ -505,7 +518,7 @@ void lexNextToken(Lex &lex) {
         *p++ = lexChar;
         lexGetChar();
         if((lex.str[0] == '0') && (lexChar == 'x')) {
-          // A hex number
+          // A hex number.
           lexGetChar();
           lex.number.intRepresentation = true;
           lex.number.valueInt = 0;
@@ -519,6 +532,22 @@ void lexNextToken(Lex &lex) {
             }
             *p = 0;
             lex.number.valueInt = hextoi(lex.str);
+          }
+        } else if((lex.str[0] == '0') && (lexChar == 'b')) {
+          // A binary number.
+          lexGetChar();
+          lex.number.intRepresentation = true;
+          lex.number.valueInt = 0;
+          if((lexChar == '0') || (lexChar == '1')) {
+            p = lex.str;
+            *p++ = lexChar;
+            lexGetChar();
+            while((lexChar == '0') || (lexChar == '1')) {
+              *p++ = lexChar;
+              lexGetChar();
+            }
+            *p = 0;
+            lex.number.valueInt = bintoi(lex.str);
           }
         } else {
           while((lexChar >= '0') && (lexChar <= '9')) {
@@ -796,6 +825,9 @@ void syntax() {
   printf("  debug                                       - prints various internal counters\n");
   printf("  stack                                       - prints the stack, top of the stack first. does not change the stack contents\n");
   printf("  btree                                       - prints the namespace contents\n");
+  printf("\n");
+  printf("Numberd\n");
+  printf("  Numbers mab be entered as decimals, hex (0x prefix, eg 0xff25) or binary (0b prefix, eg 0b1111111100100101)\n");
   printf("\n");
   printf("Conditional AND and Conditional OR\n");
   printf("  To effect a conditional and or a conditional or, push the second argument on as a code fragment. For example\n");
