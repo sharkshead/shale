@@ -24,7 +24,7 @@
 //
 //  cond1 { cond2 } and ...
 //
-// Both AND and OR will only execute the code fragment if the value
+// Both AND and OR operators will only execute the code fragment if the value
 // of the first condition does not already decide the value of the overall
 // AND or OR value.
 //

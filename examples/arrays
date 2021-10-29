@@ -35,7 +35,8 @@
 //
 // Namespace variables are global and are not tied to
 // any code fragment. When you create a namespace variable it
-// persists until the end of the shale script.
+// persists until the end of the shale script. You cannot remove
+// a namespace variable.
 //
 // You can roll your own arrays or use the helper functions
 // in the array library. First we'll discuss rolling your own.
@@ -71,7 +72,7 @@ i 0 =
 // If, on the other hand, you're dealing with a sparse array where the
 // exact size and index of each element is not known at the time of
 // writing your script, then you need to check whether the element
-// you're about the acccess is actually there. The three operators
+// you're about to access is actually there. The three operators:
 // defined, initialised and initialized help out here.
 //
 // Let's say you're about to add the value of "i" to the element "j"
@@ -91,7 +92,7 @@ j.value a:: j.value a:: i + =
 //
 // Another consideration is to keep track of the count of elements
 // in a list as you're generating and adding new elements to the list.
-// Create a "count" element
+// To do this I generally create a create a "count" element
 
 count list:: var
 count list:: 0 =
@@ -103,12 +104,12 @@ count list:: value list:: i =
 count list::++
 
 // To explain this a little, the first line reads as
-//  count list::    <-- the variable
+//  count list::    <-- the variable containing the number of elements
 //  value           <-- get the value of the variable
 //  list::          <-- we now have the variable (not the value) list[count] on the stack
 //  var             <-- create list[count]
 // ditto the next line, although this time we're assigning list[count] = i
-//  count list::++  <-- increment the counter
+//  count list::++  <-- increment the element counter
 //
 // There are many ways of slicing and dicing arrays in shale. What is presented
 // here is just a single example.

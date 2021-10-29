@@ -11,13 +11,12 @@
 // rather than a lexical scope you'd expect in a C-like language.
 // You can read more about this in the variables example file.
 //
-// Namespaces can be used to create variables that are global. They are not
-// tied to a code fragment's execution. And namespaces have features that
-// mean they can be used to implement arrays (single or multi-dimensional,
-// fully populated and sparse). You can think of namespaces as
-// something like a perl hash, or even a struct or class if you really
-// squint your eyes. shale doesn't have structs or classes, but you can
-// use namespaces to achieve something resembling them.
+// Namespace variables are global. They are not tied to a code fragment's execution.
+// And namespaces have features that mean they can be used to implement arrays
+// (single or multi-dimensional, fully populated and sparse).
+// You can think of namespaces as something like a perl hash, or even a struct
+// or class if you really squint your eyes. shale doesn't have structs or classes,
+// but you can use namespaces to achieve something resembling them.
 //
 // The namespace operator is :: and it takes two names from the stack.
 // For example

@@ -8,7 +8,7 @@
 //
 //  i                               <-- simple variable, standard
 //  loopCounter_2                   <-- simple variable, standard
-//  "_factorial_loop_counter"$      <-- simple variable, user-defined (note the $ operator)
+//  "_factorial_loop_counter"$      <-- simple variable, user-defined
 //  3$                              <-- simple variable, user-defined
 //  i ns::                          <-- namespace variable
 //  i.value j.value:: a::           <-- namespace variable
@@ -21,6 +21,9 @@
 // Referring to a variable pushes the variable name on the stack.
 // It does not push the value on the stack. It always pushes the name on the stack.
 //
+// Variables are not typed, and their value may be numbers (integer and floating point),
+// strings, code fragments or pointers.
+
 // In this file we'll discuss simple variables. See the "namespaces"
 // file for a discussion of namespace variables.
 
@@ -54,15 +57,14 @@
 
 // The scope of a simple variable.
 
-// A simple variable created in a code fragment is accessible to the code fragment
-// and any fragments that are subsequently executed by this fragment - the fragment's
+// A simple variable created in a code fragment is accessible to that code fragment
+// and any fragments that are subsequently executed by that fragment - the fragment's
 // execution path, as it were. When the code fragment exits the variable is removed.
 //
 // A variable's scope is defined by the code fragment's execution,
-// and not the lexical scope of the fragment as it is in C.
-// This really impacts functions.
+// not by the lexical scope of the fragment as it is in C.
 //
-// A variable defined in a code fragment will hide a
+// A variable created in a code fragment will hide a
 // variable of the same name created in an enclosing fragment.
 //
 // Here's how this plays out with some nested fragments.
