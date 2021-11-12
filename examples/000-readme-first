@@ -208,6 +208,21 @@ i 0 =
   i++
 } while
 
+// You can achieve the equivalent of a continue in the body of a while.
+// For this you'll need to use the "function" and "return" operators,
+// explained in more detail in the "while" and "functions" example files.
+
+"continue example" println
+i 0 =
+{ i 10 < } { function
+  i 5 < {     // if i is less than 5 ...
+    i++       // ... increment the loop counter, and ...
+    return    // ... skip the rest of the body fragment
+  } ifthen
+  i "i = %d\n" printf
+  i++
+} while
+
 
 
 // Functions.
