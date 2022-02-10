@@ -44,7 +44,11 @@ class NamespaceStatic : public Operation {
 
 const char *namespaceHelp[] = {
   "Namespace library",
-  "  help namespace::()        - this",
+  "  {ns} static namespace::()     - possibly improve access speed to the {ns} namespace.",
+  "  major version:: namespace::   - major version number",
+  "  minor version:: namespace::   - minor version number",
+  "  micro version:: namespace::   - micro version number",
+  "  help namespace::()            - this",
   (const char *) 0
 };
 
