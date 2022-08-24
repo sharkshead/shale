@@ -541,6 +541,10 @@ killerCell dup var {
 
   cage count killer:: =
   i count cage.value:: killer:: =             // Current cage number.
+  r.value c.value:: killer:: initialised {
+    c r "Cell %d %d is already part of a killer cage.\n" printf
+    0 exit
+  } ifthen
   r.value c.value:: killer:: dup var cage =   // The cage number this cell is part of.
   row i.value:: cage.value:: killer:: dup var r =
   col i.value:: cage.value:: killer:: dup var c =
