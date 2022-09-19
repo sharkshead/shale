@@ -80,7 +80,7 @@ println
 // And like other operators that accept a code fragment,
 // you can pass a variable that is assigned to a code fragment,
 // and since cond2 is a variable that is assigned to a code fragment,
-// we can drop the code fragment and refer directly to cond2.
+// we can refer directly to cond2.
 
 "" println
 "Conditional AND using a variable" println
