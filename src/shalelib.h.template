@@ -453,6 +453,30 @@ class Assign : public Operation {
     OperatorReturn action(ExecutionEnvironment *);
 };
 
+class AssignAdd : public Operation {
+  public:
+    AssignAdd(LexInfo *);
+    OperatorReturn action(ExecutionEnvironment *);
+};
+
+class AssignSub : public Operation {
+  public:
+    AssignSub(LexInfo *);
+    OperatorReturn action(ExecutionEnvironment *);
+};
+
+class AssignMul : public Operation {
+  public:
+    AssignMul(LexInfo *);
+    OperatorReturn action(ExecutionEnvironment *);
+};
+
+class AssignDiv : public Operation {
+  public:
+    AssignDiv(LexInfo *);
+    OperatorReturn action(ExecutionEnvironment *);
+};
+
 class PointerAssign : public Operation {
   public:
     PointerAssign(LexInfo *);

@@ -222,6 +222,10 @@ void lexNextToken(Lex &lex) {
             lex.token = LEX_TOKEN_EOF;
             break;
           }
+        } else if(lexChar == '=') {
+          lexGetChar();
+          lex.token = LEX_TOKEN_MATHS_OP;
+          lex.mathsOp = LEX_TOKEN_MATHS_OP_ASSIGN_DIV;
         } else {
           lex.token = LEX_TOKEN_MATHS_OP;
           lex.mathsOp = LEX_TOKEN_MATHS_OP_DIVIDE;
@@ -258,6 +262,9 @@ void lexNextToken(Lex &lex) {
         if(lexChar == '+') {
           lexGetChar();
           lex.mathsOp = LEX_TOKEN_MATHS_OP_PLUSPLUS;
+        } else if(lexChar == '=') {
+          lexGetChar();
+          lex.mathsOp = LEX_TOKEN_MATHS_OP_ASSIGN_ADD;
         } else {
           lex.mathsOp = LEX_TOKEN_MATHS_OP_PLUS;
         }
@@ -265,8 +272,13 @@ void lexNextToken(Lex &lex) {
 
       case '*':
         lex.token = LEX_TOKEN_MATHS_OP;
-        lex.mathsOp = LEX_TOKEN_MATHS_OP_TIMES;
         lexGetChar();
+        if(lexChar == '=') {
+          lexGetChar();
+          lex.mathsOp = LEX_TOKEN_MATHS_OP_ASSIGN_MUL;
+        } else {
+          lex.mathsOp = LEX_TOKEN_MATHS_OP_TIMES;
+        }
         break;
 
       case '-':
@@ -306,6 +318,10 @@ void lexNextToken(Lex &lex) {
           lexGetChar();
           lex.token = LEX_TOKEN_MATHS_OP;
           lex.mathsOp = LEX_TOKEN_MATHS_OP_MINUSMINUS;
+        } else if(lexChar == '=') {
+          lexGetChar();
+          lex.token = LEX_TOKEN_MATHS_OP;
+          lex.mathsOp = LEX_TOKEN_MATHS_OP_ASSIGN_SUB;
         } else {
           lex.token = LEX_TOKEN_MATHS_OP;
           lex.mathsOp = LEX_TOKEN_MATHS_OP_MINUS;
@@ -647,6 +663,10 @@ void olBuild(Lex &lex) {
         case LEX_TOKEN_MATHS_OP_LEFT_SHIFT: op = new LeftShift(li); break;
         case LEX_TOKEN_MATHS_OP_RIGHT_SHIFT: op = new RightShift(li); break;
         case LEX_TOKEN_MATHS_OP_ASSIGN: op = new Assign(li); break;
+        case LEX_TOKEN_MATHS_OP_ASSIGN_ADD: op = new AssignAdd(li); break;
+        case LEX_TOKEN_MATHS_OP_ASSIGN_SUB: op = new AssignSub(li); break;
+        case LEX_TOKEN_MATHS_OP_ASSIGN_MUL: op = new AssignMul(li); break;
+        case LEX_TOKEN_MATHS_OP_ASSIGN_DIV: op = new AssignDiv(li); break;
         case LEX_TOKEN_MATHS_OP_POINTER_ASSIGN: op = new PointerAssign(li); break;
         case LEX_TOKEN_MATHS_OP_POINTER_DEREF: op = new PointerDereference(li); break;
         case LEX_TOKEN_MATHS_OP_PLUSPLUS: op = new PlusPlus(li); break;
@@ -782,6 +802,10 @@ void syntax() {
   printf("  or              same as ||\n");
   printf("  not             same as !\n");
   printf("  =               {v} {n} =                   - assign variable v the value n\n");
+  printf("  +=              {v} {n} +=                  - add the value {n} to variable {v}. works for numbers and code fragments\n");
+  printf("  -=              {v} {n} -=                  - subtract {n} from {v}\n");
+  printf("  *=              {v} {n} *=                  - multiply {n} by {v}\n");
+  printf("  /=              {v} {n} /=                  - divide {n} by {v}\n");
   printf("  &=              {v} {o} &=                  - assign variable v to a pointer to o\n");
   printf("  ->              {p} ->                      - dereference the pointer p\n");
   printf("  { ... }                                     - pushes a code fragment on the stack.\n");

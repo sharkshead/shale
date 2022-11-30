@@ -1089,6 +1089,207 @@ OperatorReturn Assign::action(ExecutionEnvironment *ee) {
   return or_continue;
 }
 
+// AssignAdd class
+
+AssignAdd::AssignAdd(LexInfo *li) : Operation(li) { }
+
+OperatorReturn AssignAdd::action(ExecutionEnvironment *ee) {
+  Object *var;
+  Object *val;
+  Number *number;
+  Number *lnumber;
+  String *string;
+  String *lstring;
+  Code *code;
+  Code *lcode;
+  OperationList *ol;
+  OperationListItem *oli;
+  Object *o;
+  Variable *v;
+  bool found;
+
+  val = ee->stack.pop(getLexInfo());
+  var = ee->stack.pop(getLexInfo());
+  found = false;
+
+  // Is this a variable we're assigning?
+  v = ee->variableStack.findVariable(var->getName(getLexInfo(), ee)->getValue());
+  if(v != (Variable *) 0) {
+    try {
+      lnumber = var->getNumber(getLexInfo(), ee);
+      number = val->getNumber(getLexInfo(), ee);
+      if(lnumber->isInt() && number->isInt()) o = ee->cache.newNumber(lnumber->getInt() + number->getInt());
+      else o = ee->cache.newNumber(lnumber->getDouble() + number->getDouble());
+      v->setObject(o);
+      o->release(getLexInfo());
+      number->release(getLexInfo());
+      lnumber->release(getLexInfo());
+      found = true;
+    } catch(Exception *e) { }
+
+    if(! found) {
+      try {
+        lcode = var->getCode(getLexInfo(), ee);
+        code = val->getCode(getLexInfo(), ee);
+
+        ol = new OperationList;
+        for(oli = lcode->getOperationList()->getOperationList(); oli != (OperationListItem *) 0; oli = oli->getNext()) {
+          ol->addOperation(oli->getOperation());
+        }
+        for(oli = code->getOperationList()->getOperationList(); oli != (OperationListItem *) 0; oli = oli->getNext()) {
+          ol->addOperation(oli->getOperation());
+        }
+        v->setObject(new Code(ol, &ee->cache));
+
+        code->release(getLexInfo());
+        lcode->release(getLexInfo());
+        found = true;
+      } catch(Exception *e) { }
+    }
+
+    if(! found) slexception.chuck("Can't do this assignment", getLexInfo());
+  } else {
+    slexception.chuck("Variable not found", getLexInfo());
+  }
+
+  val->release(getLexInfo());
+  var->release(getLexInfo());
+
+  return or_continue;
+}
+
+// AssignSub class
+
+AssignSub::AssignSub(LexInfo *li) : Operation(li) { }
+
+OperatorReturn AssignSub::action(ExecutionEnvironment *ee) {
+  Object *var;
+  Object *val;
+  Number *number;
+  Number *lnumber;
+  Object *o;
+  Variable *v;
+  bool found;
+
+  val = ee->stack.pop(getLexInfo());
+  var = ee->stack.pop(getLexInfo());
+  found = false;
+
+  // Is this a variable we're assigning?
+  v = ee->variableStack.findVariable(var->getName(getLexInfo(), ee)->getValue());
+  if(v != (Variable *) 0) {
+    // Is it a number, string or code
+    try {
+      lnumber = var->getNumber(getLexInfo(), ee);
+      number = val->getNumber(getLexInfo(), ee);
+      if(lnumber->isInt() && number->isInt()) o = ee->cache.newNumber(lnumber->getInt() - number->getInt());
+      else o = ee->cache.newNumber(lnumber->getDouble() - number->getDouble());
+      v->setObject(o);
+      o->release(getLexInfo());
+      number->release(getLexInfo());
+      lnumber->release(getLexInfo());
+      found = true;
+    } catch(Exception *e) { }
+
+    if(! found) slexception.chuck("Can't do this assignment", getLexInfo());
+  } else {
+    slexception.chuck("Variable not found", getLexInfo());
+  }
+
+  val->release(getLexInfo());
+  var->release(getLexInfo());
+
+  return or_continue;
+}
+
+// AssignMul class
+
+AssignMul::AssignMul(LexInfo *li) : Operation(li) { }
+
+OperatorReturn AssignMul::action(ExecutionEnvironment *ee) {
+  Object *var;
+  Object *val;
+  Number *number;
+  Number *lnumber;
+  Object *o;
+  Variable *v;
+  bool found;
+
+  val = ee->stack.pop(getLexInfo());
+  var = ee->stack.pop(getLexInfo());
+  found = false;
+
+  // Is this a variable we're assigning?
+  v = ee->variableStack.findVariable(var->getName(getLexInfo(), ee)->getValue());
+  if(v != (Variable *) 0) {
+    // Is it a number, string or code
+    try {
+      lnumber = var->getNumber(getLexInfo(), ee);
+      number = val->getNumber(getLexInfo(), ee);
+      if(lnumber->isInt() && number->isInt()) o = ee->cache.newNumber(lnumber->getInt() * number->getInt());
+      else o = ee->cache.newNumber(lnumber->getDouble() * number->getDouble());
+      v->setObject(o);
+      o->release(getLexInfo());
+      number->release(getLexInfo());
+      lnumber->release(getLexInfo());
+      found = true;
+    } catch(Exception *e) { }
+
+    if(! found) slexception.chuck("Can't do this assignment", getLexInfo());
+  } else {
+    slexception.chuck("Variable not found", getLexInfo());
+  }
+
+  val->release(getLexInfo());
+  var->release(getLexInfo());
+
+  return or_continue;
+}
+
+// AssignDiv class
+
+AssignDiv::AssignDiv(LexInfo *li) : Operation(li) { }
+
+OperatorReturn AssignDiv::action(ExecutionEnvironment *ee) {
+  Object *var;
+  Object *val;
+  Number *number;
+  Number *lnumber;
+  Object *o;
+  Variable *v;
+  bool found;
+
+  val = ee->stack.pop(getLexInfo());
+  var = ee->stack.pop(getLexInfo());
+  found = false;
+
+  // Is this a variable we're assigning?
+  v = ee->variableStack.findVariable(var->getName(getLexInfo(), ee)->getValue());
+  if(v != (Variable *) 0) {
+    // Is it a number, string or code
+    try {
+      lnumber = var->getNumber(getLexInfo(), ee);
+      number = val->getNumber(getLexInfo(), ee);
+      if(lnumber->isInt() && number->isInt()) o = ee->cache.newNumber(lnumber->getInt() / number->getInt());
+      else o = ee->cache.newNumber(lnumber->getDouble() / number->getDouble());
+      v->setObject(o);
+      o->release(getLexInfo());
+      number->release(getLexInfo());
+      lnumber->release(getLexInfo());
+      found = true;
+    } catch(Exception *e) { }
+
+    if(! found) slexception.chuck("Can't do this assignment", getLexInfo());
+  } else {
+    slexception.chuck("Variable not found", getLexInfo());
+  }
+
+  val->release(getLexInfo());
+  var->release(getLexInfo());
+
+  return or_continue;
+}
+
 // PointerAssign class
 
 PointerAssign::PointerAssign(LexInfo *li) : Operation(li) { }
