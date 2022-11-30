@@ -129,7 +129,13 @@ i println
 
 // (987 will be output). In this case the assignment operator will take
 // the i on the stack as a name, and the j as its value.
-//
+
+// shale also has += -= *= and /= operators that mimic the behaviour of C-like languages.
+
+i 100 =
+i 23 +=
+i println     // 123
+
 // I'll mention pointers here quickly. They are explained in more detail in
 // the pointers example file. To create a pointer you use the pointer assignment
 // operator, and to access the thing pointed to you use the dereference operator.
