@@ -2178,7 +2178,7 @@ OperatorReturn Printf::action(ExecutionEnvironment *ee) {
     if(*p == '%') {
       q = buf;
       *q++ = *p++;
-      while((*p != 0) && (*p != 'c') && (*p != 'd') && (*p != 'f') && (*p != 's') && (*p != 'x') && (*p != 'X') && (*p != 'p') && (*p != 'n') && (*p != '%')) *q++ = *p++;
+      while((*p != 0) && (*p != 'c') && (*p != 'd') && (*p != 'u') && (*p != 'f') && (*p != 's') && (*p != 'x') && (*p != 'X') && (*p != 'p') && (*p != 'n') && (*p != '%')) *q++ = *p++;
       if(*p == 0) slexception.chuck("format error", getLexInfo());
       *q++ = *p;
       *q = 0;
@@ -2195,6 +2195,7 @@ OperatorReturn Printf::action(ExecutionEnvironment *ee) {
             break;
 
           case 'd':
+          case 'u':
           case 'x':
           case 'X':
             q--;

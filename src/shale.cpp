@@ -863,7 +863,7 @@ void syntax() {
   printf("\n");
   printf("Printf and sprintf operators\n");
   printf("  Takes the following %% specifiers and passes them, complete with any field width and decimal place specs, to printf:\n");
-  printf("    %%d %%x %%f %%s %%%%\n");
+  printf("    %%d %%u %%x %%f %%s %%%%\n");
   printf("  Takes %%p to print any object, ala the print keyword.\n");
   printf("  Takes %%n to print the name of a variable.\n");
   printf("  \\n produces a new line, all others are printed as-is\n");
