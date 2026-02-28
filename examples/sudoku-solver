@@ -1864,11 +1864,11 @@ whichSudoku 12 == {
   // killerCage() takes one argument being the sum of the cage. If a cage has no sum given then
   // specify 0 as the sum. Folllowing that you call killerCell() for each cell comprising the cage.
   // For example,
-  //  16 kiilerCage()   4 5 killerCell()    5 4 killerCell()    5 5 killerCell()
+  //  16 killerCage()   4 5 killerCell()    5 4 killerCell()    5 5 killerCell()
   // defines a 3-cell cage which sums to 16. For a cage with no sum given,
-  //  0 killerCage()    5 6 killerCell()    6 5 kiillerCage()   6 6 killerCake()
+  //  0 killerCage()    5 6 killerCell()    6 5 killerCage()   6 6 killerCake()
 
-  // To add an odd or even cells, give the cell coordinates followed by oddCell() or evenCell()
+  // To add odd or even cells, give the cell coordinates followed by oddCell() or evenCell()
   //  5 3 oddCell()
   //  2 5 evenCell()
 
